@@ -1,26 +1,69 @@
 <script setup lang="ts">
-defineProps<{
-  activeBar?: string;
+/*enum RoleOpt{
+  default = "default",
+  admin = "ADMIN",
+  mitra = "MITRA",
+}*/
+type Role = "default" | "admin" | "mitra";
+interface menuItem {
+  title: string;
+  url: string;
+}
+interface menuDetail extends menuItem{
+  child?: menuItem[];
+}
+const menusMitra: menuDetail[] = [
+  { title: "Beranda", url: "/" },
+  { title: "Daftar Survei", url: "/" },
+  { title: "Evaluasi", url: "/evaluasi/carapenilaian", child: [
+    {title: "Cara Penilaian", url: "/evaluasi/carapenilaian"},
+    {title: "Kegiatan", url: "/evaluasi/kegiatan"},
+    {title: "Laporan", url: "/evaluasi/carapenilaian"},
+  ] },
+  { title: "Riwayat Daftar", url: "/" },
+  { title: "Kartu Petugas", url: "/card" },
+];
+const menusAdmin: menuDetail[] = [{ title: "Beranda", url: "/" }];
+// const menusMitra: string[] = ["Beranda", "Daftar Survei", "Evaluasi", "Riwayat Daftar", "Kartu Petugas"];
+const props = defineProps<{
+  activeBar: string;
+  role?: Role;
+  authorized?: boolean;
 }>();
-const menus: string[] = ["Beranda", "Daftar Survei", "Riwayat Daftar", "Kartu Petugas"];
+
+let menus: menuDetail[] = [
+  { title: "Beranda", url: "/" },
+  { title: "Galeri", url: "/" },
+  { title: "Sekilas SOBAT", url: "/" },
+];
+if (props.role === "mitra") {
+  menus = menusMitra;
+} else if (props.role === "admin") {
+  menus = menusAdmin;
+}
 </script>
 
 <template>
-  <div class="navbar flex justify-between my-9 mx-24">
-    <div class="logo-menu flex justify-start items-center">
-      <div class="logo flex justify-start items-center">
-        <img src="/logo.png" alt="logo sobat BPS" class="h-12 w-12" />
-        <h4 class="mx-3"><strong>SOBAT</strong> BPS</h4>
+  <div class="navbar flex my-9 mx-24 justify-between">
+    <div class="logo-menu flex items-center"  :class='props.role === "default" ? "justify-between" : "justify-start"'>
+      <div class="flex justify-start items-center">
+        <NuxtLink to="/" class="logo flex justify-start items-center">
+          <img src="/logo.png" alt="logo sobat BPS" class="h-12 w-12" />
+          <h4 class="mx-3"><strong>SOBAT</strong> BPS</h4>
+        </NuxtLink>
         <h4 class="font-light">|</h4>
       </div>
-      <div class="menu flex justify-start">
-        <div class="mx-3 body1" v-for="menu in menus">
-          <strong v-if="activeBar === menu">{{ menu }}</strong>
-          <span v-else>{{ menu }}</span>
+      <div class="body1 file:menu flex justify-start">
+        <div class=" mx-1" v-for="menu in menus">
+          <!-- <NuxtLink :to="menu.url">
+            <strong v-if="activeBar === menu.title">{{ menu.title }}</strong>
+            <span v-else>{{ menu.title }}</span>
+          </NuxtLink> -->
+          <AppMenuItem :menu="menu" :active="activeBar === menu.title"/>
         </div>
       </div>
     </div>
-    <div class="authorized flex justify-end items-center">
+    <div class="flex justify-end items-center" v-if="authorized">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="{1.5}" stroke="currentColor" class="w-10 h-10">
         <path
           strokeLinecap="round"
@@ -29,6 +72,14 @@ const menus: string[] = ["Beranda", "Daftar Survei", "Riwayat Daftar", "Kartu Pe
         />
       </svg>
       <div class="body1 ms-2">Halo, kakakk</div>
+    </div>
+    <div class="flex justify-end items-center" v-else>
+      <NuxtLink to="/login">
+        <button class=" px-3 py-2 ms-5 rounded-full">Masuk</button>
+      </NuxtLink>
+      <NuxtLink to="/">
+        <button class="bg-slate-200 px-3 py-2 ms-5 rounded-full">Registrasi</button>
+      </NuxtLink>
     </div>
   </div>
 </template>

@@ -1,6 +1,6 @@
 <template>
     <div>
-      <AppHeader />
+      <AppHeader active-bar="Beranda" :authorized="false" role="default" />
       <slot></slot>
       <AppFooter />
     </div>
