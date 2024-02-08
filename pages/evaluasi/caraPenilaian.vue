@@ -1,3 +1,14 @@
+<script setup lang="ts">
+const menuDropdown : string[] = [
+"menu 1",
+"menu 2",
+"menu 3",
+]
+useSeoMeta({
+  title: "Beranda"
+});
+</script>
+
 <template>
   <h3 class="font-bold">Cara Penilaian</h3>
   <section>
@@ -24,14 +35,3 @@
     <AppDropdown :menu-dropdown="menuDropdown" menu-title="Coba2"/>
   </div>
 </template>
-
-<script setup lang="ts">
-const menuDropdown : string[] = [
-"menu 1",
-"menu 2",
-"menu 3",
-]
-definePageMeta({
-  title: "Cara Penilaian",
-});
-</script>

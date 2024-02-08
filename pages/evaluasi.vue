@@ -1,11 +1,9 @@
 <template>
-    <NuxtPage/>
+  <NuxtPage />
 </template>
 
 <script setup lang="ts">
 definePageMeta({
   layout: "mitra",
-  activeBar: "evaluasi",
 });
-
 </script>

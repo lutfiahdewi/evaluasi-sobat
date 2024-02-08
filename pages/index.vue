@@ -10,6 +10,8 @@
 <script setup lang="ts">
 definePageMeta({
   title: "Beranda",
-  
+});
+useSeoMeta({
+  title: "Beranda"
 });
 </script>

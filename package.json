@@ -13,6 +13,7 @@
     "nuxt": "^3.10.0",
     "preline": "^2.0.3",
     "vue": "^3.4.15",
+    "vue-good-table-next": "^0.2.1",
     "vue-router": "^4.2.5"
   },
   "devDependencies": {

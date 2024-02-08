@@ -2,14 +2,14 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
   typescript: {
-    strict: true
+    strict: true,
   },
-  css: ['~/assets/css/main.css'],
+  css: ["~/assets/css/main.css"],
   postcss: {
     plugins: {
       tailwindcss: {},
       autoprefixer: {},
     },
   },
-  plugins: ["~/plugins/preline.client.ts"],
-})
+  plugins: ["~/plugins/preline.client.ts", { src: "~/plugins/vue-good-table-next.js", ssr: false }],
+});

@@ -1,18 +1,14 @@
-<template>
-  <div>
-    <!-- <NuxtWelcome /> -->
-    <NuxtLayout>
-      <NuxtPage />
-    </NuxtLayout>
-  </div>
-</template>
-
 <script setup lang="ts">
 const route = useRoute();
 const counter : Ref = ref(0);
+
 useHead({
-  title: `${route.meta.title} - Evaluasi SOBAT Mitra`,
-  meta: [{ name: "description", content: "My amazing site." }],
+  titleTemplate: (titleChild) => {
+    return titleChild
+      ? `${titleChild} - Evaluasi SOBAT Mitra`
+      : 'Evaluasi SOBAT Mitra'
+  },
+  meta: [{ name: "description", content: "An unnofficial part of SOBAT BPS for performance assessment." }],
   bodyAttrs: {
     class: "test",
   },
@@ -23,4 +19,14 @@ onUpdated(() => {
   counter.value++;
   console.log("Mounted ke: ");
 })
+
 </script>
+
+<template>
+  <div>
+    <!-- <NuxtWelcome /> -->
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
+  </div>
+</template>
