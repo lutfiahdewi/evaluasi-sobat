@@ -4,10 +4,10 @@ useSeoMeta({
 });
 const authorizedRole = useCookie("authorizedRole");
 if (!authorizedRole.value) {
-  authorizedRole = "default";
+  authorizedRole.value = "default";
 }
 definePageMeta({
-  layout: authorizedRole,
+  layout: authorizedRole.value,
 });
 const activeBar = useCookie("activeBar");
 activeBar.value = "Beranda";
