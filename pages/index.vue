@@ -1,17 +1,27 @@
-<template>
-  <div>
-    <section class="mx-24">
-      <h1>Welcome to the homepage</h1>
-      Tulis sesuatu disini
-    </section>
-  </div>
-</template>
-
-<script setup lang="ts">
+<script setup>
 definePageMeta({
-  title: "Beranda",
+  layout: false,
 });
 useSeoMeta({
-  title: "Beranda"
+  title: "Beranda",
 });
+const authorizedRole = useCookie("authorizedRole");
+const activeBar = useCookie('activeBar');
+activeBar.value = 'Beranda'
 </script>
+
+<template>
+  <NuxtLayout :name="authorizedRole">
+    <section>
+      <h1>Welcome to the homepage</h1>
+      Tulis sesuatu disini
+      <div class="my-96"></div>
+    </section>
+    <section id="galeri">
+      <h3>Galeri</h3>
+    </section>
+    <section id="sekilas">
+      <h4>Sekilas tentang SOBAT</h4>
+    </section>
+  </NuxtLayout>
+</template>

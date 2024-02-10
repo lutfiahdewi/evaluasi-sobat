@@ -1,11 +1,6 @@
 <script setup lang="ts">
-const menuDropdown : string[] = [
-"menu 1",
-"menu 2",
-"menu 3",
-]
 useSeoMeta({
-  title: "Beranda"
+  title: "Cara Penilaian"
 });
 </script>
 
@@ -31,7 +26,4 @@ useSeoMeta({
     <h6>Filter</h6>
     Tabel...
   </section>
-  <div class="m-6">
-    <AppDropdown :menu-dropdown="menuDropdown" menu-title="Coba2"/>
-  </div>
 </template>

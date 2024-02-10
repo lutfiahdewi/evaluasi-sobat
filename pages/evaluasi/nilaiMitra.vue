@@ -1,7 +1,4 @@
 <script setup lang="ts">
-definePageMeta({
-  title: "Nilai Mitra",
-});
 useSeoMeta({
   title: "Nilai Mitra",
 });

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 definePageMeta({
-  layout: "mitra",
+  layout: "admin",
 });
 const activeBar = useCookie('activeBar');
-activeBar.value = 'Evaluasi'
+activeBar.value = 'Rekrutmen'
 </script>
 
 <template>

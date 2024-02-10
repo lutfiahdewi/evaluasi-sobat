@@ -17,15 +17,22 @@ the main menu using AppMenuItem component
 
 <template>
     <div class="dropdown">
-        {{ menuTitle }}
-        <div class="dropdown-content bg-gray p-3 mt-2 rounded min-w-36 max-w-56 shadow-md">
-            <div class="p-2 rounded-lg hover:bg-white" v-for="listMenu in menuDropdown">{{ listMenu }}</div>
+        <slot/>
+        <div class="dropdown-content bg-gray p-3 rounded min-w-36 max-w-56 shadow-md">
+            <div class="p-2 rounded-lg hover:bg-white" v-for="listMenu in menuDropdown">
+                <NuxtLink :to="listMenu.url">
+                    {{ listMenu.title }}
+                </NuxtLink>
+            </div>
         </div>
     </div>
 </template>
 <script setup lang="ts">
+interface menuItem {
+  title: string;
+  url: string;
+}
     defineProps<{
-    menuTitle?: string,
-    menuDropdown?: string[]
+    menuDropdown?: menuItem[]
 }>();
 </script>

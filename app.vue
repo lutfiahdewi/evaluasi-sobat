@@ -1,7 +1,4 @@
 <script setup lang="ts">
-const route = useRoute();
-const counter : Ref = ref(0);
-
 useHead({
   titleTemplate: (titleChild) => {
     return titleChild
@@ -15,6 +12,7 @@ useHead({
   script: [{ innerHTML: "console.log('Rendered!')" }],
 });
 
+const counter : Ref = ref(0);
 onUpdated(() => {
   counter.value++;
   console.log("Mounted ke: ");

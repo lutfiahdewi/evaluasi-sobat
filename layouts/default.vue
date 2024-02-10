@@ -1,8 +1,9 @@
 <template>
-    <div>
-      <AppHeader active-bar="Beranda" :authorized="false" role="default" />
-      <slot></slot>
-      <AppFooter />
+  <div>
+    <AppHeader active-bar="Beranda" :authorized="false" role="default" />
+    <div class="mx-24">
+      <slot />
     </div>
-  </template>
-  
+    <AppFooter />
+  </div>
+</template>

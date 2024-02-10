@@ -2,16 +2,17 @@
 defineProps<{
   activeBar?: string;
 }>();
-let activeBar = "Evaluasi";
-
+definePageMeta({
+  // middleware: 'auth'
+})
 </script>
 
 <template>
-  <div>
-    <AppHeader role="mitra" :authorized="true" :active-bar="activeBar"/>
+
+    <AppHeader role="mitra" :authorized="true" active-bar="Beranda"/>
     <div class="mx-24">
       <slot />
     </div>
     <AppFooter />
-  </div>
+
 </template>
