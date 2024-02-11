@@ -1,3 +1,16 @@
+<script setup lang="ts">
+const indicators = [
+  { id: 123, name: "indikator 1" },
+  { id: 121, name: "indikator 2" },
+  { id: 122, name: "indikator 3" },
+  { id: 124, name: "indikator 4" },
+];
+defineProps<{
+  name: string,
+  detail: string,
+}>()
+</script>
+
 <template>
   <div class="grid grid-cols-3 gap-3 bg-white hover:bg-slate-50 p-4 rounded-lg mb-3">
     <div class="user logo flex items-center">
@@ -27,15 +40,3 @@
   </div>
 </template>
 
-<script setup lang="ts">
-const indicators = [
-  { id: 123, name: "indikator 1" },
-  { id: 121, name: "indikator 2" },
-  { id: 122, name: "indikator 3" },
-  { id: 124, name: "indikator 4" },
-];
-defineProps<{
-  name: string,
-  detail: string,
-}>()
-</script>

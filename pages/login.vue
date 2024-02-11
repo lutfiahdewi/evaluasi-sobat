@@ -64,7 +64,8 @@ function validateUser(user: User): Role {
   <div>
     <div class="flex justify-center">
       <div class="w-fit bg-orange_1/25 border border-slate-500 flex rounded-xl">
-        <img src="https://cdn-icons-png.flaticon.com/512/7264/7264636.png" alt="" class="max-w-64" />
+        <!-- <img src="https://cdn-icons-png.flaticon.com/512/7264/7264636.png" alt="" class="max-w-64" /> -->
+        <img src="~/assets/img/Bung itung.png" alt="" class="max-w-64" />
         <div class="min-w-96 shadow-inner bg-white rounded-xl p-6">
           <div class="border-b border-slate-500 mx-2 text-center">Login Pengguna</div>
           <form action="" class="my-5">
@@ -94,3 +95,11 @@ function validateUser(user: User): Role {
     </div>
   </div>
 </template>
+
+<style scoped>
+img{
+  position: relative;
+  top: -75x;
+  left: -25px;
+}
+</style>

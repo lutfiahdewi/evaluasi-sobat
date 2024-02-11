@@ -1,21 +1,3 @@
-<style scoped>
-.dropdown-content {
-  display: none;
-  position: absolute;
-  z-index: 1;
-}
-
-.dropdown:hover + .dropdown-content {
-  display: block;
-}
-.dropdown-content:hover {
-  display: block;
-}
-.show {
-  display: block;
-}
-</style>
-
 <script setup lang="ts">
 interface menuItem {
   title: string;
@@ -38,7 +20,7 @@ function showDropdown() {
 
 <template>
   <NuxtLink :to="!Array.isArray(menu.child) ? menu.url : ''" :class="menu.child && 'dropdown'">
-    <button class="p-2 mx-1 rounded-lg hover:bg-slate-200" @click="showDropdown" :class="{ 'bg-slate-200': clicked }">
+    <button class="p-2 mx-1 rounded-lg hover:bg-slate-200" @click="showDropdown" :class="{ 'bg-slate-200': (clicked && menu.child)}">
       <strong v-if="active">{{ menu.title }}</strong>
       <span v-else>{{ menu.title }}</span>
     </button>
@@ -52,3 +34,21 @@ function showDropdown() {
     </NuxtLink>
   </div>
 </template>
+
+<style scoped>
+.dropdown-content {
+  display: none;
+  position: absolute;
+  z-index: 1;
+}
+
+.dropdown:hover + .dropdown-content {
+  display: block;
+}
+.dropdown-content:hover {
+  display: block;
+}
+.show {
+  display: block;
+}
+</style>

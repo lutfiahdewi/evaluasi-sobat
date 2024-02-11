@@ -1,11 +1,4 @@
-<template>
-    <div>
-      <vue-good-table
-        :columns="columns"
-        :rows="rows"/>
-    </div>
-  </template>
-  
+
   <script>
   export default {
     name: 'my-component',
@@ -46,3 +39,11 @@
     },
   };
   </script>
+
+<template>
+  <div>
+    <vue-good-table
+      :columns="columns"
+      :rows="rows"/>
+  </div>
+</template>

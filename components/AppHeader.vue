@@ -40,7 +40,7 @@ const menusAdmin: menuDetail[] = [
     child: [
       { title: "Kelola Pengguna", url: "/" },
       { title: "Kelola Organisasi", url: "/" },
-      { title: "Kelola Indikator", url: "/" },
+      { title: "Kelola Indikator", url: "/Pengaturan/KelolaIndikator" },
     ],
   },
 ];

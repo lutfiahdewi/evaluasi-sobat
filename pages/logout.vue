@@ -1,7 +1,12 @@
 <script setup lang="ts">
-const authorizedRole = useCookie<string>("authorizedRole");
+definePageMeta({
+  layout: false,
+});
+const authorizedRole = useCookie("authorizedRole");
     authorizedRole.value = 'default';
     reloadNuxtApp({path: '/'});
 </script>
 
-<template></template>
+<template>
+    Logging you out...
+</template>
