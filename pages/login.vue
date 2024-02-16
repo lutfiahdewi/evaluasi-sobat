@@ -46,7 +46,7 @@ function submitForm() {
 }
 
 const isFormInvalid = computed(() => {
-  return !username || password.value.length < 8;
+  return (username.value.length < 1 || password.value.length < 8);
 });
 
 function validateUser(user: User): Role {
@@ -65,10 +65,12 @@ function validateUser(user: User): Role {
     <div class="flex justify-center">
       <div class="w-fit bg-orange_1/25 border border-slate-500 flex rounded-xl">
         <!-- <img src="https://cdn-icons-png.flaticon.com/512/7264/7264636.png" alt="" class="max-w-64" /> -->
-        <img src="~/assets/img/Bung itung.png" alt="" class="max-w-64" />
+        <div class="relative w-72">
+          <img src="~/assets/img/Bung itung - fit.png" alt="" class="absolute -left-20 bottom-0 min-w-96" />
+        </div>
         <div class="min-w-96 shadow-inner bg-white rounded-xl p-6">
-          <div class="border-b border-slate-500 mx-2 text-center">Login Pengguna</div>
-          <form action="" class="my-5">
+          <div class="border-b border-slate-500 mx-2 text-center text-xl">Login Pengguna</div>
+          <form action="" class="my-6">
             <label for="input-label" class="block text-sm font-medium mb-2">Username/Email</label>
             <input
               v-model="username"
@@ -86,20 +88,14 @@ function validateUser(user: User): Role {
               placeholder="Masukkan password"
               @keypress.enter="submitForm"
             />
-            <button class="w-full py-2 mt-1 bg-slate-400 rounded-lg" @click.prevent="submitForm" :disabled="isFormInvalid">Login</button>
+            <button class="w-full py-2 mt-1 bg-slate-300 rounded-lg disabled:bg-slate-200 disabled:text-slate-400" @click.prevent="submitForm" :disabled="isFormInvalid">Login</button>
           </form>
-          atau
+          <div class="flex justify-center mb-3">
+            <span class="">atau</span>
+            </div>
           <button class="w-full py-2 bg-green-500 rounded-lg body1">Login SSO Eksternal BPS</button>
         </div>
       </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-img{
-  position: relative;
-  top: -75x;
-  left: -25px;
-}
-</style>

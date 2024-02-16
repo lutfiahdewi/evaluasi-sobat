@@ -9,7 +9,7 @@ interface menuDetail extends menuItem {
 }
 const menusMitra: menuDetail[] = [
   { title: "Beranda", url: "/" },
-  { title: "Daftar Survei", url: "/" },
+  { title: "Daftar Survei", url: "" },
   {
     title: "Evaluasi",
     url: "/evaluasi/carapenilaian",
@@ -21,19 +21,19 @@ const menusMitra: menuDetail[] = [
     ],
   },
   { title: "Riwayat Daftar", url: "/riwayatdaftar" },
-  { title: "Kartu Petugas", url: "/card" },
+  { title: "Kartu Petugas", url: "" },
 ];
 const menusAdmin: menuDetail[] = [
   { title: "Beranda", url: "/" },
-  { title: "Kegiatan", url: "/" },
+  { title: "Kegiatan", url: "" },
   { title: "Rekrutmen", url: "" ,child: [
       { title: "Seleksi Petugas", url: "/" },
       { title: "Petugas Organik", url: "/" },
       { title: "Kelola Akun Petugas", url: "/" },
       { title: "Daftar Peringkat", url: "/rekrutmen/peringkat" },
     ],},
-  { title: "Penugasan", url: "/" },
-  { title: "Master", url: "/" },
+  { title: "Penugasan", url: "" },
+  { title: "Master", url: "" },
   {
     title: "Pengaturan",
     url: "/",

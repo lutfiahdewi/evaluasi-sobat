@@ -13,8 +13,15 @@ const dataColumn = [
     <NuxtLink to="/pengaturan/tambahIndikator" class="mb-3">
       <BaseButtonMode shape="square" mode="normal"> (+) Tambah Indikator </BaseButtonMode>
     </NuxtLink>
-    <div>
-      <vue-good-table :columns="dataColumn" :rows="data.indikator" />
+    <div class="my-6">
+      <vue-good-table
+        :columns="dataColumn"
+        :rows="data.indikator"
+        :search-options="{
+          enabled: true,
+          placeholder: 'Cari...',
+        }"
+      />
     </div>
   </section>
 </template>

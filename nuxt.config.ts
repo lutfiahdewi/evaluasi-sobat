@@ -1,5 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  hooks: {},
   devtools: { enabled: true },
   typescript: {
     strict: true,
@@ -12,4 +13,12 @@ export default defineNuxtConfig({
     },
   },
   plugins: ["~/plugins/preline.client.ts", { src: "~/plugins/vue-good-table-next.js", ssr: false }],
+  modules: ['@nuxtjs/apollo'],
+  apollo: {
+    clients: {
+      default: {
+        httpEndpoint: 'https://swapi-graphql.netlify.app/.netlify/functions/index'
+      }
+    },
+  },
 });

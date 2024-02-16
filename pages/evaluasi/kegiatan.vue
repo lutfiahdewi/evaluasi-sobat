@@ -2,6 +2,7 @@
 useHead({
   title: "Kegiatan",
 });
+
 </script>
 
 <template>
