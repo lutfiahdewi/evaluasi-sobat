@@ -5,6 +5,7 @@
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
+    "host": "nuxt dev --host",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
@@ -12,6 +13,7 @@
   "dependencies": {
     "@apollo/client": "^3.9.4",
     "@vue/apollo-composable": "^4.0.1",
+    "@vueuse/components": "^10.7.2",
     "graphql": "^16.8.1",
     "graphql-tag": "^2.12.6",
     "nuxt": "^3.10.0",
@@ -23,6 +25,8 @@
   "devDependencies": {
     "@nuxtjs/apollo": "^5.0.0-alpha.11",
     "@tailwindcss/forms": "^0.5.7",
+    "@vueuse/core": "^10.7.2",
+    "@vueuse/nuxt": "^10.7.2",
     "autoprefixer": "^10.4.17",
     "postcss": "^8.4.33",
     "tailwindcss": "^3.4.1",

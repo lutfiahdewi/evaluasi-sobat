@@ -2,7 +2,7 @@
 module.exports = {
     client: {
       service: {
-        name: 'my-app',
+        name: 'my-app',//
         // URL to the GraphQL API
         url: 'https://swapi-graphql.netlify.app/.netlify/functions/index',
       },

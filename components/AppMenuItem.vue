@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { vOnClickOutside } from "@vueuse/components";
+
 interface menuItem {
   title: string;
   url: string;
@@ -20,14 +22,14 @@ function showDropdown() {
 
 <template>
   <NuxtLink :to="!Array.isArray(menu.child) ? menu.url : ''" :class="menu.child && 'dropdown'">
-    <button class="p-2 mx-1 rounded-lg hover:bg-slate-200" @click="showDropdown" :class="{ 'bg-slate-200': (clicked && menu.child)}">
+    <button class="p-2 mx-1 rounded-lg hover:bg-slate-200" @click="showDropdown" :class="{ 'bg-slate-200': clicked && menu.child }">
       <strong v-if="active">{{ menu.title }}</strong>
       <span v-else>{{ menu.title }}</span>
     </button>
   </NuxtLink>
-  <div v-if="menu.child" class="dropdown-content bg-gray p-3 mt-1 rounded min-w-36 max-w-56 shadow-md" :class="{ show: clicked }">
-    <NuxtLink :to="childMenu.url" v-for="childMenu in menu.child">
-      <div class="p-2 mb-1 rounded-lg hover:bg-white" >
+  <div v-if="menu.child"  class="dropdown-content bg-gray p-3 mt-1 rounded min-w-36 max-w-56 shadow-md" :class="{ show: clicked }">
+    <NuxtLink :to="childMenu.url" v-for="childMenu in menu.child" :key="childMenu.title.toString">
+      <div class="p-2 mb-1 rounded-lg hover:bg-white">
         <strong v-if="childMenu.title === 'Cara Penilaian'">{{ childMenu.title }}</strong>
         <span v-else>{{ childMenu.title }}</span>
       </div>

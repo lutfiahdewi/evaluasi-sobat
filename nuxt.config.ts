@@ -13,7 +13,7 @@ export default defineNuxtConfig({
     },
   },
   plugins: ["~/plugins/preline.client.ts", { src: "~/plugins/vue-good-table-next.js", ssr: false }],
-  modules: ['@nuxtjs/apollo'],
+  modules: ['@nuxtjs/apollo', '@vueuse/nuxt'],
   apollo: {
     clients: {
       default: {

@@ -65,7 +65,7 @@ function validateUser(user: User): Role {
     <div class="w-fit bg-orange_1/25 border border-slate-500 flex rounded-xl">
       <!-- <img src="https://cdn-icons-png.flaticon.com/512/7264/7264636.png" alt="" class="max-w-64" /> -->
       <div class="relative w-72 hidden sm:inline">
-        <img src="~/assets/img/Bung itung - fit.png" alt="" class="absolute -left-20 bottom-0 min-w-96" />
+        <img src="~/assets/img/Bung itung - fit.png" alt="" class="absolute -left-20 bottom-0 z-10 min-w-96" />
       </div>
       <div class="min-w-96 shadow-inner bg-white rounded-xl p-6">
         <div class="border-b border-slate-500 mx-2 text-center text-xl">Login Pengguna</div>

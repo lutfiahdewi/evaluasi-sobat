@@ -1,9 +1,16 @@
+<script setup lang="ts">
+const menu = [
+  { title: "Beranda", url: "/" },
+  { title: "Galeri", url: "#galeri" },
+  { title: "Sekilas SOBAT", url: "/#sekilas" },
+];
+</script>
 <template>
-  <div>
-    <AppHeader active-bar="Beranda" :authorized="false" role="default" />
-    <div class="mx-24">
+  <div class="min-h-screen flex flex-col">
+    <AppHeader active-bar="Beranda" :authorized="false" :menus="menu" />
+    <div class="border border-violet-500 grow pb-6 mx-3 sm:mx-12 lg:mx-24">
       <slot />
     </div>
-    <AppFooter />
+    <AppFooter class=""/>
   </div>
 </template>

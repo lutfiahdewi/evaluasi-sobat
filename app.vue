@@ -9,7 +9,8 @@ useHead({
   bodyAttrs: {
     class: "test",
   },
-  script: [{ innerHTML: "console.log('Rendered!')" }],
+  link:[{rel:"icon", type:"image/png", href:"/logo.png"}],
+  script: [{ innerHTML: "console.log('Main app rendered!')" }],
 });
 
 const counter : Ref = ref(0);

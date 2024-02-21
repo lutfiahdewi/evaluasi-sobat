@@ -1,10 +1,37 @@
 <script setup lang="ts">
+const menuAdmin = [
+  { title: "Beranda", url: "/" },
+  { title: "Kegiatan", url: "" },
+  {
+    title: "Rekrutmen",
+    url: "",
+    child: [
+      { title: "Seleksi Petugas", url: "/" },
+      { title: "Petugas Organik", url: "/" },
+      { title: "Kelola Akun Petugas", url: "/" },
+      { title: "Daftar Peringkat", url: "/rekrutmen/peringkat" },
+    ],
+  },
+  { title: "Penugasan", url: "" },
+  { title: "Master", url: "" },
+  {
+    title: "Pengaturan",
+    url: "/",
+    child: [
+      { title: "Kelola Pengguna", url: "/" },
+      { title: "Kelola Organisasi", url: "/" },
+      { title: "Kelola Indikator", url: "/Pengaturan/KelolaIndikator" },
+    ],
+  },
+];
 </script>
 
 <template>
-    <AppHeader role="admin" :authorized="true" active-bar="Beranda"/>
-    <div class="mx-24">
+  <div class="min-h-screen flex flex-col">
+    <AppHeader role="admin" :authorized="true" active-bar="Beranda" :menus="menuAdmin" />
+    <div class="grow pb-6 mx-3 sm:mx-12 lg:mx-24">
       <slot />
     </div>
     <AppFooter />
+  </div>
 </template>
