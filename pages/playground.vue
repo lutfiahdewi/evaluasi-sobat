@@ -1,6 +1,8 @@
 <script lang="ts" setup>
+import type { StepProgress } from '#build/components';
+
 definePageMeta({
-  layout: 'default',
+  layout: "default",
 });
 const query = gql`
   query Query {
@@ -63,16 +65,32 @@ const menuMitra = [
   { title: "Riwayat Daftar", url: "/riwayatdaftar" },
   { title: "Kartu Petugas", url: "" },
 ];
+
+const dataProgress = {
+  steps: ["Step 1", "Step 2", "Step 3", "Step 4"],
+  currentStep: 0,
+  activeColor: "bg-green-600",
+  passiveColor: "bg-green-400",
+};
+const step=ref<InstanceType<typeof StepProgress> | null>(null);
 </script>
 
 <template>
-  <div class="px-6 sm:px-24 py-3 sm:py-12">
-    <section class="px-3 sm:px-12 mb-6">
-      <p>There are {{ data?.allFilms?.films?.length || 0 }} film.</p>
-      <p>The type of the data is: {{ typeof data?.allFilms?.films }}</p>
-      <vue-good-table :columns="dataColumn" :rows="dataFilms2" class="my-9" v-if="dataFilms2" />
-      <span v-else>Loading...</span>
-    </section>
-    <AppDropdownMobile :menu="menuMitra" :active="true"/>
-  </div>
+  <section class="mb-6">
+    <h5>Query gql example</h5>
+    <p>There are {{ data?.allFilms?.films?.length || 0 }} film.</p>
+    <p>The type of the data is: {{ typeof data?.allFilms?.films }}</p>
+    <vue-good-table :columns="dataColumn" :rows="dataFilms2" class="my-9" v-if="dataFilms2" />
+    <span v-else>Loading...</span>
+  </section>
+
+  <section class="border border-red-500">
+    <h5>Multi step progress</h5>
+    <StepProgress :dataMain="dataProgress" ref="step" />
+    <div>
+      <button @click="step?.previousStep()" class="px-3 py-2 bg-slate-300 rounded me-3">Previous Step</button>
+      <button @click="step?.nextStep()" class="px-3 py-2 bg-slate-300 rounded me-3">Next Step</button>
+    </div>
+  </section>
+  <AppDropdownMobile :menu="menuMitra" :active="true" />
 </template>

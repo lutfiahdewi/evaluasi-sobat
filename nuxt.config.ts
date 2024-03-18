@@ -3,6 +3,7 @@ export default defineNuxtConfig({
   hooks: {},
   devtools: { enabled: true },
   typescript: {
+    // typeCheck: true,
     strict: true,
   },
   css: ["~/assets/css/main.css"],
@@ -12,8 +13,11 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
+  image: {
+    dir: 'assets/img'
+  },
   plugins: ["~/plugins/preline.client.ts", { src: "~/plugins/vue-good-table-next.js", ssr: false }],
-  modules: ['@nuxtjs/apollo', '@vueuse/nuxt'],
+  modules: ['@nuxtjs/apollo', '@vueuse/nuxt', "@nuxt/image"],
   apollo: {
     clients: {
       default: {

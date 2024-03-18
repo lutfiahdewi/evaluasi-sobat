@@ -13,10 +13,10 @@ let password = ref("");
 const authorizedRole = useCookie<Role>("authorizedRole");
 
 if (authorizedRole.value !== "default") {
-  if (typeof window !== "undefined") {
+  /*if (typeof window !== "undefined") {
     window.alert("Already logged! \nPlease log out first!");
-  }
-  navigateTo({ path: "/" });
+  }*/
+  reloadNuxtApp({ path: "/beranda" });
 }
 
 function submitForm() {
@@ -29,17 +29,12 @@ function submitForm() {
     password: password.value,
   };
   const role: Role = validateUser(newUser);
-  console.log(role);
   if (role === "mitra") {
-    // isAuthorized.value = true;
     authorizedRole.value = role;
-    return reloadNuxtApp({ path: "/evaluasi/carapenilaian" });
-    // return navigateTo("/");
+    return reloadNuxtApp({ path: "/beranda" });
   } else if (role === "admin") {
-    // isAuthorized.value = true;
     authorizedRole.value = role;
-    // return useRouter().push({ path: "/" }); //still not reloading too
-    return reloadNuxtApp({ path: "/rekrutmen/peringkat" });
+    return reloadNuxtApp({ path: "/beranda" });
   }
   password.value = "";
   return;

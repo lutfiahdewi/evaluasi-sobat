@@ -1,14 +1,22 @@
 <script setup lang="ts">
 const menuAdmin = [
-  { title: "Beranda", url: "/" },
-  { title: "Kegiatan", url: "" },
+  { title: "Beranda", url: "/beranda" },
+  {
+    title: "Kegiatan",
+    url: "",
+    child: [
+      { title: "Kelola Survei", url: "/kegiatan/kelolaSurvei" },
+      { title: "Kelola Rekrutmen", url: "" },
+      { title: "Kelola Kartu Petugas", url: "" },
+    ],
+  },
   {
     title: "Rekrutmen",
     url: "",
     child: [
-      { title: "Seleksi Petugas", url: "/" },
-      { title: "Petugas Organik", url: "/" },
-      { title: "Kelola Akun Petugas", url: "/" },
+      { title: "Seleksi Petugas", url: "" },
+      { title: "Petugas Organik", url: "" },
+      { title: "Kelola Akun Petugas", url: "#" },
       { title: "Daftar Peringkat", url: "/rekrutmen/peringkat" },
     ],
   },
@@ -16,10 +24,10 @@ const menuAdmin = [
   { title: "Master", url: "" },
   {
     title: "Pengaturan",
-    url: "/",
+    url: "",
     child: [
-      { title: "Kelola Pengguna", url: "/" },
-      { title: "Kelola Organisasi", url: "/" },
+      { title: "Kelola Pengguna", url: "" },
+      { title: "Kelola Organisasi", url: "" },
       { title: "Kelola Indikator", url: "/Pengaturan/KelolaIndikator" },
     ],
   },

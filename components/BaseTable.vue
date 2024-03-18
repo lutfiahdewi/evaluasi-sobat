@@ -1,49 +1,62 @@
-
-  <script>
-  export default {
-    name: 'my-component',
-    data(){
-      return {
-        columns: [
-          {
-            label: 'Name',
-            field: 'name',
-          },
-          {
-            label: 'Age',
-            field: 'age',
-            type: 'number',
-          },
-          {
-            label: 'Created On',
-            field: 'createdAt',
-            type: 'date',
-            dateInputFormat: 'yyyy-MM-dd',
-            dateOutputFormat: 'MMM do yy',
-          },
-          {
-            label: 'Percent',
-            field: 'score',
-            type: 'percentage',
-          },
-        ],
-        rows: [
-          { id:1, name:"John", age: 20, createdAt: '',score: 0.03343 },
-          { id:2, name:"Jane", age: 24, createdAt: '2011-10-31', score: 0.03343 },
-          { id:3, name:"Susan", age: 16, createdAt: '2011-10-30', score: 0.03343 },
-          { id:4, name:"Chris", age: 55, createdAt: '2011-10-11', score: 0.03343 },
-          { id:5, name:"Dan", age: 40, createdAt: '2011-10-21', score: 0.03343 },
-          { id:6, name:"John", age: 20, createdAt: '2011-10-31', score: 0.03343 },
-        ],
-      };
-    },
-  };
-  </script>
+<script setup lang="ts">
+const columns= [
+  {
+    label: "Nama Survei",
+    field: "survei",
+  },
+  {
+    label: "Kegiatan",
+    field: "kegiatan",
+  },
+  {
+    label: "Tanggal Pelaksanaan",
+    field: "tanggal",
+    type: "date",
+    dateInputFormat: "yyyy-MM-dd",
+    dateOutputFormat: "dd MMM yyyy",
+  },
+  {
+    label: "Status Kegiatan",
+    field: "status",
+  },
+  {
+    label: "Status Persetujuan",
+    field: "persetujuan",
+  },
+]
+const rows= [
+  { id: 1, survei: "Sensus Penduduk 2020", kegiatan: "Lapangan", tanggal: "2020-01-12", status:3 , persetujuan:3 },
+  { id: 1, survei: "Sensus Penduduk 2020", kegiatan: "Lapangan", tanggal: "2020-01-12", status:2 , persetujuan:2 },
+  { id: 4, survei: "SAKERNAS 2021", kegiatan: "Lapangan", tanggal: "2021-01-12", status:1 , persetujuan:1 },
+  { id: 5, survei: "Survei 2022", kegiatan: "Lapangan", tanggal: "2022-02-12", status:1 , persetujuan:0 },
+  { id: 3, survei: "SUSENAS 2022", kegiatan: "Lapangan", tanggal: "2022-08-17", status:1 , persetujuan:2 },
+  { id: 2, survei: "Sensus Pertanian 2023", kegiatan: "Lapangan", tanggal: "2022-01-12", status:0 , persetujuan:0 },
+]
+</script>
 
 <template>
   <div>
     <vue-good-table
       :columns="columns"
-      :rows="rows"/>
+      :rows="rows"
+      :sort-options="{
+        enabled: true,
+        initialSortBy: { field: 'tanggal', type: 'asc' },
+      }"
+    >
+      <template #table-row="props">
+        <span v-if="props.column.field == 'status'">
+          <ButtonKegiatan :status="props.row.status" />
+          {{ props.row.status }}
+        </span>
+        <span v-else-if="props.column.field == 'persetujuan'">
+          <ButtonPersetujuan :status="props.row.persetujuan" />
+          {{ props.row.persetujuan }}
+        </span>
+        <span v-else>
+          {{ props.formattedRow[props.column.field] }}
+        </span>
+      </template>
+    </vue-good-table>
   </div>
 </template>

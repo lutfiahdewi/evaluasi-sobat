@@ -1,5 +1,5 @@
 <template>
-  <button :class="defineClass(mode, shape)+$props.class" class="body2 font-medium" >
+  <button :class="defineClass(mode, shape, notActive) + $props.class" class="body2 font-medium" :disabled="$props.notActive">
     <slot />
   </button>
 </template>
@@ -10,13 +10,14 @@ type Shape = "square" | "pill";
 defineProps<{
   mode: Mode; //default = normal
   shape: Shape; //default = square
+  notActive?: boolean;
 }>();
 
-function defineClass(mode: Mode, shape: Shape) {
+function defineClass(mode: Mode, shape: Shape, notActive?: boolean) {
   let classCombine = "";
   switch (mode.toLowerCase()) {
     case "gray":
-      classCombine += "bg-slate-200 text-slate-600 hover:bg-slate-300 ";
+      classCombine += "bg-slate-200 text-slate-600 font-semibold hover:bg-slate-100 ";
       break;
     case "outlined":
       classCombine += "text-slate-600 border border-slate-600 bg-white hover:bg-slate-100 ";
@@ -26,9 +27,12 @@ function defineClass(mode: Mode, shape: Shape) {
       break;
   }
   if (shape.toLowerCase() === "pill") {
-    classCombine += "px-4 py-2 rounded-full ";
+    classCombine += " px-4 py-2 rounded-full ";
   } else {
-    classCombine += "px-3 py-2 rounded-md ";
+    classCombine += " px-3 py-2 rounded-md ";
+  }
+  if (notActive) {
+    classCombine += " disabled:opacity-50 disabled:pointer-events-none ";
   }
   return classCombine;
 }

@@ -30,7 +30,7 @@ function showDropdown() {
   <div v-if="menu.child"  class="dropdown-content bg-gray p-3 mt-1 rounded min-w-36 max-w-56 shadow-md" :class="{ show: clicked }">
     <NuxtLink :to="childMenu.url" v-for="childMenu in menu.child" :key="childMenu.title.toString">
       <div class="p-2 mb-1 rounded-lg hover:bg-white">
-        <strong v-if="childMenu.title === 'Cara Penilaian'">{{ childMenu.title }}</strong>
+        <strong v-if="childMenu.title === 'Cara'">{{ childMenu.title }}</strong>
         <span v-else>{{ childMenu.title }}</span>
       </div>
     </NuxtLink>

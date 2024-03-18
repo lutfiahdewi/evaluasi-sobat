@@ -14,8 +14,8 @@ const menuMitra = [
     child: [
       { title: "Cara Penilaian", url: "/evaluasi/carapenilaian" },
       { title: "Kegiatan", url: "/evaluasi/kegiatan" },
-      { title: "Nilai Mitra", url: "/evaluasi/nilaimitra" },
-      { title: "Laporan", url: "/evaluasi/carapenilaian" },
+      // { title: "Nilai Mitra", url: "/evaluasi/nilaimitra" },
+      // { title: "Laporan", url: "/evaluasi/carapenilaian" },
     ],
   },
   { title: "Riwayat Daftar", url: "/riwayatdaftar" },

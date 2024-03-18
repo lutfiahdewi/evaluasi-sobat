@@ -12,14 +12,14 @@ const props = defineProps<{
   menus: menuDetail[];
 }>();
 const menuProfile: menuItem[] = [
-  { title: "Profil", url: "/" },
+  { title: "Profil", url: "/profile" },
   { title: "Keluar", url: "/logout" },
 ];
 const menuClicked = ref(false);
 function changeMenuClicked() {
   menuClicked.value = !menuClicked.value;
 }
-
+const authorizedRole = useCookie("authorizedRole");
 console.log("Header Rendered!");
 </script>
 
@@ -38,13 +38,16 @@ console.log("Header Rendered!");
       <div class="flex justify-start items-center">
         <NuxtLink to="/" class="logo flex justify-start items-center">
           <img src="/logo.png" alt="logo sobat BPS" class="h-6 w-6 lg:h-12 lg:w-12" />
-          <p class="mx-3 sm:text-xl lg:text-3xl"><strong>SOBAT</strong> BPS</p>
+          <p class="mx-3 sm:text-xl lg:text-3xl">
+            <span v-if="authorizedRole === 'admin'">Kelola <strong>SOBAT</strong></span
+            ><span v-else><strong>SOBAT</strong> BPS</span>
+          </p>
         </NuxtLink>
         <span class="font-light hidden sm:inline sm:text-4xl">|</span>
       </div>
       <!-- Menu section for full view -->
       <div class="body2 lg:text-base file:menu sm:flex sm:justify-start hidden sm:show sm:max-w-[450px] sm:overflow-x-auto lg:max-w-none">
-        <div class="mx-1 " v-for="menu in props.menus" :key="menu.title.toString">
+        <div class="mx-1" v-for="menu in props.menus" :key="menu.title.toString">
           <AppMenuItem :menu="menu" :active="props.activeBar === menu.title" />
         </div>
       </div>
