@@ -25,9 +25,9 @@ useCookie("activeBar").value = "Beranda";
   <NuxtLayout :name="authorizedRole">
     <article id="kegiatan">
       <div class="flex justify-center p-3 my-16">
-        <div class="absolute top-36 right-10 w-48 h-20 bg-amber-400 z-0"></div>
+        <!-- <div class="absolute top-36 right-10 w-48 h-20 bg-amber-400 z-0"></div> -->
         <NuxtImg src="sp2023.png" loading="lazy" class="z-10" />
-        <div class="absolute -bottom-52 left-10 w-48 h-20 bg-amber-950 opacity-90 z-20"></div>
+        <!-- <div class="absolute -bottom-52 left-10 w-48 h-20 bg-amber-950 opacity-90 z-20"></div> -->
       </div>
       <div class="grid place-content-center">
         <h6 class="text-center text-amber-900 font-semibold mb-3">Tentang Kegiatan</h6>

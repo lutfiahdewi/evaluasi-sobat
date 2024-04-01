@@ -12,15 +12,24 @@
   },
   "dependencies": {
     "@apollo/client": "^3.9.4",
-    "@vue/apollo-composable": "^4.0.1",
+    "@vee-validate/nuxt": "^4.12.6",
+    "@vee-validate/yup": "^4.12.6",
+    "@vue/apollo-composable": "^4.0.2",
+    "@vue/apollo-util": "^4.0.0-beta.6",
+    "@vueup/vue-quill": "^1.2.0",
     "@vueuse/components": "^10.7.2",
     "graphql": "^16.8.1",
     "graphql-tag": "^2.12.6",
+    "mathjs": "^12.4.1",
     "nuxt": "^3.10.0",
     "preline": "^2.0.3",
+    "vee-validate": "^4.12.6",
     "vue": "^3.4.15",
     "vue-good-table-next": "^0.2.1",
-    "vue-router": "^4.2.5"
+    "vue-router": "^4.2.5",
+    "vue-server-renderer": "^2.7.16",
+    "vue-template-compiler": "^2.7.16",
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@nuxt/image": "^1.4.0",

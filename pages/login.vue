@@ -2,7 +2,7 @@
 useSeoMeta({
   title: "Masuk",
 });
-type Role = "default" | "admin" | "mitra";
+type Role = "default" | "admin" | "mitra"| "operator";
 interface User {
   username: string;
   password: string;
@@ -33,6 +33,9 @@ function submitForm() {
     authorizedRole.value = role;
     return reloadNuxtApp({ path: "/beranda" });
   } else if (role === "admin") {
+    authorizedRole.value = role;
+    return reloadNuxtApp({ path: "/beranda" });
+  } else if (role === "operator") {
     authorizedRole.value = role;
     return reloadNuxtApp({ path: "/beranda" });
   }

@@ -21,6 +21,11 @@ const menuMitra = [
   { title: "Riwayat Daftar", url: "/riwayatdaftar" },
   { title: "Kartu Petugas", url: "" },
 ];
+
+const authorizedRole = useCookie("authorizedRole");
+if (authorizedRole.value !== "mitra"){
+    navigateTo({ path: "/beranda" });
+}
 </script>
 
 <template>

@@ -4,7 +4,8 @@ import type { StepProgress } from '#build/components';
 definePageMeta({
   layout: "default",
 });
-const query = gql`
+// GraphQL example
+/*const query = gql`
   query Query {
     allFilms {
       films {
@@ -21,6 +22,13 @@ const query = gql`
           }
         }
       }
+    }
+  }
+`;*/
+const query = gql`
+  query {
+    allKategori {
+      nama
     }
   }
 `;
@@ -49,6 +57,8 @@ if (data.value) {
 } else {
   console.log("Can't parse data");
 }
+
+//dropdown eaxaple
 const menuMitra = [
   { title: "Beranda", url: "/" },
   { title: "Daftar Survei", url: "" },
@@ -66,6 +76,7 @@ const menuMitra = [
   { title: "Kartu Petugas", url: "" },
 ];
 
+//progress bar example
 const dataProgress = {
   steps: ["Step 1", "Step 2", "Step 3", "Step 4"],
   currentStep: 0,
@@ -78,9 +89,9 @@ const step=ref<InstanceType<typeof StepProgress> | null>(null);
 <template>
   <section class="mb-6">
     <h5>Query gql example</h5>
-    <p>There are {{ data?.allFilms?.films?.length || 0 }} film.</p>
-    <p>The type of the data is: {{ typeof data?.allFilms?.films }}</p>
-    <vue-good-table :columns="dataColumn" :rows="dataFilms2" class="my-9" v-if="dataFilms2" />
+    <ul v-if="data">
+      <li v-for="(item, i) in data?.allKategori" :key="i">{{ item?.nama }}</li>
+    </ul>
     <span v-else>Loading...</span>
   </section>
 

@@ -32,6 +32,11 @@ const menuAdmin = [
     ],
   },
 ];
+
+const authorizedRole = useCookie("authorizedRole");
+if (authorizedRole.value !== "admin"){
+    navigateTo({ path: "/beranda" });
+}
 </script>
 
 <template>

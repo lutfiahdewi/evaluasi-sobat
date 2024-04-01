@@ -14,15 +14,28 @@ export default defineNuxtConfig({
     },
   },
   image: {
-    dir: 'assets/img'
+    dir: "assets/img",
+    domains: ["evaluasi-sobat.vercel.com"],
   },
-  plugins: ["~/plugins/preline.client.ts", { src: "~/plugins/vue-good-table-next.js", ssr: false }],
-  modules: ['@nuxtjs/apollo', '@vueuse/nuxt', "@nuxt/image"],
+  plugins: ["~/plugins/preline.client.ts", { src: "~/plugins/vue-good-table-next.js", ssr: false },{ src: "~/plugins/vue-quill.ts", mode: "client" },],
+  modules: ["@nuxtjs/apollo", "@vueuse/nuxt", "@nuxt/image", "@vee-validate/nuxt"],
   apollo: {
     clients: {
       default: {
-        httpEndpoint: 'https://swapi-graphql.netlify.app/.netlify/functions/index'
-      }
+        // httpEndpoint: 'https://swapi-graphql.netlify.app/.netlify/functions/index'
+        httpEndpoint: "http://localhost:4000",
+      },
+    },
+  },
+  veeValidate: {
+    // disable or enable auto imports
+    autoImports: true,
+    // Use different names for components
+    componentNames: {
+      Form: "VeeForm",
+      Field: "VeeField",
+      FieldArray: "VeeFieldArray",
+      ErrorMessage: "VeeErrorMessage",
     },
   },
 });
