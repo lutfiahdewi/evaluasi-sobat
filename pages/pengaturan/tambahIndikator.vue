@@ -155,10 +155,6 @@ function sendData() {
   formSent.value = katInd.length == arr_indicators.length ? true : false;
 }
 
-// check
-function checkFun() {
-  console.log(arr_indicators);
-}
 </script>
 
 <template>
@@ -318,15 +314,4 @@ function checkFun() {
       </div>
     </div>
   </div>
-
-  <section>
-    <button class="rounded bg-sky-400 p-3" @click.prevent="checkFun">Cek</button>
-    <br />
-    Coba query graphql
-    <ul>
-      <li v-for="(item, i) in data?.allKategori" :key="i">{{ item?.nama }}</li>
-    </ul>
-    <br />
-    <p>Successful category id made: {{ kategoriId }}</p>
-  </section>
 </template>

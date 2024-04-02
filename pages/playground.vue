@@ -38,7 +38,7 @@ const dataColumn = [
   { label: "Title", field: "title" },
   { label: "Director", field: "director" },
 ];
-
+/*
 type film = {
   title: String;
   director: String;
@@ -56,7 +56,7 @@ if (data.value) {
   console.log(loading);
 } else {
   console.log("Can't parse data");
-}
+}*/
 
 //dropdown eaxaple
 const menuMitra = [

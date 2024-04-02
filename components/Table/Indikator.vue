@@ -1,8 +1,23 @@
 <script setup lang="ts">
+type indicatorQuery = {
+  indikator_id: Number;
+  nama: String;
+  KategoriIndikator: {
+    kategori : {
+      kategori_id: String;
+      nama: String;
+    }
+  }[];
+}
+type indikator = {
+  id: Number;
+  nama: String;
+  kategori: String;
+}
 const columns = [
   {
     label: "Nama Indikator",
-    field: "indikator",
+    field: "nama",
   },
   {
     label: "Kategori terkait",
@@ -20,16 +35,34 @@ const columns = [
     field: "id",
   },
 ];
-const rows = [
-  { id: 112728, kategori: "kategori 1,kategori 1,kategori 1", indikator: "indikator1", tanggal: "2020-01-12" },
-  { id: 138934, kategori: "kategori 2,kategori 2,kategori 2", indikator: "indikator1", tanggal: "2020-01-12" },
-  { id: 298749, kategori: "kategori 4,kategori 4,kategori 4", indikator: "indikator1...", tanggal: "2022-01-12" },
-];
+
+// Query data
+let dataTable : indikator[] = []
+try{
+const { data, error, pending} = await useAsyncQuery(useTableIndicators());
+const result = await computed(() => data.value?.allIndikatorNested);
+(result.value).forEach((item: indicatorQuery) => {
+    let temp = "";
+    item.KategoriIndikator.forEach((ind) => {
+      temp += ind.kategori.nama;
+      if(useLast(item.KategoriIndikator) != ind){
+        temp += ", ";
+      }
+    });
+    dataTable.push({
+      id: item.indikator_id,
+      nama: item.nama,
+      kategori: temp,
+    });
+  });
+}catch(error){
+  console.log(error)
+}
 </script>
 <template>
   <vue-good-table
     :columns="columns"
-    :rows="rows"
+    :rows="dataTable"
     :search-options="{
       enabled: true,
     }"
