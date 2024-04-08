@@ -1,30 +1,10 @@
 <script lang="ts" setup>
-import type { StepProgress } from '#build/components';
+import type { ModalBase, StepProgress } from "#build/components";
 
 definePageMeta({
   layout: "default",
 });
 // GraphQL example
-/*const query = gql`
-  query Query {
-    allFilms {
-      films {
-        title
-        director
-        releaseDate
-        speciesConnection {
-          species {
-            name
-            classification
-            homeworld {
-              name
-            }
-          }
-        }
-      }
-    }
-  }
-`;*/
 const query = gql`
   query {
     allKategori {
@@ -83,10 +63,17 @@ const dataProgress = {
   activeColor: "bg-green-600",
   passiveColor: "bg-green-400",
 };
-const step=ref<InstanceType<typeof StepProgress> | null>(null);
+const step = ref<InstanceType<typeof StepProgress> | null>(null);
+
+//Modal
+const modal = ref<InstanceType<typeof ModalBase> | null>(null);
+const successModal = ref(false);
+const loadingModal = ref(false);
+const errorModal = ref(false);
 </script>
 
 <template>
+  <!-- <ModalSuccess :show="true"/> -->
   <section class="mb-6">
     <h5>Query gql example</h5>
     <ul v-if="data">
@@ -102,6 +89,17 @@ const step=ref<InstanceType<typeof StepProgress> | null>(null);
       <button @click="step?.previousStep()" class="px-3 py-2 bg-slate-300 rounded me-3">Previous Step</button>
       <button @click="step?.nextStep()" class="px-3 py-2 bg-slate-300 rounded me-3">Next Step</button>
     </div>
+  </section>
+  <section class="flex gap-x-3 justify-start">
+    <ModalBase ref="modal" />
+    <BaseButtonMode mode="outlined" shape="square" @click="modal?.open">Open Modal</BaseButtonMode>
+    <ModalSuccess v-if="successModal" />
+    <BaseButtonMode mode="normal" shape="square" @click.prevent="successModal = !successModal">Open Successs Modal</BaseButtonMode>
+    <ModalLoading v-if="loadingModal" />
+    <BaseButtonMode mode="outlined" shape="square" @click.prevent="loadingModal = !loadingModal">Open Loading Modal</BaseButtonMode>
+    <ModalError v-if="errorModal" />
+    <BaseButtonMode mode="normal" shape="square" @click.prevent="errorModal = !errorModal">Open Error Modal</BaseButtonMode>
+    
   </section>
   <AppDropdownMobile :menu="menuMitra" :active="true" />
 </template>

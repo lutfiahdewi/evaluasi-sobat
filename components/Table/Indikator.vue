@@ -69,8 +69,8 @@ const result = await computed(() => data.value?.allIndikatorNested);
   >
     <template #table-row="props">
       <span v-if="props.column.field == 'id'" class="flex justify-evenly">
-        <ButtonUpdate baseLink="/pengaturan/tambahIndikator/" :id="props.row.id" />
-        <ButtonDelete baseLink="/pengaturan/tambahIndikator/" :id="props.row.id" />
+        <ButtonUpdate baseLink="/pengaturan/ubahIndikator/" :id="props.row.id" />
+        <ButtonDelete />
       </span>
       <span v-else>
         {{ props.formattedRow[props.column.field] }}

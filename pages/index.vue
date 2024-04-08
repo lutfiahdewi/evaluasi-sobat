@@ -7,9 +7,9 @@ definePageMeta({
 });
 const authorizedRole = useCookie("authorizedRole");
 
-/*if (authorizedRole.value !== undefined || authorizedRole.value !== null) {
+if (authorizedRole.value !== undefined || authorizedRole.value !== null) {
     reloadNuxtApp({ path: "/beranda" });
-  }*/
+  }
 
 useCookie("activeBar").value = "Beranda";
 </script>
@@ -55,4 +55,5 @@ useCookie("activeBar").value = "Beranda";
       </p>
     </div>
   </article>
+  <div id="modal"></div>
 </template>

@@ -1,22 +1,43 @@
-/*import { defineEventHandler, useFetch } from 'nuxt/app'
-
-export const useFetchData = async (url: string) => {
-  const { data } = await useFetch(url)
-  return data
-}
-
-export const useFormatData = (data: any) => {
-  // Function to format the fetched data
-  // ...
-  return formattedData;
-}*/
-
+/**
+ * Composable for getting GraphQL queries
+ *
+ */
 // Getting all kategori data
 export const useGetAllKategori = () => {
   const query = gql`
     query {
       allKategori {
         nama
+      }
+    }
+  `;
+  return query;
+};
+// Getting a Kategori Nested
+// input: id
+export const useGetKategori = () => {
+  const query = gql`
+    query ($id: Int!) {
+      Kategori(id: $id) {
+        kategori_id
+        nama
+        definisi
+        KategoriIndikator {
+          kategoriIndikator_id
+          branch_kd
+          indikator_id
+          kategori_id
+          bobot
+          no_urut
+          perbandingan
+          indikator {
+            indikator_id
+            branch_kd
+            nama
+            is_benefit
+            definisi
+          }
+        }
       }
     }
   `;
@@ -29,6 +50,19 @@ export const useCreateKategori = () => {
     mutation createKategori($input: KategoriInputType!) {
       createKategori(input: $input) {
         kategori_id
+      }
+    }
+  `;
+  return query;
+};
+
+//Deleting a kategori (and connection to kategoriIndikator)
+export const useDeleteKategori = () => {
+  const query = gql`
+    mutation ($id: Int!) {
+      deleteKategori(id: $id) {
+        kategori_id
+        nama
       }
     }
   `;

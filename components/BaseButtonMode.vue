@@ -1,5 +1,5 @@
 <template>
-  <button :data-hs-overlay="$props.dataHsOverlay ? $props.dataHsOverlay :'' " :class="defineClass(mode, shape, notActive) + $props.class" class="body2 font-medium" :disabled="$props.notActive">
+  <button :class="defineClass(mode, shape, notActive) + $props.class" class="body2 font-medium disabled:opacity-50" :disabled="$props.notActive">
     <slot />
   </button>
 </template>
@@ -10,7 +10,6 @@ type Shape = "square" | "pill";
 defineProps<{
   mode: Mode; //default = normal
   shape: Shape; //default = square
-  dataHsOverlay?: String;
   notActive?: boolean;
 }>();
 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { useTableCategories } from "#imports";
+import { useTableCategories, useDeleteKategori } from "~/composables/useQueries";
+import { logErrorMessages } from "@vue/apollo-util";
 interface Kategori {
   id: Number;
   nama: String;
@@ -42,17 +43,18 @@ const columns = [
     field: "id",
   },
 ];
+
 // query data
 
 let dataTable: Kategori[] = [];
-try{
-  const { data: result, loading, error, pending} = await useAsyncQuery(useTableCategories());
+const { data: result, loading, error, pending, refetch } = await useAsyncQuery(useTableCategories());
+try {
   const data = await computed(() => result.value?.allKategoriNested);
-  (data.value).forEach((item: Item) => {
+  data.value.forEach((item: Item) => {
     let temp = "";
     item.KategoriIndikator.forEach((ind) => {
       temp += ind.indikator.nama;
-      if(useLast(item.KategoriIndikator) != ind){
+      if (useLast(item.KategoriIndikator) != ind) {
         temp += ", ";
       }
     });
@@ -62,45 +64,59 @@ try{
       indikator: temp,
     });
   });
-
-/*
-if (await result.value?.allKategoriNested) {
-  /*for (let i = 0; i < data.value.length; i++) {
-    let temp = "";
-    data.value[i].KategoriIndikator.forEach((ind) => {
-      temp += ind.indikator.nama + ", ";
-    });
-    console.log(data.value[i].nama);
-    console.log(temp);
-    dataTable.push({
-      id: data.value[i].kategori_id,
-      nama: data.value[i].nama,
-      indikator: temp,
-    });
-  }
-  const data2 : [] = data.value
-  data2.forEach((item: Item) => {
-    let temp = "";
-    item.KategoriIndikator.forEach((ind) => {
-      temp += ind.indikator.nama + ", ";
-    });
-    dataTable.push({
-      id: item.kategori_id,
-      nama: item.nama,
-      indikator: temp,
-    });
-  });
-}*/
-}catch(error){
-  console.log(error)
+} catch (error) {
+  console.log(error);
 }
 
-const rows = [
-  { id: 112728, nama: "kategori 1", indikator: "indikator1, indikator2, indikator3", tanggal: "2020-01-12" },
-  { id: 138934, nama: "kategori 2", indikator: "indikator1, indikator2, indikator3", tanggal: "2020-01-12" },
-  { id: 298749, nama: "kategori 4", indikator: "indikator1, indikator2, indikator3...", tanggal: "2022-01-12" },
-];
+const rows = [{ id: 112728, nama: "kategori 1", indikator: "indikator1, indikator2, indikator3", tanggal: "2020-01-12" }];
 
+// Update data
+
+// delete data
+const confirmationModal = ref(false);
+const deleteKategoriNama = ref("");
+let resolvePromise: (value: PromiseLike<boolean> | boolean) => void;
+const { mutate: deleteKategori, onDone: resultDeleteKategori, onError: errorDeleteKategori } = useMutation(useDeleteKategori());
+async function deleteData(id: string, nama: string): Promise<void> {
+  deleteKategoriNama.value = nama;
+  //modal konfirmasi
+  confirmationModal.value = true;
+  const confirmed = await isConfirmed();
+  if (confirmed) {
+    isDataLoading.value = true;
+    confirmationModal.value = false;
+    deleteKategori({ id: parseInt(id) });
+    errorDeleteKategori((error) => {
+      isDataLoading.value = false;
+      logErrorMessages(error);
+      isDataError.value = true;
+      return;
+    })
+    resultDeleteKategori((result) => {
+      isDataLoading.value = false;
+      isDataSent.value = true;
+      // reloadNuxtApp();
+      refetch();
+    });
+  }
+}
+
+function isConfirmed() {
+  return new Promise((resolve) => {
+    resolvePromise = resolve;
+  });
+}
+
+function handleUserInput(value: boolean) {
+  if (!resolvePromise) return;
+  resolvePromise(value);
+  confirmationModal.value = false;
+}
+
+//MOdal
+const isDataSent = ref(false);
+const isDataLoading = ref(false);
+const isDataError = ref(false);
 </script>
 <template>
   <vue-good-table
@@ -112,8 +128,8 @@ const rows = [
   >
     <template #table-row="props">
       <span v-if="props.column.field == 'id'" class="flex justify-evenly">
-        <ButtonUpdate baseLink="/pengaturan/tambahIndikator/" :id="props.row.id" />
-        <ButtonDelete baseLink="/pengaturan/tambahIndikator/" :id="props.row.id" />
+        <ButtonUpdate baseLink="/pengaturan/ubahIndikator/" :id="props.row.id" />
+        <ButtonDelete @click.prevent="deleteData(props.row.id, props.row.nama)" />
       </span>
       <span v-else>
         {{ props.formattedRow[props.column.field] }}
@@ -132,4 +148,24 @@ const rows = [
   <br>
   <div v-if="!pending">{{ data[0]?.nama }}</div>
   <div v-if="loading">Still Loading...</div> -->
+  <!-- Modal konfirmasi-->
+  <ModalBase2 v-if="confirmationModal" @close="confirmationModal = !confirmationModal">
+    <template #header><h5 class="font-bold text-gray-800">Hapus kategori penilaian?</h5></template>
+    <template #body>
+      <div class="grid place-content-center">
+        <IconWarning class="justify-self-center h-24 w-24 text-slate-800" />
+        <div class="text-center">Anda yakin akan menghapus kategori penilaian: {{ deleteKategoriNama }} ?</div>
+      </div>
+    </template>
+    <template #footer>
+      <div class="flex justify-around">
+        <BaseButtonMode shape="square" mode="outlined" @click="handleUserInput(false)" class="px-8">Batal</BaseButtonMode>
+        <BaseButtonMode shape="square" mode="normal" @click="handleUserInput(true)" class="px-8">Hapus</BaseButtonMode>
+      </div>
+    </template>
+  </ModalBase2>
+  <!-- MOdal lain2 -->
+  <ModalSuccess v-if="isDataSent" @close="isDataSent = !isDataSent" />
+  <ModalLoading v-if="isDataLoading" @close="isDataLoading = !isDataLoading"/>
+  <ModalError v-if="isDataError" @close="isDataError = !isDataError" />
 </template>

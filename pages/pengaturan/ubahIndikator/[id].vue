@@ -1,52 +1,74 @@
 <script setup lang="ts">
 import { logErrorMessages } from "@vue/apollo-util";
-import { useCreateKategori, useCreateIndikatorNested } from "~/composables/useQueries";
+import { useCreateKategori, useCreateIndikatorNested, useGetKategori} from "~/composables/useQueries";
 import { evaluate, round } from "mathjs";
 import type { ModalBase } from "#build/components";
 useSeoMeta({
-  title: "Tambah Indikator",
+  title: "Ubah Indikator",
 });
 interface indicator {
-  id?: number;
+  id: number;
   nama: string;
-  definisi: string | number | readonly string[] | null | undefined;
-  isBenefit?: number;
+  definisi: string;
+  isBenefit: number;
   perbandingan: string;
   no_urut: number;
-  bobot?: number;
+  bobot: number;
 }
-
-// initialization
-const count = useState<string>("indicators");
-if (count.value == undefined) {
-  count.value = "4";
-}
-const arr_indicators: indicator[] = reactive(new Array(parseInt(count.value)));
-const mat_weight: string[][] = reactive(Array.from(Array(parseInt(count.value)), () => new Array(parseInt(count.value)).fill("")));
-console.log("n matriks: " + mat_weight.length + ", indicators (count): " + count.value);
 //Modal
 const createCatModal = ref<InstanceType<typeof ModalBase> | null>(null);
 const isDataSent = ref(false);
 const isDataLoading = ref(false);
 const isDataError = ref(false);
 
+// getting params from route
+const route = useRoute();
+const id = route.params.id;
+
+// getting kategori data
+const { result: resultQueryKategori, error: errorQueryKategori, loading: loadingQueryKategori } = useQuery(useGetKategori(), {id});
+if(loadingQueryKategori){
+  isDataLoading.value = true;
+}
+if(resultQueryKategori.value.data?.kategori){
+  isDataLoading.value = false;
+}
+if(errorQueryKategori){
+  isDataError.value = true;
+  reloadNuxtApp({ path: "/pengaturan/kelolaIndikator" });
+}
+
+// initialization
+let dataIndikator = resultQueryKategori.value.data?.Kategori?.KategoriIndikator;
+const count = await useState<string>(useToString(dataIndikator.length));
+
+const arr_indicators: indicator[] = reactive(new Array(parseInt(count.value)));
+const mat_weight: string[][] = reactive(Array.from(Array(parseInt(count.value)), () => new Array(parseInt(count.value)).fill("")));
+console.log("n matriks: " + mat_weight.length + ", indicators (count): " + count.value);
+
 // data form
 const kategoriId: Ref<number | undefined> = ref();
 const kategoriNama = ref("umum");
 const kategoriDefinisi = ref("definsi");
 for (let i = 0; i < parseInt(count.value); i++) {
-  arr_indicators[i] = {
-    nama: "indikator " + i,
-    definisi: "definisi" + i,
-    perbandingan: "",
-    isBenefit: undefined,
-    no_urut: i,
-    bobot: undefined,
-  };
-  for (let j = 0; j < parseInt(count.value); j++) {
-    if (j == i) {
-      mat_weight[i][j] = "1";
+  for (let j = 0; j < dataIndikator.length; j++) {
+    if (i != dataIndikator[j].no_urut) {
+      continue;
+    }else{
+      arr_indicators[i] = {
+        id: parseInt(dataIndikator[j].indikator.indikator_id),
+        nama: dataIndikator[j].indikator.nama,
+        definisi: dataIndikator[j].indikator.definisi,
+        perbandingan: dataIndikator[j].perbandingan,
+        isBenefit: dataIndikator[j].indikator.is_benefit,
+        no_urut: dataIndikator[j].no_urut,
+        bobot: dataIndikator[j].bobot,
+      };
     }
+  }
+  let tempWeight = useSplit(arr_indicators[i].perbandingan,';')
+  for (let j = 0; j < parseInt(count.value); j++) {
+    mat_weight[i][j] = tempWeight[j];
   }
 }
 
@@ -94,7 +116,7 @@ function runAhp() {
     ahp.isConsistent = isConsistent;
     ahp.CR = CR;
     ahp.weight = weight;
-  } else {
+  } else{
     const { weight } = useAhp(mat_weight);
     ahp.isConsistent = true;
     ahp.CR = 0;
@@ -132,7 +154,7 @@ const runChecking = computed(() => {
   return checkForm();
 });
 
-// send data
+// send data : update data
 const {
   mutate: sendKategori,
   onDone: resultKategori,
@@ -140,7 +162,7 @@ const {
 } = useMutation(useCreateKategori(), () => ({
   variables: {
     input: {
-      nama: useCapitalize(kategoriNama.value),
+      nama: kategoriNama.value,
       definisi: kategoriDefinisi.value,
     },
   },
@@ -165,7 +187,7 @@ function sendData() {
         input: {
           branch_kd,
           kategori_id: kategoriId.value?.toString(),
-          nama: useCapitalize(ind.nama),
+          nama: ind.nama,
           is_benefit: ind.isBenefit,
           definisi: ind.definisi,
           perbandingan: ind.perbandingan,
@@ -193,20 +215,6 @@ function sendData() {
     console.log(temp);
     await reloadNuxtApp({ path: "/pengaturan/kelolaIndikator" });
     isDataSent.value = false;
-
-    /*let tempValid;
-    await arr_indicators.forEach((ind) => {
-      console.log(ind.id);
-      if (ind.id == null || ind.id == undefined || ind.id === 0) {
-        tempValid = false;
-      }
-    });
-    if (tempValid==null || tempValid == undefined) {
-      //close loading modal
-      console.log("temp valid: ", tempValid);
-      isDataSent.value = true;
-      reloadNuxtApp({ path: "/pengaturan/kelolaIndikator" });
-    }*/
   });
 }
 
@@ -366,6 +374,6 @@ function resolveAfter3s() {
   </form>
 
   <ModalSuccess v-if="isDataSent" @close="isDataSent = !isDataSent" />
-  <ModalLoading v-if="isDataLoading" @close="isDataLoading = !isDataLoading" />
+  <ModalLoading v-if="isDataLoading" @close="isDataLoading = !isDataLoading"/>
   <ModalError v-if="isDataError" @close="isDataError = !isDataError" />
 </template>
