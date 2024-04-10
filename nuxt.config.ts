@@ -18,7 +18,7 @@ export default defineNuxtConfig({
     domains: ["evaluasi-sobat.vercel.com"],
   },
   plugins: ["~/plugins/preline.client.ts", { src: "~/plugins/vue-good-table-next.js", ssr: false },{ src: "~/plugins/vue-quill.ts", mode: "client" },],
-  modules: ["@nuxtjs/apollo", "@vueuse/nuxt", "@nuxt/image", "@vee-validate/nuxt", "nuxt-lodash"],
+  modules: ["@nuxtjs/apollo", "@vueuse/nuxt", "@nuxt/image", "@vee-validate/nuxt", "nuxt-lodash", "@pinia/nuxt"],
   apollo: {
     clients: {
       default: {

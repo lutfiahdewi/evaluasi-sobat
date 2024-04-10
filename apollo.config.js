@@ -10,6 +10,6 @@ module.exports = {
       localSchemaFile: "./graphql-apollo/schema.graphql",
     },
     // Files processed by the extension
-    includes: ["src/**/*.vue", "pages/**/*.vue", "src/**/*.js"],
+    includes: ["src/**/*.vue", "pages/**/*.vue", "src/**/*.js", "store/**/*.ts"],
   },
 };

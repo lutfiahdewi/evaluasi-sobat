@@ -2,9 +2,6 @@
 defineProps<{
   activeBar?: string;
 }>();
-definePageMeta({
-  // middleware: 'auth'
-})
 const menuMitra = [
   { title: "Beranda", url: "/" },
   { title: "Daftar Survei", url: "" },

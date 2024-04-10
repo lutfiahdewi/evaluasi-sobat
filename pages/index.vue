@@ -7,7 +7,7 @@ definePageMeta({
 });
 const authorizedRole = useCookie("authorizedRole");
 
-if (authorizedRole.value !== undefined || authorizedRole.value !== null) {
+if (authorizedRole.value) {
     reloadNuxtApp({ path: "/beranda" });
   }
 
@@ -31,7 +31,7 @@ useCookie("activeBar").value = "Beranda";
     <!-- Right/Mascot Section -->
     <div class="maskot sm:pe-28">
       <!-- <img src="~/assets/img/Bung itung - fit.png" class="" /> -->
-      <NuxtImg src="Bung itung - fit.png" loading="lazy" />
+      <NuxtImg src="Bung itung - fit.png" loading="eager" />
     </div>
   </div>
   <!-- Gallery Section -->

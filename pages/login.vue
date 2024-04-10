@@ -2,16 +2,32 @@
 useSeoMeta({
   title: "Masuk",
 });
+import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
+import User from '~/components/Icon/User.vue';
+import { useAuthStore } from '~/store/auth'; // import the auth store we just created
+
 type Role = "default" | "admin" | "mitra"| "operator";
 interface User {
-  username: string;
+  email: string;
   password: string;
 }
-let username = ref("");
-let password = ref("");
+
+const { authenticateUser } = useAuthStore(); // use authenticateUser action from  auth store
+const { authenticated } = storeToRefs(useAuthStore()); // make authenticated state reactive with storeToRefs
+const user = reactive({email:'',password:''})
+const router = useRouter();
+
+const login = async () => {
+  await authenticateUser(user); // call authenticateUser and pass the user object
+  // redirect to homepage if user is authenticated
+  if (authenticated) {
+    router.push('/beranda');
+  }else{
+    console.log("failed auth")
+  }
+};
 
 const authorizedRole = useCookie<Role>("authorizedRole");
-
 if (authorizedRole.value !== "default") {
   /*if (typeof window !== "undefined") {
     window.alert("Already logged! \nPlease log out first!");
@@ -20,38 +36,31 @@ if (authorizedRole.value !== "default") {
 }
 
 function submitForm() {
-  if (!username || !password) {
-    window.alert("Please fill the form.");
+  if (!user.email || !user.password) {
+    // window.alert("Please fill the form.");
     return;
   }
-  let newUser: User = {
-    username: username.value,
-    password: password.value,
-  };
-  const role: Role = validateUser(newUser);
-  if (role === "mitra") {
+  const role: Role = validateUser(user);
+  if (role !== "default") {
     authorizedRole.value = role;
-    return reloadNuxtApp({ path: "/beranda" });
-  } else if (role === "admin") {
-    authorizedRole.value = role;
-    return reloadNuxtApp({ path: "/beranda" });
-  } else if (role === "operator") {
-    authorizedRole.value = role;
-    return reloadNuxtApp({ path: "/beranda" });
+    // return reloadNuxtApp({ path: "/beranda" });
   }
-  password.value = "";
+  login();
+  user.password = "";
   return;
 }
 
 const isFormInvalid = computed(() => {
-  return username.value.length < 1 || password.value.length < 8;
+  return user.email.length < 1 || user.password.length < 8;
 });
 
 function validateUser(user: User): Role {
-  if (user.username === "admin") {
+  if (user.email === "admin@mail.com") {
     return "admin";
-  } else if (user.username === "mitra") {
+  } else if (user.email === "mitra@mail.com") {
     return "mitra";
+  }else if (user.email === "operator@mail.com") {
+    return "operator";
   } else {
     return "default";
   }
@@ -68,9 +77,9 @@ function validateUser(user: User): Role {
       <div class="min-w-96 shadow-inner bg-white rounded-xl p-6">
         <div class="border-b border-slate-500 mx-2 text-center text-xl">Login Pengguna</div>
         <form action="" class="mt-6">
-          <label for="input-email" class="block text-sm font-medium mb-2">Username/Email</label>
+          <label for="input-email" class="block text-sm font-medium mb-2">Email</label>
           <input
-            v-model="username"
+            v-model="user.email"
             type="email"
             id="input-email"
             class="py-3 px-4 mb-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
@@ -78,7 +87,7 @@ function validateUser(user: User): Role {
           />
           <label for="input-password" class="block text-sm font-medium mb-2">Password</label>
           <input
-            v-model="password"
+            v-model="user.password"
             type="password"
             id="input-password"
             class="py-3 px-4 mb-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"

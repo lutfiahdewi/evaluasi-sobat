@@ -1,7 +1,27 @@
 /**
  * Composable for getting GraphQL queries
- *
+ * Login
+ * List item:
+ * 1. Kategori
+ * 2. Indikator
  */
+
+// Login => argumen email and password
+export const useLogin = () => {
+  const query = gql`
+    mutation ($email: String!, $password: String!) {
+      login(email: $email, password: $password) {
+        token
+        user {
+          user_id
+          username
+        }
+      }
+    }
+  `;
+  return query;
+};
+
 // Getting all kategori data
 export const useGetAllKategori = () => {
   const query = gql`

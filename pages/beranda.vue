@@ -4,25 +4,21 @@ useSeoMeta({
 });
 definePageMeta({
   layout: false,
+  // middleware: 'auth'
 });
-const authorizedRole = useCookie("authorizedRole");
+/*const authorizedRole = useCookie('authorizedRole');
 if (authorizedRole.value === undefined || authorizedRole.value === null){
+    // authorizedRole.value = "default";
     navigateTo({ path: "/login" });
-}
-/*
-function getRole(): string {
-  if (authorizedRole.value === undefined || authorizedRole.value === null) {
-    return "default";
-  } else {
-    return authorizedRole.value;
-  }
 }*/
 
 useCookie("activeBar").value = "Beranda";
+const token = useCookie("token");
+console.log("cookie: ", token.value)
 </script>
 
 <template>
-  <NuxtLayout :name="authorizedRole">
+  <NuxtLayout :name="useCookie('authorizedRole')">
     <article id="kegiatan">
       <div class="flex justify-center p-3 my-16">
         <!-- <div class="absolute top-36 right-10 w-48 h-20 bg-amber-400 z-0"></div> -->

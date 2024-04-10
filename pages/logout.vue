@@ -2,11 +2,19 @@
 definePageMeta({
   layout: false,
 });
+import { storeToRefs } from "pinia"; // import storeToRefs helper hook from pinia
+import { useAuthStore } from "~/store/auth"; // import the auth store we just created
+
+const router = useRouter();
+
+const { logUserOut } = useAuthStore(); // use authenticateUser action from  auth store
+const { authenticated } = storeToRefs(useAuthStore()); // make authenticated state reactive with storeToRefs
+logUserOut();
 const authorizedRole = useCookie("authorizedRole");
-    authorizedRole.value = 'default';
-    reloadNuxtApp({path: '/'});
+authorizedRole.value = undefined;
+reloadNuxtApp({ path: "/" });
 </script>
 
 <template>
-    Logging you out...
+  <ModalLoading> Logging you out... </ModalLoading>
 </template>

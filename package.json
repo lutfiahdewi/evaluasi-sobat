@@ -35,11 +35,13 @@
   "devDependencies": {
     "@nuxt/image": "^1.4.0",
     "@nuxtjs/apollo": "^5.0.0-alpha.11",
+    "@pinia/nuxt": "^0.5.1",
     "@tailwindcss/forms": "^0.5.7",
     "@vueuse/core": "^10.7.2",
     "@vueuse/nuxt": "^10.7.2",
     "autoprefixer": "^10.4.17",
     "nuxt-lodash": "^2.5.3",
+    "pinia": "^2.1.7",
     "postcss": "^8.4.33",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.3.3",

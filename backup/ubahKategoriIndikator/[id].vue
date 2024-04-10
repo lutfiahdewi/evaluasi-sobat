@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import { logErrorMessages } from "@vue/apollo-util";
-import { useCreateKategori, useCreateIndikatorNested, useGetKategori} from "~/composables/useQueries";
+import { useCreateKategori, useCreateIndikatorNested, useGetKategori } from "~/composables/useQueries";
 import { evaluate, round } from "mathjs";
 import type { ModalBase } from "#build/components";
 useSeoMeta({
-  title: "Ubah Indikator",
+  title: "Ubah Kategori Indikator",
 });
 interface indicator {
   id: number;
   nama: string;
   definisi: string;
   isBenefit: number;
+  kategoriIndikator_id: number;
   perbandingan: string;
   no_urut: number;
   bobot: number;
@@ -26,14 +27,14 @@ const route = useRoute();
 const id = route.params.id;
 
 // getting kategori data
-const { result: resultQueryKategori, error: errorQueryKategori, loading: loadingQueryKategori } = useQuery(useGetKategori(), {id});
-if(loadingQueryKategori){
+const { result: resultQueryKategori, error: errorQueryKategori, loading: loadingQueryKategori } = useQuery(useGetKategori(), { id });
+if (loadingQueryKategori) {
   isDataLoading.value = true;
 }
-if(resultQueryKategori.value.data?.kategori){
+if (resultQueryKategori.value.data?.kategori) {
   isDataLoading.value = false;
 }
-if(errorQueryKategori){
+if (errorQueryKategori) {
   isDataError.value = true;
   reloadNuxtApp({ path: "/pengaturan/kelolaIndikator" });
 }
@@ -47,26 +48,27 @@ const mat_weight: string[][] = reactive(Array.from(Array(parseInt(count.value)),
 console.log("n matriks: " + mat_weight.length + ", indicators (count): " + count.value);
 
 // data form
-const kategoriId: Ref<number | undefined> = ref();
-const kategoriNama = ref("umum");
-const kategoriDefinisi = ref("definsi");
+const kategoriId = ref(resultQueryKategori.value.data?.Kategori.kategori_id);
+const kategoriNama = ref(resultQueryKategori.value.data?.nama);
+const kategoriDefinisi = ref(resultQueryKategori.value.data?.Kategori.definisi);
 for (let i = 0; i < parseInt(count.value); i++) {
   for (let j = 0; j < dataIndikator.length; j++) {
     if (i != dataIndikator[j].no_urut) {
       continue;
-    }else{
+    } else {
       arr_indicators[i] = {
         id: parseInt(dataIndikator[j].indikator.indikator_id),
         nama: dataIndikator[j].indikator.nama,
         definisi: dataIndikator[j].indikator.definisi,
-        perbandingan: dataIndikator[j].perbandingan,
         isBenefit: dataIndikator[j].indikator.is_benefit,
+        kategoriIndikator_id: parseInt(dataIndikator[j].kategoriIndikator_id),
+        perbandingan: dataIndikator[j].perbandingan,
         no_urut: dataIndikator[j].no_urut,
         bobot: dataIndikator[j].bobot,
       };
     }
   }
-  let tempWeight = useSplit(arr_indicators[i].perbandingan,';')
+  let tempWeight = useSplit(arr_indicators[i].perbandingan, ";");
   for (let j = 0; j < parseInt(count.value); j++) {
     mat_weight[i][j] = tempWeight[j];
   }
@@ -116,7 +118,7 @@ function runAhp() {
     ahp.isConsistent = isConsistent;
     ahp.CR = CR;
     ahp.weight = weight;
-  } else{
+  } else {
     const { weight } = useAhp(mat_weight);
     ahp.isConsistent = true;
     ahp.CR = 0;
@@ -374,6 +376,6 @@ function resolveAfter3s() {
   </form>
 
   <ModalSuccess v-if="isDataSent" @close="isDataSent = !isDataSent" />
-  <ModalLoading v-if="isDataLoading" @close="isDataLoading = !isDataLoading"/>
+  <ModalLoading v-if="isDataLoading" @close="isDataLoading = !isDataLoading" />
   <ModalError v-if="isDataError" @close="isDataError = !isDataError" />
 </template>

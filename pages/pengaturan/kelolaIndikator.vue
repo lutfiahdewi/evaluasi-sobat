@@ -35,8 +35,8 @@ const newIndModal = ref<InstanceType<typeof ModalBase> | null>(null);
       </template>
       <template #footer>
         <div class="flex justify-end">
-          <NuxtLink to="/pengaturan/tambahIndikator/" class="">
-            <BaseButtonMode shape="square" mode="normal" @click="newCatIndModal?.close()"> Buat kategori </BaseButtonMode>
+          <NuxtLink to="/pengaturan/tambahKategoriIndikator/" class="">
+            <BaseButtonMode shape="square" mode="normal" @click="newCatIndModal?.close()"> Buat Kategori </BaseButtonMode>
           </NuxtLink>
         </div>
       </template>

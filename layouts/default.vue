@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const menu = [
-  { title: "Beranda", url: "/" },
+  { title: "Beranda", url: "/beranda" },
   { title: "Galeri", url: "#galeri" },
   { title: "Sekilas SOBAT", url: "/#sekilas" },
 ];
