@@ -6,6 +6,10 @@ import { object, string, number } from "yup";
 useSeoMeta({
   title: "Kelola Survei",
 });
+type kategori={
+  kategori_id: string
+  nama: string
+}
 const currentStep = ref(0);
 const dataProgress = {
   steps: ["Survei/Sensus", "Wilayah", "Kegiatan", "Posisi", "Jumlah Petugas", "Evaluasi", "Ringkasan"],
@@ -14,21 +18,11 @@ const dataProgress = {
   passiveColor: "bg-zinc-100",
   textColor: "text-white",
 };
-
 const step = ref<InstanceType<typeof StepProgress> | null>(null);
 
-// data form
-/*const kodeSurvei = ref("");
-const namaSurvei = ref("");
-const tipeSurvei = ref("");
-const data = reactive({
-  kodeSurvei: "",
-  namaSurvei: "",
-  tipeSurvei: "",
-});
-const isConfirmed = ref();
-const isOptional = ref();*/
-
+// data opsi
+const { result } = await useAsyncQuery(useGetAllKategori());
+const dataKategori : kategori[] = result?.data?.allKategori
 // Validation
 const schemas = [
   object({
@@ -51,58 +45,18 @@ const schemas = [
   object({
     evaluasiSurvei: string().required(),
     konfirmasiEvaluasiSurvei: string().required(),
-    opsiEvaluasiSurvei: string().required(),
+    // opsiEvaluasiSurvei: string().required(),
   }),
 ];
 const currentSchema = computed(() => {
-  currentStep.value = step.value ? step.value.data?.currentStep : 0;
-  return schemas[step.value ? step.value.data?.currentStep : 0];
-});
-/*const currentSchema = computed(() => {
   return schemas[currentStep.value];
 });
 
-/*async function validateStep0() {
-  const { kodeSurvei, namaSurvei, tipeSurvei } = data;
-  try {
-    const parsed = await schemas[0].validate(
-      {
-        kodeSurvei,
-        namaSurvei,
-        tipeSurvei,
-      },
-      { strict: true }
-    );
-    console.log(parsed);
-  } catch (err: any) {
-    console.log(err.path);
-    console.log(err.errors);
-    return false;
-  }
-  return true;
-}*/
-function cek(step: number) {
+function cek() {
   console.log(currentStep.value);
-  console.log(schemas[step].isValid);
+  console.log(schemas[currentStep.value]);
+  console.log(schemas[currentStep.value].isValid);
 }
-/*function validateFormStep(step: number): boolean {
-  switch (step) {
-    case 0:
-      console.log(kodeSurvei && namaSurvei && tipeSurvei);
-      if (kodeSurvei.value && namaSurvei.value && tipeSurvei.value) {
-        formStepValid.value = true;
-        return true;
-      } else {
-        formStepValid.value = false;
-        return false;
-      }
-    default:
-      formStepValid.value = true;
-      return true;
-  }
-}*/
-
-//tabel
 </script>
 
 <template>
@@ -130,148 +84,235 @@ function cek(step: number) {
         <!-- Form Buat Survei -->
         <div class="py-5 px-8 overflow-y-auto">
           <StepProgress :dataMain="dataProgress" ref="step" />
-          <Form :validation-schema="currentSchema" keep-values v-slot="{ handleSubmit, values }" :currentStep="() => step?.data?.currentStep">
-            <div class="form-1" v-if="step?.data?.currentStep === 0">
-              <div class="grid grid-cols-4 gap-4">
-                <!-- Kode survei -->
-                <label for="kodeSurvei" class="self-center font-medium text-lg text-white mb-3">Kode survei</label>
-                <div class="col-span-3 mb-3">
-                  <Field type="text" id="kodeSurvei" name="kodeSurvei" class="py-3 px-4 block w-full border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none" placeholder="" />
-                  <ErrorMessage name="kodeSurvei" class="text-red-600" />
-                </div>
-                <!-- Nama survei -->
-                <label for="namaSurvei" class="self-center font-medium text-lg text-white mb-3">Nama survei</label>
-                <div class="col-span-3 mb-3">
-                  <Field type="text" id="namaSurvei" name="namaSurvei" class="py-3 px-4 block w-full border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none" placeholder="" />
-                  <ErrorMessage name="namaSurvei" />
-                </div>
-                <!-- Tipe survei -->
-                <label for="tipeSurvei" class="self-center font-medium text-lg text-white mb-3">Tipe</label>
-                <div class="col-span-3 mb-3 text-black">
-                  <Field as="select" id="tipeSurvei" name="tipeSurvei" class="py-3 px-4 block w-full border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none">
-                    <option selected disabled>Pilih tipe</option>
-                    <option value="Tipe 1">Tipe 1</option>
-                    <option value="Tipe 2">Tipe 2</option>
-                    <option value="Tipe 3">Tipe 3</option>
-                  </Field>
-                  <ErrorMessage name="tipeSurvei" />
-                </div>
-              </div>
-            </div>
-            <div class="form-1" v-if="step?.data?.currentStep === 1">
-              <div class="grid grid-cols-4 gap-4">
-                <!-- Nama survei -->
-                <label for="nama" class="self-center font-medium text-lg text-white mb-3">Nama survei</label>
-                <div class="col-span-3 mb-3">
-                  <span class="py-3 text-white">: {{ values.namaSurvei }}</span>
-                </div>
-                <!-- Wilayah survei -->
-                <label for="wilayahSurvei" class="self-center font-medium text-lg text-white mb-3">Wilayah</label>
-                <div class="col-span-3 mb-3">
-                  <Field
-                    type="text"
-                    id="wilayahSurvei"
-                    name="wilayahSurvei"
-                    class="py-3 px-4 block w-full border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
-                    placeholder=""
-                  />
-                  <ErrorMessage name="wilayahSurvei" />
+          <Form :validation-schema="currentSchema" keep-values v-slot="{ handleSubmit, values, meta }" as="div">
+            <form
+              id="survei"
+              @submit="
+                handleSubmit($event, () => {
+                  currentStep++;
+                  step?.nextStep();
+                })
+              "
+            >
+              <div class="form-1" v-if="step?.data?.currentStep === 0">
+                <div class="grid grid-cols-4 gap-4">
+                  <!-- Kode survei -->
+                  <label for="kodeSurvei" class="self-center font-medium text-lg text-white mb-3">Kode survei</label>
+                  <div class="col-span-3 mb-3">
+                    <Field type="text" id="kodeSurvei" name="kodeSurvei" class="py-3 px-4 block w-full border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none" placeholder="" />
+                    <ErrorMessage name="kodeSurvei" />
+                  </div>
+                  <!-- Nama survei -->
+                  <label for="namaSurvei" class="self-center font-medium text-lg text-white mb-3">Nama survei</label>
+                  <div class="col-span-3 mb-3">
+                    <Field type="text" id="namaSurvei" name="namaSurvei" class="py-3 px-4 block w-full border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none" placeholder="" />
+                    <ErrorMessage name="namaSurvei" />
+                  </div>
+                  <!-- Tipe survei -->
+                  <label for="tipeSurvei" class="self-center font-medium text-lg text-white mb-3">Tipe</label>
+                  <div class="col-span-3 mb-3 text-black">
+                    <Field as="select" id="tipeSurvei" name="tipeSurvei" class="py-3 px-4 block w-full border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none">
+                      <option selected disabled>Pilih tipe</option>
+                      <option value="Tipe 1">Tipe 1</option>
+                      <option value="Tipe 2">Tipe 2</option>
+                      <option value="Tipe 3">Tipe 3</option>
+                    </Field>
+                    <ErrorMessage name="tipeSurvei" />
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="form-1" v-if="step?.data?.currentStep === 2">
-              <div class="grid grid-cols-4 gap-4">
-                <!-- Nama survei -->
-                <label for="namaSurvei" class="self-center font-medium text-lg text-white mb-3">Nama survei</label>
-                <div class="col-span-3 mb-3">
-                  <span class="py-3 px-4">{{ values.namaSurvei }}</span>
-                </div>
-                <!-- kegiatan survei -->
-                <label for="kegiatanSurvei" class="self-center font-medium text-lg text-white mb-3">Kegiatan</label>
-                <div class="col-span-3 mb-3">
-                  <Field as="select" id="kegiatanSurvei" name="kegiatanSurvei" class="py-3 px-4 block w-full border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none">
-                    <option selected disabled>Pilih kegiatan</option>
-                    <option>Kegiatan 1</option>
-                    <option>Kegiatan 2</option>
-                    <option>Kegiatan 3</option>
-                  </Field>
-                  <ErrorMessage name="kegiatanSurvei" />
-                </div>
-              </div>
-            </div>
-            <div class="form-1" v-if="step?.data?.currentStep === 3">
-              <div class="grid grid-cols-4 gap-4">
-                <!-- Nama survei -->
-                <label for="nama" class="self-center font-medium text-lg text-white mb-3">Nama survei</label>
-                <div class="col-span-3 mb-3">
-                  <span class="py-3 px-4">{{ values.namaSurvei }}</span>
-                </div>
-                <!-- Kegiatan survei -->
-                <label for="kegiatan" class="self-center font-medium text-lg text-white mb-3">Kegiatan</label>
-                <div class="col-span-3 mb-3">
-                  <span class="py-3 px-4">{{ values.kegiatanSurvei }}</span>
-                </div>
-                <!-- Posisi Survei -->
-                <label for="posisiSurvei" class="self-center font-medium text-lg text-white mb-3">Posisi</label>
-                <div class="col-span-3 mb-3">
-                  <Field as="select" id="posisiSurvei" name="posisiSurvei" class="py-3 px-4 block w-full border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none">
-                    <option selected disabled>Pilih posisi</option>
-                    <option>Posisi 1</option>
-                    <option>Posisi 2</option>
-                    <option>Posisi 3</option>
-                  </Field>
-                  <ErrorMessage name="posisiSurvei" />
+              <div class="form-1" v-if="step?.data?.currentStep === 1">
+                <div class="grid grid-cols-4 gap-4">
+                  <!-- Nama survei -->
+                  <label for="nama" class="self-center font-medium text-lg text-white mb-3">Nama survei</label>
+                  <div class="col-span-3 mb-3">
+                    <span class="py-3 text-white">{{ values.namaSurvei }}</span>
+                  </div>
+                  <!-- Wilayah survei -->
+                  <label for="wilayahSurvei" class="self-center font-medium text-lg text-white mb-3">Wilayah</label>
+                  <div class="col-span-3 mb-3">
+                    <Field
+                      type="text"
+                      id="wilayahSurvei"
+                      name="wilayahSurvei"
+                      class="py-3 px-4 block w-full border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
+                      placeholder=""
+                    />
+                    <ErrorMessage name="wilayahSurvei" />
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="form-1" v-if="step?.data?.currentStep === 4">Jumlah Petugas</div>
-            <div class="form-1" v-if="step?.data?.currentStep === 5">
-              <div class="grid grid-cols-4 gap-4">
-                <!-- Kategori penilaian survei -->
-                <label for="evaluasiSurvei" class="self-center font-medium text-lg text-white mb-3">Kategori</label>
-                <div class="col-span-3 mb-3">
-                  <Field
-                    as="select"
-                    id="evaluasiSurvei"
-                    name="evaluasiSurvei"
-                    class="col-span-3 py-3 px-4 block w-full border-gray-200 rounded-lg mb-3 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
-                  >
-                    <option selected disabled>Pilih kategori</option>
-                    <option>Kategori 1</option>
-                    <option>Kategori 2</option>
-                    <option>Kategori 3</option>
-                  </Field>
-                  <ErrorMessage name="evaluasiSurvei" />
+              <div class="form-1" v-if="step?.data?.currentStep === 2">
+                <div class="grid grid-cols-4 gap-4">
+                  <!-- Nama survei -->
+                  <label for="nama" class="self-center font-medium text-lg text-white mb-3">Nama survei</label>
+                  <div class="col-span-3 mb-3">
+                    <span class="py-3 text-white">{{ values.namaSurvei }}</span>
+                  </div>
+                  <!-- kegiatan survei -->
+                  <label for="kegiatanSurvei" class="self-center font-medium text-lg text-white mb-3">Kegiatan</label>
+                  <div class="col-span-3 mb-3">
+                    <Field as="select" id="kegiatanSurvei" name="kegiatanSurvei" class="py-3 px-4 block w-full border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none">
+                      <option selected disabled>Pilih kegiatan</option>
+                      <option value="kegiatan 1">Kegiatan 1</option>
+                      <option value="kegiatan 2">Kegiatan 2</option>
+                      <option value="kegiatan 3">Kegiatan 3</option>
+                    </Field>
+                    <ErrorMessage name="kegiatanSurvei" />
+                  </div>
                 </div>
-                <!-- Opsi konfirmasi -->
-                <div class="label text-white mb-3">Opsi Konfirmasi</div>
-                <label class="text-white mb-3"><Field type="radio" name="konfirmasiEvaluasiSurvei" value="1" class="me-3" />Ya</label>
-                <div class="col-span-2 text-white mb-3">
-                  <label><Field type="radio" name="konfirmasiEvaluasiSurvei" value="0" class="me-3" />Tidak</label>
-                </div>
-                <ErrorMessage name="konfirmasiEvaluasiSurvei" />
-                <!-- Opsi indikator opsional -->
-                <div class="label text-white mb-3">Opsi Konfirmasi</div>
-                <label class="text-white mb-3"><Field type="radio" name="opsiEvaluasiSurvei" value="1" class="me-3" />Ya</label>
-                <div class="col-span-2 text-white mb-3">
-                  <label><Field type="radio" name="opsiEvaluasiSurvei" value="0" class="me-3" />Tidak</label>
-                </div>
-                <ErrorMessage name="opsiEvaluasiSurvei" />
               </div>
-            </div>
-            <div class="form-1" v-if="step?.data?.currentStep === 6">
-              Ringkasan<br />
-              <pre>{{ values }}</pre>
-            </div>
+              <div class="form-1" v-if="step?.data?.currentStep === 3">
+                <div class="grid grid-cols-4 gap-4">
+                  <!-- Nama survei -->
+                  <label for="nama" class="self-center font-medium text-lg text-white mb-3">Nama survei</label>
+                  <div class="col-span-3 mb-3">
+                    <span class="py-3 text-white">{{ values.namaSurvei }}</span>
+                  </div>
+                  <!-- Kegiatan survei -->
+                  <label for="kegiatan" class="self-center font-medium text-lg text-white mb-3">Kegiatan</label>
+                  <div class="col-span-3 mb-3">
+                    <span class="py-3 text-white">{{ values.kegiatanSurvei }}</span>
+                  </div>
+                  <!-- Posisi Survei -->
+                  <label for="posisiSurvei" class="self-center font-medium text-lg text-white mb-3">Posisi</label>
+                  <div class="col-span-3 mb-3">
+                    <Field as="select" id="posisiSurvei" name="posisiSurvei" class="py-3 px-4 block w-full border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none">
+                      <option selected disabled>Pilih posisi</option>
+                      <option value="posisi 1">Posisi 1</option>
+                      <option value="posisi 2">Posisi 2</option>
+                      <option value="posisi 3">Posisi 3</option>
+                    </Field>
+                    <ErrorMessage name="posisiSurvei" />
+                  </div>
+                </div>
+              </div>
+              <div class="form-1" v-if="step?.data?.currentStep === 4">
+                <div class="grid grid-cols-4 gap-4">
+                  <!-- Nama survei -->
+                  <label for="nama" class="self-center font-medium text-lg text-white mb-3">Nama survei</label>
+                  <div class="col-span-3 mb-3">
+                    <span class="py-3 text-white">{{ values.namaSurvei }}</span>
+                  </div>
+                  <!-- Kegiatan survei -->
+                  <label for="kegiatan" class="self-center font-medium text-lg text-white mb-3">Kegiatan</label>
+                  <div class="col-span-3 mb-3">
+                    <span class="py-3 text-white">{{ values.kegiatanSurvei }}</span>
+                  </div>
+                  <!-- Posisi survei -->
+                  <!-- <label for="posisi" class="self-center font-medium text-lg text-white mb-3">Posisi</label>
+                  <div class="col-span-3 mb-3">
+                    <span class="py-3 px-4  text-white">{{ values.posisiSurvei }}</span>
+                  </div> -->
+                  <!-- jumlah petugas survei -->
+                  <label for="jumlahPetugasSurvei" class="self-center font-medium text-lg text-white mb-3">Jumlah petugas</label>
+                  <div class="col-span-3 mb-3">
+                    <Field
+                      type="text"
+                      id="jumlahPetugasSurvei"
+                      name="jumlahPetugasSurvei"
+                      class="py-3 px-4 block w-full border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
+                      placeholder=""
+                    />
+                    <ErrorMessage name="jumlahPetugasSurvei" />
+                  </div>
+                </div>
+              </div>
+              <div class="form-1" v-if="step?.data?.currentStep === 5">
+                <div class="grid grid-cols-4 gap-4">
+                  <!-- Nama survei -->
+                  <label for="nama" class="self-center font-medium text-lg text-white mb-3">Nama survei</label>
+                  <div class="col-span-3 mb-3">
+                    <span class="py-3 text-white">{{ values.namaSurvei }}</span>
+                  </div>
+                  <!-- Kegiatan survei -->
+                  <label for="kegiatan" class="self-center font-medium text-lg text-white mb-3">Kegiatan</label>
+                  <div class="col-span-3 mb-3">
+                    <span class="py-3 text-white">{{ values.kegiatanSurvei }}</span>
+                  </div>
+                  <!-- Kategori penilaian survei -->
+                  <label for="evaluasiSurvei" class="self-center font-medium text-lg text-white mb-3">Kategori</label>
+                  <div class="col-span-3 mb-3">
+                    <Field
+                      as="select"
+                      id="evaluasiSurvei"
+                      name="evaluasiSurvei"
+                      class="col-span-3 py-3 px-4 block w-full border-gray-200 rounded-lg mb-3 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
+                    >
+                      <option selected disabled>Pilih kategori</option>
+                      <option v-for="item in dataKategori" :value="item.nama" >{{ item.nama }}</option>
+                      <option value="Kategori 3">Kategori 3</option>
+                    </Field>
+                    <ErrorMessage name="evaluasiSurvei" />
+                  </div>
+                  <!-- Opsi konfirmasi -->
+                  <div class="label text-white mb-3">Opsi Konfirmasi</div>
+                  <label class="text-white mb-3"><Field type="radio" name="konfirmasiEvaluasiSurvei" value="1" class="me-3" />Ya</label>
+                  <div class="col-span-2 text-white mb-3">
+                    <label><Field type="radio" name="konfirmasiEvaluasiSurvei" value="0" class="me-3" />Tidak</label>
+                  </div>
+                  <ErrorMessage name="konfirmasiEvaluasiSurvei" />
+                  <!-- Opsi indikator opsional -->
+                  <!-- <div class="label text-white mb-3">Opsi Konfirmasi</div>
+                  <label class="text-white mb-3"><Field type="radio" name="opsiEvaluasiSurvei" value="1" class="me-3" />Ya</label>
+                  <div class="col-span-2 text-white mb-3">
+                    <label><Field type="radio" name="opsiEvaluasiSurvei" value="0" class="me-3" />Tidak</label>
+                  </div>
+                  <ErrorMessage name="opsiEvaluasiSurvei" /> -->
+                </div>
+              </div>
+              <div class="form-1 text-white grid place-content-center" v-if="step?.data?.currentStep === 6">
+                <h6 class="pb-3 text-center">Ringkasan Survei</h6>
+                <table class="bg-slate-200 rounded-lg text-slate-800 max-w-full">
+                  <tbody class="divide-y divide-slate-400">
+                    <tr >
+                      <td>Kode</td>
+                      <td>{{values.kodeSurvei}}</td>
+                    </tr>
+                    <tr>
+                      <td>Nama</td>
+                      <td>{{values.namaSurvei}}</td>
+                    </tr>
+                    <tr>
+                      <td>Tipe</td>
+                      <td>{{values.tipeSurvei}}</td>
+                    </tr>
+                    <tr>
+                      <td>Wilayah</td>
+                      <td>{{values.wilayahSurvei}}</td>
+                    </tr>
+                    <tr>
+                      <td>Kegiatan</td>
+                      <td>{{values.kegiatanSurvei}}</td>
+                    </tr>
+                    <tr>
+                      <td>Posisi</td>
+                      <td>{{values.posisiSurvei}}</td>
+                    </tr>
+                    <tr>
+                      <td>Jumlah Petugas</td>
+                      <td>{{values.jumlahPetugasSurvei}}</td>
+                    </tr>
+                    <tr>
+                      <td>Evaluasi</td>
+                      <td>{{values.evaluasiSurvei}}</td>
+                    </tr>
+                    <tr>
+                      <td>konfirmasi Evaluasi</td>
+                      <td>{{values.konfirmasiEvaluasiSurvei==0 ? 'Tidak':'Ya'}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </form>
           </Form>
         </div>
         <!-- BUttons -->
         <div class="flex justify-end items-center gap-x-2 py-3 px-4 border-t">
-          <BaseButtonMode mode="gray" shape="square" class="border me-3" @click="step?.previousStep()" v-if="step?.data?.currentStep > 0">Sebelumnya</BaseButtonMode>
-          <!-- <BaseButtonMode mode="gray" shape="square" class="border" @click="validateFormStep(step?.data?.currentStep) ? step?.nextStep() : ''" v-if="step?.data?.currentStep < dataProgress.steps.length - 1">Selanjutnya</BaseButtonMode> -->
-          <BaseButtonMode mode="gray" shape="square" class="border" @click="schemas[step?.data?.currentStep] ? step?.nextStep() : ''" v-if="step?.data?.currentStep < dataProgress.steps.length - 1">Selanjutnya</BaseButtonMode>
+          <BaseButtonMode mode="gray" shape="square" class="border me-3" @click="step?.previousStep() ? currentStep-- : ''" v-if="step?.data?.currentStep > 0">Sebelumnya</BaseButtonMode>
+          <BaseButtonMode type="submit" form="survei" mode="gray" shape="square" class="border" v-if="step?.data?.currentStep < dataProgress.steps.length - 1">Selanjutnya</BaseButtonMode>
           <BaseButtonMode mode="outlined" shape="square" class="border" v-if="step?.data?.currentStep == dataProgress.steps.length - 1">Buat Survei</BaseButtonMode>
-          <button class="mx-3 rounded bg-sky-300 p-3" @click="cek(step?.data?.currentStep)">cek</button>
+          <!-- <button class="mx-3 rounded bg-sky-300 p-3" @click="cek()">cek</button> -->
         </div>
       </div>
     </div>
@@ -286,3 +327,16 @@ function cek(step: number) {
     <TableSurvei />
   </section>
 </template>
+
+<style scoped>
+tr:hover{
+  background-color: #cbd5e1;
+}
+td{
+  padding: 12px 18px;
+  overflow-x: auto;
+}
+td:nth-child(2){
+  min-width: 320px;
+}
+</style>

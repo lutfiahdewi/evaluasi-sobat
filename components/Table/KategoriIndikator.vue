@@ -49,7 +49,7 @@ const columns = [
 let dataTable: Kategori[] = [];
 const { data: result, loading, error, pending, refetch } = await useAsyncQuery(useTableCategories());
 try {
-  const data = await computed(() => result.value?.allKategoriNested);
+  const data = await computed(() => result.value?.allKategori);
   data.value.forEach((item: Item) => {
     let temp = "";
     item.KategoriIndikator.forEach((ind) => {

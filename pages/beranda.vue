@@ -6,11 +6,11 @@ definePageMeta({
   layout: false,
   // middleware: 'auth'
 });
-/*const authorizedRole = useCookie('authorizedRole');
+const authorizedRole = useCookie('authorizedRole');
 if (authorizedRole.value === undefined || authorizedRole.value === null){
-    // authorizedRole.value = "default";
-    navigateTo({ path: "/login" });
-}*/
+    authorizedRole.value = "default";
+    // navigateTo({ path: "/login" });
+}
 
 useCookie("activeBar").value = "Beranda";
 const token = useCookie("token");

@@ -15,25 +15,21 @@ interface User {
 const { authenticateUser } = useAuthStore(); // use authenticateUser action from  auth store
 const { authenticated } = storeToRefs(useAuthStore()); // make authenticated state reactive with storeToRefs
 const user = reactive({email:'',password:''})
-const router = useRouter();
 
 const login = async () => {
   await authenticateUser(user); // call authenticateUser and pass the user object
   // redirect to homepage if user is authenticated
   if (authenticated) {
-    router.push('/beranda');
+    reloadNuxtApp({ path: "/beranda" });
   }else{
     console.log("failed auth")
   }
 };
 
 const authorizedRole = useCookie<Role>("authorizedRole");
-if (authorizedRole.value !== "default") {
-  /*if (typeof window !== "undefined") {
-    window.alert("Already logged! \nPlease log out first!");
-  }*/
+/*if (authorizedRole.value !== "default") {
   reloadNuxtApp({ path: "/beranda" });
-}
+}*/
 
 function submitForm() {
   if (!user.email || !user.password) {

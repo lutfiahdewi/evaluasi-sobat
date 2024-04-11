@@ -1,9 +1,12 @@
 import { logErrorMessages } from "@vue/apollo-util";
 import { defineStore } from "pinia";
 import { useLogin } from "~/composables/useQueries";
-import { provideApolloClient } from "@vue/apollo-composable";
-import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client/core";
+import { DefaultApolloClient, provideApolloClient } from "@vue/apollo-composable";
+import { ApolloClient, InMemoryCache, createHttpLink, type NormalizedCacheObject } from "@apollo/client/core";
+import { inject } from "vue";
 
+// const nuxtApp = useNuxtApp()
+// const currentClient: ApolloClient<NormalizedCacheObject> = nuxtApp.vueApp.runWithContext(()=>inject(DefaultApolloClient))
 interface UserPayloadInterface {
   email: string;
   password: string;
@@ -11,17 +14,17 @@ interface UserPayloadInterface {
 // Apollo client
 // HTTP connection to the API
 const httpLink = createHttpLink({
-    uri: "http://localhost:4000/",
-  });
-  
-  // Cache implementation
-  const cache = new InMemoryCache();
+  uri: "http://localhost:4000/",
+});
+
+// Cache implementation
+const cache = new InMemoryCache();
 // Create the apollo client
 const apolloClient = new ApolloClient({
-    link: httpLink,
-    cache,
-  });
-  
+  link: httpLink,
+  cache,
+});
+
 
 export const useAuthStore = defineStore("auth", {
   state: () => ({
@@ -37,7 +40,7 @@ export const useAuthStore = defineStore("auth", {
         body: {
           username,
           password,
-        },
+        },plugin, Nuxt hook, Nuxt middleware, or Vue setup function.
       });*/
       const { mutate: sendLogin, onDone, onError, loading } = provideApolloClient(apolloClient)(() => useMutation(useLogin()));
       sendLogin({ email, password });
@@ -49,7 +52,7 @@ export const useAuthStore = defineStore("auth", {
       onDone((result) => {
         if (result.data) {
           console.log("token from grqpql: ", result.data?.login?.token);
-          const token = useCookie("token", {maxAge: (30*24*3600)}); // useCookie new hook in nuxt 3
+          const token = useCookie("token", { maxAge: 30 * 24 * 3600 }); // useCookie new hook in nuxt 3
           token.value = result.data?.login?.token; // set token to cookie
           this.authenticated = true; // set authenticated  state value to true
         }

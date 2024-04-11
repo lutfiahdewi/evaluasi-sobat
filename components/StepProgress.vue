@@ -8,19 +8,19 @@ const props = defineProps({
 const data = ref(props.dataMain);
 
 const nextStep = () => {
-  console.log("current step: ", data.value?.currentStep);
   if (data.value?.currentStep < data.value?.steps.length && data.value?.currentStep != undefined) {
     data.value.currentStep++;
   }
-  console.log("current next step: ", data.value?.currentStep);
+  console.log("current step: ", data.value?.currentStep);
+  return true;
 };
 
 const previousStep = () => {
-  console.log("current step: ", data.value?.currentStep);
   if (data.value?.currentStep > 0 && data.value?.currentStep != undefined) {
     data.value.currentStep--;
   }
-  console.log("current prev step: ", data.value?.currentStep);
+  console.log("current step: ", data.value?.currentStep);
+  return true;
 };
 
 defineExpose({

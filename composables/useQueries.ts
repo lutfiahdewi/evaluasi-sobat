@@ -27,6 +27,7 @@ export const useGetAllKategori = () => {
   const query = gql`
     query {
       allKategori {
+        kategori_id
         nama
       }
     }
@@ -127,7 +128,7 @@ export const useCreateIndikatorNested = () => {
 export const useTableCategories = () => {
   const query = gql`
     query {
-      allKategoriNested {
+      allKategori {
         kategori_id
         nama
         KategoriIndikator {
