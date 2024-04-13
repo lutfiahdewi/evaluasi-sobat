@@ -3,7 +3,7 @@ useSeoMeta({
   title: "Masuk",
 });
 import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
-import User from '~/components/Icon/User.vue';
+// import User from '~/components/Icon/User.vue';
 import { useAuthStore } from '~/store/auth'; // import the auth store we just created
 
 type Role = "default" | "admin" | "mitra"| "operator";
@@ -11,6 +11,10 @@ interface User {
   email: string;
   password: string;
 }
+const isDataSent = ref(false);
+const isDataLoading = ref(false);
+const isDataError = ref(false);
+
 
 const { authenticateUser } = useAuthStore(); // use authenticateUser action from  auth store
 const { authenticated } = storeToRefs(useAuthStore()); // make authenticated state reactive with storeToRefs
@@ -20,9 +24,10 @@ const login = async () => {
   await authenticateUser(user); // call authenticateUser and pass the user object
   // redirect to homepage if user is authenticated
   if (authenticated) {
+    isDataSent.value = true;
     reloadNuxtApp({ path: "/beranda" });
   }else{
-    console.log("failed auth")
+    isDataError.value = true;
   }
 };
 
@@ -36,6 +41,7 @@ function submitForm() {
     // window.alert("Please fill the form.");
     return;
   }
+  isDataLoading.value = true;
   const role: Role = validateUser(user);
   if (role !== "default") {
     authorizedRole.value = role;
@@ -43,6 +49,7 @@ function submitForm() {
   }
   login();
   user.password = "";
+  isDataLoading.value = false;
   return;
 }
 
@@ -97,4 +104,8 @@ function validateUser(user: User): Role {
       </div>
     </div>
   </div>
+  <!-- MOdal-modal lain -->
+  <ModalSuccess v-if="isDataSent" @close="isDataSent = !isDataSent" />
+  <ModalLoading v-if="isDataLoading" @close="isDataLoading = !isDataLoading" />
+  <ModalError v-if="isDataError" @close="isDataError = !isDataError" />
 </template>

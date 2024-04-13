@@ -6,10 +6,13 @@
  * Use this component to make basic modal or other modal.
  * You can define your own width and max-height modal using props.
  * Slot for each section also available to customized.
+ * (-) : transition animation doesn't work(?)
+ * @return
  */
 defineProps<{
-  width?: string;
-  maxHeight?: string;
+  color?: string;
+  width?: string; //default: 600px
+  maxHeight?: string; //default:256px
 }>();
 const emit = defineEmits<{
   (e: 'close'): void
@@ -22,7 +25,7 @@ import { vOnClickOutside } from "@vueuse/components";
     <!-- Modal component-->
     <Transition name="modal">
       <div class="modal-mask">
-        <div :class="'modal-container bg-slate-300 border rounded-lg ' + ($props.width || 'w-[600px]')" v-on-click-outside="() => $emit('close')">
+        <div :class="'modal-container rounded-lg ' + ($props.width || ' w-[600px] ') + ' border ' + ($props.color || ' bg-slate-300 ')" v-on-click-outside="() => $emit('close')">
           <!-- Header section -->
           <div class="modal-header border-b px-5 py-3">
             <div class="flex justify-between">

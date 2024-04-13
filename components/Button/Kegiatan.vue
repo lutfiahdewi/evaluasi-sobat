@@ -3,10 +3,14 @@ defineProps<{
   status: number;
 }>();
 type Mode = "normal" | "outlined" | "gray";
-var mode : Mode = "outlined";
+var mode: Mode = "outlined";
 var statusKegiatan = "Belum berjalan";
 function getMode(status: number) {
   switch (status) {
+    case 0:
+      mode = "outlined";
+      statusKegiatan = "Belum berjalan";
+      break;
     case 1:
       mode = "normal";
       statusKegiatan = "Berjalan";
@@ -28,11 +32,11 @@ function getMode(status: number) {
 
 <template>
   <NuxtLink v-if="status === 2" to="/evaluasi/nilaimitra">
-    <BaseButtonMode shape="pill" :mode="getMode(status)" :notActive="status !== 2">
+    <BaseButtonMode shape="pill" :mode="getMode(status)">
       {{ statusKegiatan }}
     </BaseButtonMode>
   </NuxtLink>
-  <BaseButtonMode v-else shape="pill" :mode="getMode(status)" :notActive="status !== 2">
+  <BaseButtonMode v-else shape="pill" :mode="getMode(status)" :not-active="true">
     {{ statusKegiatan }}
   </BaseButtonMode>
 </template>

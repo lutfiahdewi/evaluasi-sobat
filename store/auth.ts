@@ -47,6 +47,7 @@ export const useAuthStore = defineStore("auth", {
       this.loading = loading.value;
       onError((error) => {
         logErrorMessages(error);
+        this.authenticated = false;
         return;
       });
       onDone((result) => {
@@ -60,8 +61,8 @@ export const useAuthStore = defineStore("auth", {
     },
     logUserOut() {
       const token = useCookie("token"); // useCookie new hook in nuxt 3
-      this.authenticated = false; // set authenticated  state value to false
       token.value = null; // clear the token cookie
+      this.authenticated = false; // set authenticated  state value to false
     },
   },
 });

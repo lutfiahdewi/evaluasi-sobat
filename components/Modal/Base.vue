@@ -10,8 +10,9 @@
  */
 const props = defineProps<{
   show?: boolean;
-  width?: string;
-  maxHeight?: string;
+  color?: string;
+  width?: string; //default: 600px
+  maxHeight?: string; //default:256px
 }>();
 defineEmits<{
   (e: "close"): void;
@@ -38,7 +39,7 @@ defineExpose({
     <!-- Modal component-->
     <Transition name="modal">
       <div v-if="showModal" class="modal-mask">
-        <div :class="'modal-container bg-slate-300 border rounded-lg ' + ($props.width || 'w-[600px]')" v-on-click-outside="close">
+        <div :class="'modal-container rounded-lg '+ ($props.width || ' w-[600px] ') + ' border ' + ($props.color || ' bg-slate-300 ')" v-on-click-outside="close">
           <!-- Header section -->
           <div class="modal-header border-b px-5 py-3">
             <div class="flex justify-between">

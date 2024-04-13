@@ -47,7 +47,7 @@ const columns = [
 // query data
 
 let dataTable: Kategori[] = [];
-const { data: result, loading, error, pending, refetch } = await useAsyncQuery(useTableCategories());
+const { data: result, error, pending } = await useAsyncQuery(useTableCategories());
 try {
   const data = await computed(() => result.value?.allKategori);
   data.value.forEach((item: Item) => {

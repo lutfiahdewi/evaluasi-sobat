@@ -164,3 +164,142 @@ export const useTableIndicators = () => {
   `;
   return query;
 };
+
+/**
+ * Survei
+ * @returns
+ */
+export const useCreateSurvei = () => {
+  return gql`
+    mutation ($kode: String!, $nama: String!, $tahun: String!, $tipe: Int!, $unit_kd: String) {
+      createSurvei(kode: $kode, nama: $nama, tahun: $tahun, tipe: $tipe, unit_kd: $unit_kd) {
+        __typename
+        survei_id
+        kode
+        nama
+        tahun
+        tipe
+        unit_kd
+      }
+    }
+  `;
+};
+
+/**
+ * Kegiatan
+ */
+// Get all or single kegiatan
+export const useGetKegiatan = () => {
+  return gql`
+    query ($kode: String) {
+      Kegiatan(kode: $kode) {
+        kegiatan_id
+        kode
+        nama
+      }
+    }
+  `;
+};
+
+/**
+ * Posisi
+ */
+// Get all or single posisi
+export const useGetPosisi = () => {
+  return gql`
+    query ($kode: String) {
+      Posisi(kode: $kode) {
+        posisi_id
+        kode
+        nama
+      }
+    }
+  `;
+};
+
+/**
+ * KegSurvei
+ */
+//create
+export const useCreateKegSurvei = () => {
+  return gql`
+    mutation ($input: KegSurveiInputType!, $survei: SurveiInputType) {
+      createKegSurvei(input: $input, survei: $survei) {
+        kegsurvei_id
+        status
+      }
+    }
+  `;
+};
+// get
+export const useGetKegSurvei = () => {
+  return gql`
+    query ($id: Int) {
+    KegSurvei (
+        id: $id
+    ) {
+        kegsurvei_id
+        Survei { 
+            kode
+            nama
+            tipe
+        }
+        Kegiatan { 
+            kode
+            nama
+        }
+        status
+    }
+}
+  `;
+};
+
+/**
+ * PosKegSurvei
+ */
+
+//Create
+export const useCreatePosKegSurvei = () => {
+  return gql`
+    mutation ($input: PosKegSurveiInputType!) {
+      createPosKegSurvei(input: $input) {
+        poskegsurvei_id
+        urutan
+      }
+    }
+  `;
+};
+
+
+/**
+ * JumPosisiPetugasKegSurvei
+ */
+
+// create
+export const useCreateJumPosisiPetugasKegSurvei = () => {
+  return gql`
+    mutation ($input: JumPosisiPetugasKegSurveiInputType!) {
+      createJumPosisiPetugasKegSurvei(input: $input) {
+        jumposisipetugaskegsurvei_id
+        jumlah
+      }
+    }
+  `;
+};
+// query
+export const useGetJumPosisiPetugasKegSurvei = () => {
+  return gql`
+    query ($id: Int) {
+      JumPosisiPetugasKegSurvei(id: $id) {
+        jumposisipetugaskegsurvei_id
+        survei_kd
+        keg_kd
+        kategori {
+          kategori_id
+          nama
+        }
+        jumlah
+      }
+    }
+  `;
+};
