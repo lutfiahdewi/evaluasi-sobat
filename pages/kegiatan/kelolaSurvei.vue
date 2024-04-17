@@ -4,10 +4,11 @@ import type { StepProgress } from "#build/components";
 import { Form, Field, ErrorMessage } from "vee-validate";
 import { object, string, number, boolean } from "yup";
 import { useGetKegiatan } from "~/composables/useQueries";
-
 useSeoMeta({
   title: "Kelola Survei",
 });
+// const authorizedRole = useCookie("authorizedRole");
+const operator = useCookie("operator");
 type kategori = {
   kategori_id: string;
   nama: string;
@@ -178,7 +179,7 @@ function sendData2(data:survei) {
 
 <template>
   <h3 class="font-bold mb-3">Kelola Survei</h3>
-  <BaseButtonMode mode="normal" shape="square" class="text-lg" @click="toggleModal()"><IconAdd class="h-5 w-5 inline" /> Tambahkan Survei Baru</BaseButtonMode>
+  <BaseButtonMode v-if="!operator" mode="normal" shape="square" class="text-lg" @click="toggleModal()"><IconAdd class="h-5 w-5 inline" /> Tambahkan Survei Baru</BaseButtonMode>
   <!-- Modal form survei -->
   <ModalBase2 v-if="isOpen" width="max-w-fit" maxHeight="h-[400px] 2xl:h-fit 2xl:min-h-[450px] " color="bg-slate-500" @close="toggleModal()">
     <template #header>

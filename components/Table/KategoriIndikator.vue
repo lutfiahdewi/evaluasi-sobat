@@ -47,9 +47,9 @@ const columns = [
 // query data
 
 let dataTable: Kategori[] = [];
-const { data: result, error, pending } = await useAsyncQuery(useTableCategories());
+const { data: result, error, refresh } = await useAsyncQuery(useTableCategories());
 try {
-  const data = await computed(() => result.value?.allKategori);
+  const data = computed(() => result.value?.allKategori);
   data.value.forEach((item: Item) => {
     let temp = "";
     item.KategoriIndikator.forEach((ind) => {
@@ -96,7 +96,7 @@ async function deleteData(id: string, nama: string): Promise<void> {
       isDataLoading.value = false;
       isDataSent.value = true;
       // reloadNuxtApp();
-      refetch();
+      refresh();
     });
   }
 }

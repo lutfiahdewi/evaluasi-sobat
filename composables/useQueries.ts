@@ -12,9 +12,12 @@ export const useLogin = () => {
     mutation ($email: String!, $password: String!) {
       login(email: $email, password: $password) {
         token
-        user {
-          user_id
-          username
+        user { 
+            username
+            is_pegawai
+            UserRole { 
+                role_id
+            }
         }
       }
     }
@@ -282,6 +285,7 @@ export const useCreateJumPosisiPetugasKegSurvei = () => {
       createJumPosisiPetugasKegSurvei(input: $input) {
         jumposisipetugaskegsurvei_id
         jumlah
+        is_confirmed
       }
     }
   `;

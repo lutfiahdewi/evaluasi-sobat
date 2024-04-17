@@ -27,7 +27,7 @@ if (authorizedRole.value !== "mitra"){
 
 <template>
 <div class="min-h-screen flex flex-col">
-    <AppHeader role="mitra" :authorized="true" active-bar="Beranda" :menus="menuMitra"/>
+    <AppHeader role="mitra" :authorized="true" :menus="menuMitra"/>
     <div class="grow pb-6 mx-3 md:mx-12 lg:mx-24">
       <slot />
     </div>

@@ -12,8 +12,15 @@ const { logUserOut } = useAuthStore(); // use authenticateUser action from  auth
 const { authenticated } = storeToRefs(useAuthStore()); // make authenticated state reactive with storeToRefs
 logUserOut();
 const authorizedRole = useCookie("authorizedRole");
+const operator = useCookie("operator");
 authorizedRole.value = undefined;
+operator.value = undefined;
 onLogout(); // remove auth token in apollo client
+/*if(authenticated){
+  return
+}else{
+}*/
+
 reloadNuxtApp({ path: "/" });
 </script>
 

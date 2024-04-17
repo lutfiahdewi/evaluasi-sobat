@@ -25,21 +25,16 @@ const menuAdmin = [
   {
     title: "Pengaturan",
     url: "",
-    child: [
-      { title: "Kelola Pengguna", url: "" },
-      { title: "Kelola Organisasi", url: "" },
-      { title: "Kelola Indikator", url: "/Pengaturan/KelolaIndikator" },
-    ],
+    // child: [
+    //   { title: "Kelola Pengguna", url: "" },
+    //   { title: "Kelola Organisasi", url: "" },
+    //   { title: "Kelola Indikator", url: "/Pengaturan/KelolaIndikator" },
+    // ],
   },
 ];
-const operator = useCookie("operator");
-if(operator.value){
-  menuAdmin[5].child = undefined
-}
-
 
 const authorizedRole = useCookie("authorizedRole");
-if (authorizedRole.value !== "admin"){
+if (authorizedRole.value !== "operator"){
     navigateTo({ path: "/beranda" });
 }
 </script>

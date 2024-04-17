@@ -20,7 +20,6 @@ function changeMenuClicked() {
   menuClicked.value = !menuClicked.value;
 }
 const authorizedRole = useCookie("authorizedRole");
-console.log("Header Rendered!");
 </script>
 
 <template>

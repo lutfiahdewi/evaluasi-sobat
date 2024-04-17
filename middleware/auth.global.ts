@@ -6,9 +6,9 @@ export default defineNuxtRouteMiddleware((to) => {
   const { onLogin } = useApollo();
   const { authenticated } = storeToRefs(useAuthStore()); // make authenticated state reactive
   const token = useCookie("token"); // get token from cookies
-  console.log("Hello form middleware");
-  console.log(to?.name);
-  console.log(token.value);
+  // console.log("Hello form middleware");
+  // console.log(to?.name);
+  // console.log(token.value);
 
   // check if value exists
   if (token.value) {

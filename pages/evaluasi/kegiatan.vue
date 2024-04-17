@@ -9,6 +9,6 @@ useHead({
   <!-- <SectionFilter /> -->
   <section>
     <BaseTable class="py-3" />
+    <TableEvaluasiKegiatan/>
   </section>
-  <BaseButtonMode shape="square" mode="normal" >Coba</BaseButtonMode>
 </template>

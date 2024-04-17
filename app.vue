@@ -9,8 +9,13 @@ useHead({
     class: "test",
   },
   link: [{ rel: "icon", type: "image/png", href: "/logo.png" }],
-  script: [{ innerHTML: "console.log('Main app rendered!')" }],
+  // script: [{ innerHTML: "console.log('Main app rendered!')" }],
 });
+
+const authorizedRole = useCookie('authorizedRole');
+if (authorizedRole.value === undefined || authorizedRole.value === null){
+    authorizedRole.value = "default";
+}
 </script>
 
 <template>

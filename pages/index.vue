@@ -1,17 +1,8 @@
 <script setup lang="ts">
-useSeoMeta({
-  // title: "Beranda",
-});
 definePageMeta({
   //layout: false,
 });
-const authorizedRole = useCookie("authorizedRole");
 
-if (authorizedRole.value) {
-    reloadNuxtApp({ path: "/beranda" });
-  }
-
-useCookie("activeBar").value = "Beranda";
 </script>
 
 <template>

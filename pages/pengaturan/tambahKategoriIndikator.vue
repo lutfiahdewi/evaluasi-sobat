@@ -189,34 +189,13 @@ function sendData() {
     });
     isDataSent.value = true;
     isDataLoading.value = false;
-    const temp = await resolveAfter3s();
+    const temp = await useWaitS(3);
     console.log(temp);
     await reloadNuxtApp({ path: "/pengaturan/kelolaIndikator" });
     isDataSent.value = false;
-
-    /*let tempValid;
-    await arr_indicators.forEach((ind) => {
-      console.log(ind.id);
-      if (ind.id == null || ind.id == undefined || ind.id === 0) {
-        tempValid = false;
-      }
-    });
-    if (tempValid==null || tempValid == undefined) {
-      //close loading modal
-      console.log("temp valid: ", tempValid);
-      isDataSent.value = true;
-      reloadNuxtApp({ path: "/pengaturan/kelolaIndikator" });
-    }*/
   });
 }
 
-function resolveAfter3s() {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve("resolved");
-    }, 3000);
-  });
-}
 </script>
 
 <template>
