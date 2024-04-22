@@ -9,6 +9,7 @@ type dataRow = {
   kegiatanSurvei: string;
   jumlahPetugasSurvei: string;
   evaluasiSurvei: string;
+  konfirmasivaluasiSurvei: boolean;
   statusEvaluasiSurvei?: boolean;
 };
 const columns = [
@@ -44,10 +45,10 @@ const columns = [
     label: "Penilaian",
     field: "evaluasiSurvei",
   },
-  {
-    label: "Status Penilaian",
-    field: "statusEvaluasiSurvei",
-  },
+  // {
+  //   label: "Status Penilaian",
+  //   field: "statusEvaluasiSurvei",
+  // },
   {
     label: "Aksi",
     field: "aksi",
@@ -55,16 +56,22 @@ const columns = [
 ];
 
 // query KegSurvei
-const { data: resultKegSurvei } = await useAsyncQuery(useGetKegSurvei());
+const { data: resultKegSurvei, refresh: refreshKegSurvei } = await useAsyncQuery(useGetKegSurvei());
 const dataKegSurvei: any[] = resultKegSurvei.value?.KegSurvei;
 
 // query JumPosisiPetugasKegSurvei
-const { data: resultJumPosisiPetugasKegSurvei, refresh, error } = await useAsyncQuery(useGetJumPosisiPetugasKegSurvei());
+const { data: resultJumPosisiPetugasKegSurvei, refresh : refreshJumPosisiPetugasKegSurvei, error } = await useAsyncQuery(useGetJumPosisiPetugasKegSurvei());
 const dataJumPosisiPetugasKegSurvei: any[] = resultJumPosisiPetugasKegSurvei.value?.JumPosisiPetugasKegSurvei;
-
 let dataTable: dataRow[] = reactive([]);
+//refresh data
+function refreshData(){
+  refreshKegSurvei();
+  refreshJumPosisiPetugasKegSurvei();
+  dataTable= reactive([]);
+  addData();
+}
 
-onMounted(() => {
+function addData(){
   try {
     dataKegSurvei.forEach((item) => {
       let temp: dataRow = {
@@ -75,6 +82,7 @@ onMounted(() => {
         kegiatanSurvei: item.Kegiatan?.nama,
         jumlahPetugasSurvei: "0",
         evaluasiSurvei: "0",
+        konfirmasivaluasiSurvei: item.is_confirm,
       };
       const matchIndex = useFindIndex(dataJumPosisiPetugasKegSurvei, { survei_kd: item.Survei?.kode, keg_kd: item.Kegiatan?.kode });
       if (matchIndex >= 0) {
@@ -87,24 +95,30 @@ onMounted(() => {
   } catch (error) {
     console.log(error);
   }
-});
+};
+addData();
 </script>
 
 <template>
   <div>
-    <BaseButtonMode mode="normal" shape="square" @click="refresh" class="mb-3"><IconRefresh class="h-6 w-6 inline me-1" />Refresh</BaseButtonMode>
+    <!-- <BaseButtonMode mode="normal" shape="square" @click="refreshData()" class="mb-3"><IconRefresh class="h-6 w-6 inline me-1" />Refresh</BaseButtonMode> -->
     <vue-good-table :columns="columns" :rows="dataTable">
       <template #table-row="props">
         <span v-if="props.column.field == 'statusSurvei'">
           <div class="flex justify-center">
-            <ButtonKegiatan :status="props.row.statusSurvei" />
+            <ButtonKegiatan :status="parseInt(props.row.statusSurvei)" />
           </div>
         </span>
-        <span v-else-if="props.column.field == 'statusEvaluasiSurvei'">
+        <!-- <span v-else-if="props.column.field == 'statusEvaluasiSurvei'">
           <div class="flex justify-center">
-            <ButtonPenilaian :status="props.row.statusEvaluasiSurvei" />
+            <ButtonPenilaian 
+            :status="parseInt(props.row.statusEvaluasiSurvei)"  
+            :kegiatan="parseInt(props.row.statusSurvei)" 
+            :konfirmasi="parseInt(props.row.konfirmasiEvaluasiSurvei)"
+            :query="'a'+'b'"
+            />
           </div>
-        </span>
+        </span> -->
         <!-- <span v-else-if="props.column.field == 'aksi'" class="flex justify-evenly">
           <ButtonUpdate :id="props.row.id" baseLink="#" />
           <ButtonDelete/>
@@ -115,5 +129,4 @@ onMounted(() => {
       </template>
     </vue-good-table>
   </div>
-  {{ dataJumPosisiPetugasKegSurvei[1].kategori?.nama }}
 </template>

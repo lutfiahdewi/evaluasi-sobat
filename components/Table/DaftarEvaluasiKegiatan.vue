@@ -95,7 +95,7 @@ try {
         </span>
         <span v-else-if="props.column.field == 'statusEvaluasiSurvei'">
           <div class="flex justify-center">
-            <ButtonPersetujuan 
+            <ButtonPenilaian 
             :kegiatan="parseInt(props.row.statusSurvei)" 
             :konfirmasi="parseInt(props.row.konfirmasiEvaluasiSurvei)"
             :status="parseInt(props.row.statusEvaluasiSurvei)" 

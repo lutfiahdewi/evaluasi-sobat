@@ -146,7 +146,7 @@ const {
   },
 }));
 const { mutate: sendIndikatorNested, onDone: resultIndikatorNested, onError: errorIndikatorNested, loading: loadingIndikatorNested } = useMutation(useCreateIndikatorNested());
-const branch_kd = "000abc";
+const branch_kd = "0123ABC";
 function sendData() {
   //Show loading modal
   isDataLoading.value = true;
@@ -173,29 +173,29 @@ function sendData() {
           no_urut: ind.no_urut,
         },
       });
-      // loading.value === false;
-      resultIndikatorNested((result) => {
-        console.log("indikator sent!");
-        const res = result.data;
-        console.log(res);
-        ind.id = res?.createIndikatorNested?.indikator_id;
-      });
       errorIndikatorNested((error) => {
         logErrorMessages(error);
         isDataLoading.value = false;
         isDataError.value = true;
         return;
       });
+      // loading.value === false;
+      resultIndikatorNested(async (result) => {
+        console.log("indikator sent!");
+        const res = result.data;
+        console.log(res);
+        ind.id = res?.createIndikatorNested?.indikator_id;
+        isDataSent.value = true;
+        isDataLoading.value = false;
+        const temp = await useWaitS(2);
+        if (temp) {
+          isDataSent.value = false;
+          reloadNuxtApp({ path: "/pengaturan/kelolaIndikator" });
+        }
+      });
     });
-    isDataSent.value = true;
-    isDataLoading.value = false;
-    const temp = await useWaitS(3);
-    console.log(temp);
-    await reloadNuxtApp({ path: "/pengaturan/kelolaIndikator" });
-    isDataSent.value = false;
   });
 }
-
 </script>
 
 <template>
@@ -313,8 +313,10 @@ function sendData() {
       </div>
       <BaseButtonMode shape="square" mode="outlined" class="me-3 font-semibold" @click.prevent="generate()">Cek Konsistensi</BaseButtonMode>
       <div class="my-3 p-3 flex item-center text-red-600 border rounded-lg" v-if="!isMatricesValid"><IconWarning class="w-6 h-6 me-2" />Pastikan skala yang dimasukkan antara 1-9</div>
-      <div class="my-3 p-3 flex item-center text-red-600 border rounded-lg" v-if="!ahp.isConsistent && isMatricesValid"><IconWarning class="w-6 h-6 me-2" />CR = {{ ahp.CR }}, pastikan perbandingan yang dimasukkan konsisten</div>
-      <div class="my-3 p-3 flex item-center border rounded-lg" v-if="ahp.isConsistent && ahp.CR != -1">CR = {{ ahp.CR }} menunjukkan perbandingan konsisten</div>
+      <div class="my-3 p-3 flex item-center text-red-600 border rounded-lg" v-if="!ahp.isConsistent && isMatricesValid">
+        <IconWarning class="w-6 h-6 me-2" />Rasio konsistensi = {{ round(ahp.CR, 3) }}, pastikan perbandingan yang dimasukkan konsisten
+      </div>
+      <div class="my-3 p-3 flex item-center border rounded-lg" v-if="ahp.isConsistent && ahp.CR != -1">Rasio konsistensi = {{ round(ahp.CR, 3) }} menunjukkan perbandingan konsisten</div>
     </section>
     <!-- Validasi -->
     <div class="my-3 p-3 flex item-center text-red-600 border rounded-lg" v-if="!isValid"><IconWarning class="w-6 h-6 me-2" />Pastikan form telah terisi semua!</div>

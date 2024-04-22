@@ -12,12 +12,12 @@ export const useLogin = () => {
     mutation ($email: String!, $password: String!) {
       login(email: $email, password: $password) {
         token
-        user { 
-            username
-            is_pegawai
-            UserRole { 
-                role_id
-            }
+        user {
+          username
+          is_pegawai
+          UserRole {
+            role_id
+          }
         }
       }
     }
@@ -43,6 +43,7 @@ export const useGetKategori = () => {
   const query = gql`
     query ($id: Int!) {
       Kategori(id: $id) {
+        __typename
         kategori_id
         nama
         definisi
@@ -237,23 +238,23 @@ export const useCreateKegSurvei = () => {
 // get
 export const useGetKegSurvei = () => {
   return gql`
-    query ($id: Int) {
-    KegSurvei (
-        id: $id
-    ) {
+    query ($id: Int, $survei_kd: String, $keg_kd: String) {
+      KegSurvei(id: $id, survei_kd: $survei_kd, keg_kd: $keg_kd) {
         kegsurvei_id
-        Survei { 
-            kode
-            nama
-            tipe
+        Survei {
+          kode
+          nama
+          tipe
+          tahun
         }
-        Kegiatan { 
-            kode
-            nama
+        Kegiatan {
+          kode
+          nama
         }
+        is_confirm
         status
+      }
     }
-}
   `;
 };
 
@@ -273,6 +274,7 @@ export const useCreatePosKegSurvei = () => {
   `;
 };
 
+//get
 
 /**
  * JumPosisiPetugasKegSurvei
@@ -302,7 +304,219 @@ export const useGetJumPosisiPetugasKegSurvei = () => {
           kategori_id
           nama
         }
+        posisi_kd
+        Posisi {
+          nama
+        }
         jumlah
+        is_confirmed
+      }
+    }
+  `;
+};
+// serach by
+export const useSearchJumPosisiPetugasKegSurvei = () => {
+  return gql`
+    query ($survei_kd: String!, $keg_kd: String!, $branch_kd: String!, $posisi_kd: String!) {
+      searchJumPosisiPetugasKegSurvei(survei_kd: $survei_kd, keg_kd: $keg_kd, branch_kd: $branch_kd, posisi_kd: $posisi_kd) {
+        jumposisipetugaskegsurvei_id
+        Posisi {
+          nama
+        }
+        kategori {
+          kategori_id
+          nama
+          KategoriIndikator {
+            kategoriIndikator_id
+            no_urut
+            bobot
+            indikator {
+              indikator_id
+              nama
+              is_benefit
+            }
+          }
+        }
+        jumlah
+        is_confirmed
+      }
+    }
+  `;
+};
+
+/**
+ * Petugas Survey
+ *
+ */
+
+// Create
+
+// Get
+export const useGetPetugasSurvei = () => {
+  return gql`
+    query ($id: Int) {
+      PetugasSurvei(id: $id) {
+        __typename
+        petugassurvei_id
+        survei_kd
+        keg_kd
+        branch_kd
+        posisi_kd
+        Posisi {
+          nama
+        }
+        username
+        status
+      }
+    }
+  `;
+};
+// create
+
+// create many
+export const useCreateManyPetugasSurvei = () => {
+  return gql`
+    mutation ($input: PetugasSurveiInputType!, $usernames: [String]!) {
+      createManyPetugasSurvei(input: $input, usernames: $usernames) {
+        petugassurvei_id
+      }
+    }
+  `;
+};
+
+/***
+ * Penugasan Struktur
+ * @returns
+ * @param input: What?
+ */
+//get
+//create
+//create many
+export const useCreateManyPenugasanStruktur = () => {
+  return gql`
+    mutation ($input: PenugasanStrukturInputType!, $usernames: [String]!) {
+      createManyPenugasanStruktur(input: $input, usernames: $usernames) {
+        penugasanstruktur_id
+      }
+    }
+  `;
+};
+// search(query by filtering )
+export const useSearchPenugasanStruktur = () => {
+  return gql`
+    query ($keg_kd: String!, $branch_kd: String!, $posisi_kd: String!) {
+      searchPenugasanStruktur(keg_kd: $keg_kd, branch_kd: $branch_kd, posisi_kd: $posisi_kd) {
+        username
+        User {
+          user_id
+          nama
+        }
+        parent
+        status
+      }
+    }
+  `;
+};
+// Query optional filtering
+export const useGetPenugasanStruktur = () => {
+  return gql`
+    query ($id: Int, $keg_kd: String, $branch_kd: String, $posisi_kd: String) {
+      PenugasanStruktur(id: $id, keg_kd: $keg_kd, branch_kd: $branch_kd, posisi_kd: $posisi_kd) {
+        penugasanstruktur_id
+        keg_kd
+        branch_kd
+        posisi_kd
+        username
+        User {
+          user_id
+          username
+          nama
+        }
+        parent
+        status
+      }
+    }
+  `;
+};
+
+/**
+ * Nilai Kategori Indikator
+ * @param "input": {
+ *      "survei_kd": "0125A",
+ *       "keg_kd": "0125B",
+ *       "branch_kd": "0123ABC",
+ *       "posisi_kd": "0125C",
+ *       "username": "mitra_1",
+ *       "kategoriIndikator_id": [
+ *           1, 2
+ *       ],
+ *       "nilai": [
+ *           null, 4
+ *       ],
+ *       "is_final": false
+ *   }
+ */
+// create
+export const useCreateNilaiKategoriIndikator = () => {
+  return gql`
+    mutation ($input: NilaiKategoriIndikatorInputType!) {
+      createNilaiKategoriIndikator(input: $input) {
+        nilaikategoriindikator_id
+        survei_kd
+        keg_kd
+        branch_kd
+        posisi_kd
+        username
+        kategoriIndikator_id
+        nilai
+        is_final
+      }
+    }
+  `;
+};
+// get
+export const useGetNilaiKategoriIndikator = () => {
+  return gql`
+    query ($id: Int, $survei_kd: String, $keg_kd: String, $branch_kd: String, $posisi_kd: String, $username: String, $tahun: String) {
+      NilaiKategoriIndikator(id: $id, survei_kd: $survei_kd, keg_kd: $keg_kd, branch_kd: $branch_kd, posisi_kd: $posisi_kd, username: $username, tahun: $tahun) {
+        __typename
+        nilaikategoriindikator_id
+        survei_kd
+        keg_kd
+        branch_kd
+        posisi_kd
+        username
+        kategoriIndikator_id
+        KategoriIndikator {
+          no_urut
+        }
+        nilai
+        is_final
+        tahun
+      }
+    }
+  `;
+};
+
+// update
+/**
+ * @returns id, nilai, is_final
+ *
+ * @param single update: id should have is_final
+ * @param
+ * batch update: input where there are list of kategoriIndikator_id and nilai, both should have same length.
+ *
+ */
+export const useUpdateNilaiKategoriIndikator = () => {
+  return gql`
+    mutation ($input: NilaiKategoriIndikatorInputType, $id: Int, $nilai: Int, $is_final: Boolean) {
+      updateNilaiKategoriIndikator(input: $input, id: $id, nilai: $nilai, is_final: $is_final) {
+        nilaikategoriindikator_id
+        KategoriIndikator {
+          kategoriIndikator_id
+        }
+        nilai
+        is_final
       }
     }
   `;

@@ -11,7 +11,7 @@ interface User {
   email: string;
   password: string;
 }
-const isDataSent = ref(false);
+// const isDataSent = ref(false);
 const isDataLoading = ref(false);
 const isUserNotFound = ref(false);
 const isEmailNotValid = ref(false);
@@ -31,7 +31,7 @@ const login = async () => {
   const isAuthenticated = await authenticateUser(user); // call authenticateUser and pass the user object
   // redirect to homepage if user is authenticated
   if (isAuthenticated) {
-    isDataSent.value = true;
+    // isDataSent.value = true;
     // authorizedRole.value = validateRole(getRoleId.value);
     reloadNuxtApp({ path: "/beranda" });
   } else {
@@ -108,6 +108,5 @@ const isFormInvalid = computed(() => {
     </div>
   </div>
   <!-- MOdal-modal lain -->
-  <ModalSuccess v-if="isDataSent" @close="isDataSent = !isDataSent" />
   <ModalLoading v-if="isDataLoading" @close="isDataLoading = !isDataLoading" />
 </template>

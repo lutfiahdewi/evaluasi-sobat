@@ -16,7 +16,9 @@ const menuAdmin = [
     child: [
       { title: "Seleksi Petugas", url: "" },
       { title: "Petugas Organik", url: "" },
-      { title: "Kelola Akun Petugas", url: "#" },
+      { title: "Kelola Akun Petugas", url: "" },
+      { title: "Evaluasi Kegiatan", url: "/rekrutmen/evaluasi" },
+      { title: "Daftar Nilai Evaluasi", url: "/rekrutmen/nilaiEvaluasi" },
       { title: "Daftar Peringkat", url: "/rekrutmen/peringkat" },
     ],
   },
@@ -34,7 +36,8 @@ const menuAdmin = [
 ];
 const operator = useCookie("operator");
 if(operator.value){
-  menuAdmin[5].child = undefined
+  menuAdmin[1].child = undefined;
+  menuAdmin[5].child = undefined;
 }
 
 

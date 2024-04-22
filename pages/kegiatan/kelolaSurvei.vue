@@ -3,7 +3,7 @@ import { logErrorMessages } from "@vue/apollo-util";
 import type { StepProgress } from "#build/components";
 import { Form, Field, ErrorMessage } from "vee-validate";
 import { object, string, number, boolean } from "yup";
-import { useGetKegiatan } from "~/composables/useQueries";
+import { useCreateManyPenugasanStruktur, useCreateManyPetugasSurvei, useGetKegiatan } from "~/composables/useQueries";
 useSeoMeta({
   title: "Kelola Survei",
 });
@@ -26,24 +26,24 @@ type survei = {
   konfirmasiEvaluasiSurvei?: boolean;
 };
 
-const dataForm : survei = reactive({
-  kodeSurvei: '',
-  namaSurvei: '',
-  tipeSurvei: '',
+const dataForm: survei = reactive({
+  kodeSurvei: "",
+  namaSurvei: "",
+  tipeSurvei: "",
   tahunSurvei: undefined,
-  wilayahSurvei: '',
-  kegiatanSurvei: '',
-  posisiSurvei: '',
-  jumlahPetugasSurvei: '',
-  evaluasiSurvei: '',
+  wilayahSurvei: "",
+  kegiatanSurvei: "",
+  posisiSurvei: "",
+  jumlahPetugasSurvei: "",
+  evaluasiSurvei: "",
   konfirmasiEvaluasiSurvei: undefined,
-})
+});
 //Modal
 const isOpen = ref(false);
 const isDataSent = ref(false);
 const isDataLoading = ref(false);
 const isDataError = ref(false);
-function toggleModal(){
+function toggleModal() {
   isOpen.value = !isOpen.value;
 }
 // progress
@@ -97,7 +97,7 @@ const currentSchema = computed(() => {
 
 // send form
 function sendData() {
-  const data:survei = useClone(dataForm)
+  const data: survei = useClone(dataForm);
   isDataLoading.value = true;
   //create kegSurvei
   const { mutate: sendKegSurvei, onDone: resultKegSurvei, onError: errorKegSurvei } = useMutation(useCreateKegSurvei());
@@ -105,7 +105,7 @@ function sendData() {
     input: {
       survei_kd: data.kodeSurvei,
       keg_kd: data.kegiatanSurvei,
-      status: 1,// 0:blm jalan; 1: berjalan; 2: evaluasi
+      status: 2, // 0:blm jalan; 1: berjalan; 2: evaluasi
       is_rekrutmen: 1,
       is_multi: 0,
       is_confirm: data.konfirmasiEvaluasiSurvei,
@@ -118,25 +118,22 @@ function sendData() {
       tipe: parseInt(data.tipeSurvei),
     },
   });
-  
+
   errorKegSurvei((error) => {
     logErrorMessages(error);
     isDataLoading.value = false;
     isDataError.value = true;
     return;
   });
-  resultKegSurvei(() =>{
+  resultKegSurvei(() => {
     sendData2(data);
   });
 }
 
-function sendData2(data:survei) {
-  //create KegSurvei
-
-
+async function sendData2(data: survei) {
   //create posKegSurvei
   const { mutate: sendPosKegSurvei, onDone: resultPosKegSurvei, onError: errorPosKegSurvei } = useMutation(useCreatePosKegSurvei());
-  sendPosKegSurvei({
+  const res1 = await sendPosKegSurvei({
     input: {
       survei_kd: data.kodeSurvei,
       keg_kd: data.kegiatanSurvei,
@@ -151,14 +148,17 @@ function sendData2(data:survei) {
   });
 
   //create jumPosisiPetugasKegSurvei
-  const branch_kd = "000abc";
+  const branch_kd = "0123ABC";
   const { mutate: sendJumPosisiPetugasKegSurvei, onDone: resultJumPosisiPetugasKegSurvei, onError: errorJumPosisiPetugasKegSurvei } = useMutation(useCreateJumPosisiPetugasKegSurvei());
-  sendJumPosisiPetugasKegSurvei({
+  const is_confirmed = data.konfirmasiEvaluasiSurvei ? false : true
+  const res2 = await sendJumPosisiPetugasKegSurvei({
     input: {
       survei_kd: data.kodeSurvei,
       keg_kd: data.kegiatanSurvei,
+      posisi_kd: data.posisiSurvei,
       branch_kd,
       kategori_id: data.evaluasiSurvei,
+      is_confirmed,
       jumlah: parseInt(data.jumlahPetugasSurvei),
     },
   });
@@ -168,12 +168,56 @@ function sendData2(data:survei) {
     isDataError.value = true;
     return;
   });
-  resultJumPosisiPetugasKegSurvei(() =>{
+
+  //create dummy on petugasSurvei
+  const { mutate: sendPetugasSurvei, onDone: resultPetugasSurvei, onError: errorPetugasSurvei } = useMutation(useCreateManyPetugasSurvei());
+  const res3 = await sendPetugasSurvei({
+    input: {
+      survei_kd: data.kodeSurvei,
+      keg_kd: data.kegiatanSurvei,
+      posisi_kd: data.posisiSurvei,
+      branch_kd,
+      username: "",
+      status: 1,
+    },
+    usernames: ["mitra_2", "mitra_3", "mitra_4", "mitra_5"],
+  });
+  errorPetugasSurvei((error) => {
+    logErrorMessages(error);
+    isDataLoading.value = false;
+    isDataError.value = true;
+    return;
+  });
+
+  //create dummy on penugasanStruktur
+  const { mutate: sendPenugasanStruktur, onDone: resultPenugasanStruktur, onError: errorPenugasanStruktur } = useMutation(useCreateManyPenugasanStruktur());
+  const res4 = await sendPenugasanStruktur({
+    input: {
+      keg_kd: data.kegiatanSurvei,
+      branch_kd,
+      posisi_kd: data.posisiSurvei,
+      username: "",
+      parent: "mitra_1",
+      status: 1,
+    },
+    usernames: ["mitra_2", "mitra_3", "mitra_4", "mitra_5"],
+  });
+  errorPenugasanStruktur((error) => {
+    logErrorMessages(error);
+    isDataLoading.value = false;
+    isDataError.value = true;
+    return;
+  });
+  if(res1 && res2 && res3 && res4){
     isDataLoading.value = false;
     isDataSent.value = true;
-    reloadNuxtApp();
-    return
-  })
+    // reloadNuxtApp();
+    async () => {
+      const temp = await useWaitS(1.5)
+      if (temp) isDataSent.value = false;
+    }
+    return;
+  }
 }
 </script>
 
@@ -204,19 +248,39 @@ function sendData2(data:survei) {
               <!-- Kode survei -->
               <label for="kodeSurvei" class="self-center font-medium text-lg text-white mb-3">Kode survei</label>
               <div class="col-span-3 mb-3">
-                <Field type="text" id="kodeSurvei" v-model="dataForm.kodeSurvei" name="kodeSurvei" class="py-3 px-4 block w-full border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none" placeholder="" />
+                <Field
+                  type="text"
+                  id="kodeSurvei"
+                  v-model="dataForm.kodeSurvei"
+                  name="kodeSurvei"
+                  class="py-3 px-4 block w-full border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
+                  placeholder=""
+                />
                 <ErrorMessage name="kodeSurvei" />
               </div>
               <!-- Nama survei -->
               <label for="namaSurvei" class="self-center font-medium text-lg text-white mb-3">Nama survei</label>
               <div class="col-span-3 mb-3">
-                <Field type="text" id="namaSurvei" v-model="dataForm.namaSurvei" name="namaSurvei" class="py-3 px-4 block w-full border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none" placeholder="" />
+                <Field
+                  type="text"
+                  id="namaSurvei"
+                  v-model="dataForm.namaSurvei"
+                  name="namaSurvei"
+                  class="py-3 px-4 block w-full border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
+                  placeholder=""
+                />
                 <ErrorMessage name="namaSurvei" />
               </div>
               <!-- Tipe survei -->
               <label for="tipeSurvei" class="self-center font-medium text-lg text-white mb-3">Tipe</label>
               <div class="col-span-3 mb-3 text-black">
-                <Field as="select" v-model="dataForm.tipeSurvei" id="tipeSurvei" name="tipeSurvei" class="py-3 px-4 block w-full border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none">
+                <Field
+                  as="select"
+                  v-model="dataForm.tipeSurvei"
+                  id="tipeSurvei"
+                  name="tipeSurvei"
+                  class="py-3 px-4 block w-full border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
+                >
                   <option selected disabled>Pilih tipe</option>
                   <option value="1">Tipe 1</option>
                   <option value="2">Tipe 2</option>
@@ -228,7 +292,14 @@ function sendData2(data:survei) {
               <!-- Tahun survei -->
               <label for="tahunSurvei" class="self-center font-medium text-lg text-white mb-3">Tahun survei</label>
               <div class="col-span-3 mb-3">
-                <Field type="text" v-model="dataForm.tahunSurvei" id="tahunSurvei" name="tahunSurvei" class="py-3 px-4 block w-full border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none" placeholder="" />
+                <Field
+                  type="text"
+                  v-model="dataForm.tahunSurvei"
+                  id="tahunSurvei"
+                  name="tahunSurvei"
+                  class="py-3 px-4 block w-full border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
+                  placeholder=""
+                />
                 <ErrorMessage name="tahunSurvei" />
               </div>
             </div>
@@ -265,7 +336,13 @@ function sendData2(data:survei) {
               <!-- kegiatan survei -->
               <label for="kegiatanSurvei" class="self-center font-medium text-lg text-white mb-3">Kegiatan</label>
               <div class="col-span-3 mb-3">
-                <Field as="select" v-model="dataForm.kegiatanSurvei" id="kegiatanSurvei" name="kegiatanSurvei" class="py-3 px-4 block w-full border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none">
+                <Field
+                  as="select"
+                  v-model="dataForm.kegiatanSurvei"
+                  id="kegiatanSurvei"
+                  name="kegiatanSurvei"
+                  class="py-3 px-4 block w-full border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
+                >
                   <option selected disabled>Pilih kegiatan</option>
                   <option v-for="item in dataKegiatan" :value="item?.kode">{{ item?.nama }}</option>
                 </Field>
@@ -288,7 +365,13 @@ function sendData2(data:survei) {
               <!-- Posisi Survei -->
               <label for="posisiSurvei" class="self-center font-medium text-lg text-white mb-3">Posisi</label>
               <div class="col-span-3 mb-3">
-                <Field as="select" v-model="dataForm.posisiSurvei" id="posisiSurvei" name="posisiSurvei" class="py-3 px-4 block w-full border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none">
+                <Field
+                  as="select"
+                  v-model="dataForm.posisiSurvei"
+                  id="posisiSurvei"
+                  name="posisiSurvei"
+                  class="py-3 px-4 block w-full border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
+                >
                   <option selected disabled>Pilih posisi</option>
                   <option v-for="item in dataPosisi" :value="item.kode">{{ item.nama }}</option>
                 </Field>
@@ -423,10 +506,10 @@ function sendData2(data:survei) {
     </template>
     <template #footer>
       <div class="flex justify-end items-center gap-x-2">
-          <BaseButtonMode mode="gray" shape="square" class="border me-3" @click="step?.previousStep() ? currentStep-- : ''" v-if="step?.data?.currentStep > 0">Sebelumnya</BaseButtonMode>
-          <BaseButtonMode type="submit" form="survei" mode="gray" shape="square" class="border" v-if="step?.data?.currentStep < dataProgress.steps.length - 1">Selanjutnya</BaseButtonMode>
-          <BaseButtonMode mode="outlined" shape="square" class="border" v-if="step?.data?.currentStep == dataProgress.steps.length - 1" @click="sendData()">Buat Survei</BaseButtonMode>
-        </div>
+        <BaseButtonMode mode="gray" shape="square" class="border me-3" @click="step?.previousStep() ? currentStep-- : ''" v-if="step?.data?.currentStep > 0">Sebelumnya</BaseButtonMode>
+        <BaseButtonMode type="submit" form="survei" mode="gray" shape="square" class="border" v-if="step?.data?.currentStep < dataProgress.steps.length - 1">Selanjutnya</BaseButtonMode>
+        <BaseButtonMode mode="outlined" shape="square" class="border" v-if="step?.data?.currentStep == dataProgress.steps.length - 1" @click="sendData()">Buat Survei</BaseButtonMode>
+      </div>
     </template>
   </ModalBase2>
   <section id="filter_pj">
@@ -462,14 +545,4 @@ td {
 td:nth-child(2) {
   min-width: 320px;
 }
-</style>useMutation(useCreatePosKegSurvei())errorPosKegSurvei((error) => {
-    logErrorMessages(error);
-    isDataLoading.value = false;
-    isDataError.value = true;
-    return;
-  })useMutation(useCreateJumPosisiPetugasKegSurvei())useMutation(useCreatePosKegSurvei())errorPosKegSurvei((error) => {
-    logErrorMessages(error);
-    isDataLoading.value = false;
-    isDataError.value = true;
-    return;
-  })useMutation(useCreateJumPosisiPetugasKegSurvei())
+</style>

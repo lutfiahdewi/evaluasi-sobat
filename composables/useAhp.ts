@@ -1,3 +1,8 @@
+/**
+ * 
+ * @param matrix : string[][], 2d matrix containing the criteria comparison in string format
+ * @returns isConsistent, CR, weight
+ */
 export default function useAhp(matrix: string[][]) {
   const n = matrix.length;
   const RI = [0, 0,  0, 0.58, 0.9, 1.12, 1.24, 1.32, 1.41, 1.45, 1.49]; //bersesuain dg nilai n (n=0 => 0 hanya dummy)

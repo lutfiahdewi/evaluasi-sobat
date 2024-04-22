@@ -1,14 +1,14 @@
 <script setup lang="ts">
 useHead({
-  title: "Kegiatan",
+  title: "Daftar Kegiatan",
 });
 </script>
 
 <template>
-  <h3 class="font-bold">Daftar Kegiatan untuk Dievaluasi</h3>
+  <h3 class="font-bold">Daftar Evaluasi Kegiatan</h3>
   <!-- <SectionFilter /> -->
   <section>
     <!-- <BaseTable class="py-3" /> -->
-    <TableEvaluasiKegiatan/>
+    <TableDaftarEvaluasiKegiatan/>
   </section>
 </template>

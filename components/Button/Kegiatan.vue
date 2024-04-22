@@ -1,6 +1,6 @@
 <script setup lang="ts">
 defineProps<{
-  status: number;
+  status: number; // 0:blm jalan; 1: berjalan; 2: selesai =selesai
 }>();
 type Mode = "normal" | "outlined" | "gray";
 var mode: Mode = "outlined";
@@ -12,13 +12,13 @@ function getMode(status: number) {
       statusKegiatan = "Berjalan";
       break;
     case 2:
-      mode = "normal";
-      statusKegiatan = "Evaluasi";
-      break;
-    case 3:
       mode = "gray";
       statusKegiatan = "Selesai";
       break;
+    // case 3:
+    //   mode = "gray";
+    //   statusKegiatan = "Selesai";
+    //   break;
     default:
       break;
   }
@@ -27,12 +27,12 @@ function getMode(status: number) {
 </script>
 
 <template>
-  <NuxtLink v-if="status === 2" to="/evaluasi/nilaimitra">
-    <BaseButtonMode shape="pill" :mode="getMode(status)">
+  <!-- <NuxtLink v-if="status === 2" to="/evaluasi/nilaimitra"> -->
+    <!-- <BaseButtonMode  v-if="status === 2" shape="pill" :mode="getMode(status)">
       {{ statusKegiatan }}
-    </BaseButtonMode>
-  </NuxtLink>
-  <BaseButtonMode v-else shape="pill" :mode="getMode(status)" :not-active="true">
+    </BaseButtonMode> -->
+  <!-- </NuxtLink> -->
+  <BaseButtonMode shape="pill" :mode="getMode(status)" >
     {{ statusKegiatan }}
   </BaseButtonMode>
 </template>
