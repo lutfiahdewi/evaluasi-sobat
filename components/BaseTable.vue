@@ -50,7 +50,7 @@ const rows= [
           {{ props.row.status }}
         </span>
         <span v-else-if="props.column.field == 'persetujuan'">
-          <ButtonPersetujuan :status="props.row.persetujuan" />
+          <!-- <ButtonPersetujuan :status="props.row.persetujuan" /> -->
           {{ props.row.persetujuan }}
         </span>
         <span v-else>

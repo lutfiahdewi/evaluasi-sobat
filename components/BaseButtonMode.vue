@@ -1,5 +1,5 @@
 <template>
-  <button :class="defineClass(mode, shape, notActive) + $props.class" class="body2 font-medium disabled:opacity-50" :disabled="$props.notActive">
+  <button class=" body2 font-medium disabled:opacity-50 "  :class="defineClass(mode, shape, notActive) + $props.class":disabled="$props.notActive">
     <slot />
   </button>
 </template>

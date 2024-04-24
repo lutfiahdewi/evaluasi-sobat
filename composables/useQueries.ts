@@ -343,6 +343,18 @@ export const useSearchJumPosisiPetugasKegSurvei = () => {
     }
   `;
 };
+// update
+export const useUdateJumPosisiPetugasKegSurvei = () => {
+  return gql`
+    mutation ($id: Int!, $jumlah: Int, $is_confirmed: Boolean) {
+      updateJumPosisiPetugasKegSurvei(id: $id, jumlah: $jumlah, is_confirmed: $is_confirmed) {
+        jumposisipetugaskegsurvei_id
+        jumlah
+        is_confirmed
+      }
+    }
+  `;
+};
 
 /**
  * Petugas Survey
@@ -517,6 +529,54 @@ export const useUpdateNilaiKategoriIndikator = () => {
         }
         nilai
         is_final
+      }
+    }
+  `;
+};
+
+// RankMitraPosKeg
+/**
+ * CreateRankMitraPosKegSurvei
+ * @param input {{
+    "input": {
+        "survei_kd": "Vivamus",
+        "keg_kd": "erat",
+        "branch_kd": "quis",
+        "posisi_kd": "Suspendisse",
+        "username": "quis",
+        "nilai": 131.52
+    }
+}}
+ * @returns 
+ */
+export const useCreateRankMitraPosKegSurvei = () => {
+  return gql`
+    mutation ($input: RankMitraPosKegSurveiInputType!) {
+      createRankMitraPosKegSurvei(input: $input) {
+        rankmitraposkegsurvei_id
+        survei_kd
+        keg_kd
+        branch_kd
+        posisi_kd
+        username
+        nilai
+      }
+    }
+  `;
+};
+// query
+export const useGetRankMitraPosKegSurvei = () => {
+  return gql`
+    query ($id: Int, $survei_kd: String, $keg_kd: String, $branch_kd: String, $posisi_kd: String, $username: String) {
+      RankMitraPosKegSurvei(id: $id, survei_kd: $survei_kd, keg_kd: $keg_kd, branch_kd: $branch_kd, posisi_kd: $posisi_kd, username: $username) {
+        __typename
+        rankmitraposkegsurvei_id
+        survei_kd
+        keg_kd
+        branch_kd
+        posisi_kd
+        username
+        nilai
       }
     }
   `;

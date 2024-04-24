@@ -1,7 +1,8 @@
 import { complex, max, min, round, sqrt, square, sum } from "mathjs";
 
 type evaluatee = {
-  name: string;
+  username: string;
+  name?: string;
   preference_value?: number;
 };
 /**
@@ -10,7 +11,7 @@ type evaluatee = {
  * @param weight
  * @param is_benefit
  * @param evaluatees
- * @returns
+ * @returns evaluatees: {name: string, username: string, preference_value?: number}[]
  */
 export default function useTopsis(score: number[][], weight: number[], is_benefit: boolean[], evaluatees: evaluatee[]) {
   const p = evaluatees.length; //baris
@@ -66,7 +67,7 @@ export default function useTopsis(score: number[][], weight: number[], is_benefi
     // console.log(ssqNegative);
     dPositive[i] = round(sqrt(sum(ssqPositive)), 5);
     dNegative[i] = round(sqrt(sum(ssqNegative)), 5);
-    console.log("array: ", dNegative[i], " cal: ", round(sqrt(sum(ssqNegative)), 5));
+    // console.log("array: ", dNegative[i], " cal: ", round(sqrt(sum(ssqNegative)), 5));
   }
   // console.log(dPositive);
   // console.log(dNegative);

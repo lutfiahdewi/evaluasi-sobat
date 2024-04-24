@@ -35,7 +35,7 @@ const columns = [
     field: "nilai",
   },
 ];
-const rows = [1];
+const rows = [{a:1}];
 </script>
 
 <template>
