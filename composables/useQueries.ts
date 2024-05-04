@@ -94,18 +94,6 @@ export const useDeleteKategori = () => {
   return query;
 };
 
-// Creating an indikator
-export const useCreateIndikator = () => {
-  const query = gql`
-    mutation createIndikator($input: IndikatorInputType!) {
-      createIndikator(input: $input) {
-        indikator_id
-      }
-    }
-  `;
-  return query;
-};
-
 // Creating an indikator nested (a kategoriIndikator directly connected)
 export const useCreateIndikatorNested = () => {
   const query = gql`
@@ -148,7 +136,61 @@ export const useTableCategories = () => {
   `;
   return query;
 };
+// Creating an indikator
+export const useCreateIndikator = () => {
+  const query = gql`
+    mutation ($input: IndikatorInputType!) {
+      createIndikator(input: $input) {
+        indikator_id
+        nama
+        is_benefit
+        definisi
+      }
+    }
+  `;
+  return query;
+};
 
+// get many or single(id) indikayor
+export const useGetIndicators = () => {
+  const query = gql`
+    query ($id: Int) {
+      indikator(id: $id) {
+        indikator_id
+        branch_kd
+        nama
+        is_benefit
+        definisi
+      }
+    }
+  `;
+  return query;
+};
+
+// Update indikator
+export const useUpdateIndicator = () => {
+  const query = gql`
+    mutation ($input: IndikatorInputType!, $id: Int!) {
+      updateIndikator(input: $input, id: $id) {
+        indikator_id
+      }
+    }
+  `;
+  return query;
+};
+
+// Delete indikator
+export const useDeleteIndicator = () => {
+  const query = gql`
+    mutation ($id: Int!) {
+      deleteIndikator(id: $id) {
+        indikator_id
+        nama
+      }
+    }
+  `;
+  return query;
+};
 // Getting all indicators data
 // Data berupaka nama indikator, id dan kategori terkait
 export const useTableIndicators = () => {
@@ -156,7 +198,10 @@ export const useTableIndicators = () => {
     query {
       allIndikatorNested {
         indikator_id
+        branch_kd
         nama
+        is_benefit
+        definisi
         KategoriIndikator {
           kategori {
             kategori_id
@@ -167,6 +212,31 @@ export const useTableIndicators = () => {
     }
   `;
   return query;
+};
+
+// create kategoriIndikator
+export const useCreateKategoriIndikator = () => {
+  return gql`
+    mutation ($input: KategoriIndikatorInputType!) {
+      createKategoriIndikator(input: $input) {
+        kategoriIndikator_id
+        branch_kd
+        indikator_id
+        kategori_id
+        bobot
+        no_urut
+        perbandingan
+        kategori {
+          kategori_id
+          nama
+        }
+        indikator {
+          indikator_id
+          nama
+        }
+      }
+    }
+  `;
 };
 
 /**
@@ -498,6 +568,9 @@ export const useGetNilaiKategoriIndikator = () => {
         branch_kd
         posisi_kd
         username
+        User {
+          nama
+        }
         kategoriIndikator_id
         KategoriIndikator {
           no_urut
@@ -576,6 +649,69 @@ export const useGetRankMitraPosKegSurvei = () => {
         branch_kd
         posisi_kd
         username
+        nilai
+      }
+    }
+  `;
+};
+
+/**
+ * RankMitra
+ */
+/**
+ * Get
+ * @param branch_kd
+ * @param username
+ * @param kategori_id
+ * @return
+ */
+export const useGetRankMitra = () => {
+  return gql`
+    query ($id: Int, $branch_kd: String, $username: String, $kategori_id: String) {
+      RankMitra(id: $id, branch_kd: $branch_kd, username: $username, kategori_id: $kategori_id) {
+        __typename
+        rankmitra_id
+        branch_kd
+        username
+        User {
+          user_id
+          username
+          nama
+          email
+          is_pegawai
+          UserRole {
+            user_role_id
+            username
+            role_id
+            status
+          }
+          MitraTahunKerja {
+            mitratahunkerja_id
+            username
+            tahun
+            status
+          }
+        }
+        kategori_id
+        nilai
+      }
+    }
+  `;
+};
+
+/**
+ * Create Rank Mitra
+ * @param input {}
+ */
+
+export const useCreateRankMitra = () => {
+  return gql`
+    mutation ($input: RankMitraInputType!) {
+      createRankMitra(input: $input) {
+        rankmitra_id
+        branch_kd
+        username
+        kategori_id
         nilai
       }
     }

@@ -17,7 +17,12 @@ export default defineNuxtConfig({
     dir: "assets/img",
     domains: ["evaluasi-sobat.vercel.com"],
   },
-  plugins: ["~/plugins/preline.client.ts","~/plugins/my-apollo-client.ts", { src: "~/plugins/vue-good-table-next.js", ssr: false },{ src: "~/plugins/vue-quill.ts", mode: "client" },],
+  plugins: ["~/plugins/preline.client.ts",
+    "~/plugins/my-apollo-client.ts", 
+    { src: "~/plugins/vue-good-table-next.js", ssr: false },
+    { src: "~/plugins/vue-quill.ts", mode: "client" },
+    { src: "~/plugins/vue-select.ts", mode: "client" },
+  ],
   modules: ["@nuxtjs/apollo", "@vueuse/nuxt", "@nuxt/image", "@vee-validate/nuxt", "nuxt-lodash", "@pinia/nuxt"],
   apollo: {
     clients: {

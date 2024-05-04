@@ -4,7 +4,7 @@ import { useCreateKategori, useCreateIndikatorNested } from "~/composables/useQu
 import { evaluate, round } from "mathjs";
 import type { ModalBase } from "#build/components";
 useSeoMeta({
-  title: "Tambah Indikator",
+  title: "Tambah Kategori Indikator",
 });
 interface indicator {
   id?: number;
@@ -17,10 +17,10 @@ interface indicator {
 }
 
 // initialization
-const count = useState<string>("indicators");
-if (count.value == undefined) {
+const count = useState<string>("indicators");//jumlah indikator yang telah dipilih
+/*if (count.value == undefined) {
   count.value = "4";
-}
+}*/
 const arr_indicators: indicator[] = reactive(new Array(parseInt(count.value)));
 const mat_weight: string[][] = reactive(Array.from(Array(parseInt(count.value)), () => new Array(parseInt(count.value)).fill("")));
 console.log("n matriks: " + mat_weight.length + ", indicators (count): " + count.value);
@@ -32,8 +32,8 @@ const isDataError = ref(false);
 
 // data form
 const kategoriId: Ref<number | undefined> = ref();
-const kategoriNama = ref("umum");
-const kategoriDefinisi = ref("definsi");
+const kategoriNama = ref("");
+const kategoriDefinisi = ref("");
 for (let i = 0; i < parseInt(count.value); i++) {
   arr_indicators[i] = {
     nama: "indikator " + i,
@@ -199,7 +199,7 @@ function sendData() {
 </script>
 
 <template>
-  <h3 class="font-bold mb-3">Buat Indikator Penilaian</h3>
+  <h3 class="font-bold mb-3">Buat Kategori-Indikator Penilaian</h3>
   <form>
     <!-- Kategori Form -->
     <section>
@@ -254,7 +254,7 @@ function sendData() {
           />
         </div>
         <div>
-          <label :id="'tipe-label' + 1" class="block font-medium mb-2">Tipe Indikator</label>
+          <label :id="'tipe-label' + i" class="block font-medium mb-2">Tipe Indikator</label>
           <div class="grid grid-cols-2 content-center">
             <div class="flex pt-2">
               <input
@@ -290,7 +290,7 @@ function sendData() {
         </div>
       </div>
     </section>
-    <!-- Matriks -->
+    <!-- Matriks Perbandingan-->
     <section>
       <h5 class="mb-3">Matriks Perbandingan</h5>
       <div v-for="(item, i) in mat_weight" :key="i">

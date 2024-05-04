@@ -128,7 +128,7 @@ const isDataError = ref(false);
   >
     <template #table-row="props">
       <span v-if="props.column.field == 'id'" class="flex justify-evenly">
-        <ButtonUpdate baseLink="/pengaturan/ubahIndikator/" :id="parseInt(props.row.id)" />
+        <ButtonUpdate baseLink="/pengaturan/ubahKategori/" :id="parseInt(props.row.id)" />
         <ButtonDelete @click.prevent="deleteData(props.row.id, props.row.nama)" />
       </span>
       <span v-else>

@@ -15,8 +15,8 @@ const query = gql`
 
 const { data, loading, error } = await useAsyncQuery(query);
 const dataColumn = [
-  { label: "Title", field: "title" },
-  { label: "Director", field: "director" },
+  { label: "kategori", field: "kategori" },
+  // { label: "Director", field: "director" },
 ];
 /*
 type film = {
@@ -66,10 +66,13 @@ const dataProgress = {
 const step = ref<InstanceType<typeof StepProgress> | null>(null);
 
 //Modal
-const modal = ref<InstanceType<typeof ModalBase> | null>(null);
+const modal123 = ref<InstanceType<typeof ModalBase> | null>(null);
 const successModal = ref(false);
 const loadingModal = ref(false);
 const errorModal = ref(false);
+
+// WYSIWYG
+const dataProperty = ref("");
 </script>
 
 <template>
@@ -81,7 +84,16 @@ const errorModal = ref(false);
     </ul>
     <span v-else>Loading...</span>
   </section>
-
+  <section>
+    <p>WYSIWYG editor</p>
+    <div class="bg-slate-50">
+      <QuillEditor v-model:content="dataProperty" theme="snow" contentType="html"/>
+    </div>
+    <div class="content mt-3">
+      {{ dataProperty }}
+    </div>
+    <div v-html="dataProperty" class="wysiwyg"></div>
+  </section>
   <section class="border border-red-500">
     <h5>Multi step progress</h5>
     <StepProgress :dataMain="dataProgress" ref="step" />
@@ -91,15 +103,14 @@ const errorModal = ref(false);
     </div>
   </section>
   <section class="flex gap-x-3 justify-start">
-    <ModalBase ref="modal" />
-    <BaseButtonMode mode="outlined" shape="square" @click="modal?.open">Open Modal</BaseButtonMode>
+    <ModalBase ref="modal123" />
+    <BaseButtonMode mode="outlined" shape="square" @click="modal123?.open">Open Modal</BaseButtonMode>
     <ModalSuccess v-if="successModal" />
     <BaseButtonMode mode="normal" shape="square" @click.prevent="successModal = !successModal">Open Successs Modal</BaseButtonMode>
     <ModalLoading v-if="loadingModal" />
     <BaseButtonMode mode="outlined" shape="square" @click.prevent="loadingModal = !loadingModal">Open Loading Modal</BaseButtonMode>
     <ModalError v-if="errorModal" />
     <BaseButtonMode mode="normal" shape="square" @click.prevent="errorModal = !errorModal">Open Error Modal</BaseButtonMode>
-    
   </section>
   <AppDropdownMobile :menu="menuMitra" :active="true" />
 </template>
