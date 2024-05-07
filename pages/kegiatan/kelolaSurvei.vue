@@ -150,7 +150,7 @@ async function sendData2(data: survei) {
   //create jumPosisiPetugasKegSurvei
   const branch_kd = "0123ABC";
   const { mutate: sendJumPosisiPetugasKegSurvei, onDone: resultJumPosisiPetugasKegSurvei, onError: errorJumPosisiPetugasKegSurvei } = useMutation(useCreateJumPosisiPetugasKegSurvei());
-  const is_confirmed = data.konfirmasiEvaluasiSurvei ? false : true
+  const is_confirmed = data.konfirmasiEvaluasiSurvei ? false : true;
   const res2 = await sendJumPosisiPetugasKegSurvei({
     input: {
       survei_kd: data.kodeSurvei,
@@ -169,7 +169,7 @@ async function sendData2(data: survei) {
     return;
   });
 
-  //create dummy on petugasSurvei
+  //create dummy on petugasSurvei (hanya yang dinilai, tidak termasuk penilai)
   const { mutate: sendPetugasSurvei, onDone: resultPetugasSurvei, onError: errorPetugasSurvei } = useMutation(useCreateManyPetugasSurvei());
   const res3 = await sendPetugasSurvei({
     input: {
@@ -177,10 +177,10 @@ async function sendData2(data: survei) {
       keg_kd: data.kegiatanSurvei,
       posisi_kd: data.posisiSurvei,
       branch_kd,
-      username: "",
+      username: "", //tidak digunakan
       status: 1,
     },
-    usernames: ["mitra_2", "mitra_3", "mitra_4", "mitra_5"],
+    usernames: ["mitra_2", "mitra_3", "mitra_4", "mitra_5", "mitra_7", "mitra_8", "mitra_9", "mitra_10"],
   });
   errorPetugasSurvei((error) => {
     logErrorMessages(error);
@@ -202,20 +202,33 @@ async function sendData2(data: survei) {
     },
     usernames: ["mitra_2", "mitra_3", "mitra_4", "mitra_5"],
   });
+  const res5 = await sendPenugasanStruktur({
+    input: {
+      keg_kd: data.kegiatanSurvei,
+      branch_kd,
+      posisi_kd: data.posisiSurvei,
+      username: "",
+      parent: "mitra_6",
+      status: 1,
+    },
+    usernames: ["mitra_7", "mitra_8", "mitra_9", "mitra_10"],
+  });
   errorPenugasanStruktur((error) => {
     logErrorMessages(error);
     isDataLoading.value = false;
     isDataError.value = true;
     return;
   });
-  if(res1 && res2 && res3 && res4){
+  if (res1 && res2 && res3 && res4 && res5) {
     isDataLoading.value = false;
     isDataSent.value = true;
-    // reloadNuxtApp();
     async () => {
-      const temp = await useWaitS(1.5)
-      if (temp) isDataSent.value = false;
-    }
+      const temp = await useWaitS(1.5);
+      if (temp) {
+        isDataSent.value = false;
+        reloadNuxtApp();
+      }
+    };
     return;
   }
 }
@@ -496,7 +509,7 @@ async function sendData2(data: survei) {
                 </tr>
                 <tr>
                   <td>Konfirmasi Evaluasi</td>
-                  <td>{{ dataForm.konfirmasiEvaluasiSurvei }}</td>
+                  <td>{{ dataForm.konfirmasiEvaluasiSurvei ? "Ya" : "Tidak" }}</td>
                 </tr>
               </tbody>
             </table>

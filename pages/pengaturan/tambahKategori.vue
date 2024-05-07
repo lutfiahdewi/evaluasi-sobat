@@ -30,8 +30,14 @@ const kategoriNama = ref("");
 const kategoriDefinisi = ref("");
 // query semua indikator
 const { data, error, pending } = await useAsyncQuery(useGetIndicators());
-const dataIndikator = data.value.indikator;
-const options = reactive(dataIndikator.map((ind: { nama: any; indikator_id: any }) => ({ label: ind.nama, indikator_id: ind.indikator_id })));
+const dataIndikator: any[] = data.value ? data.value.indikator : undefined;
+const options: any[] = reactive([]);
+try {
+  options.push(...dataIndikator.map((ind: { nama: any; indikator_id: any }) => ({ label: ind.nama, indikator_id: ind.indikator_id })));
+} catch (e) {
+  console.log(e);
+}
+// options.push(...['a','b','c'])
 
 // tambah indikator
 const selected = ref([]);
@@ -51,6 +57,7 @@ function addIndicator() {
   }
   console.log(chosenIndicator);
   selected.value = [];
+  makeMatrices();
 }
 function removeIndicator(obj: indikator) {
   const matchIdx = useFindIndex(chosenIndicator, { indikator_id: obj.indikator_id });
@@ -59,6 +66,7 @@ function removeIndicator(obj: indikator) {
     chosenIndicator[i].no_urut--;
   }
   options.push({ label: obj.nama, indikator_id: obj.indikator_id });
+  makeMatrices(matchIdx);
 }
 
 // tabel indikator
@@ -86,21 +94,33 @@ const columns = [
 ];
 
 // generate matriks perbandingan
-const isMatricesGenerated = ref(false);
 const mat_weight: string[][] = reactive([]);
-function makeMatrices() {
-  const n = chosenIndicator.length;
-  if (n > 0) mat_weight.length = 0;
-  mat_weight.push(...Array.from(Array(n), () => new Array(n).fill("")));
+function makeMatrices(removedIdx?: number) {
+  const n = chosenIndicator.length; //byk indikator
+  const p = mat_weight.length; // ordo mat
+  // (n-p) >= 1 : proses penambahan indikator bisa >1, (p-n) = 1 hapus hny bisa 1 per1
+  if (p === 0) {
+    mat_weight.push(...Array.from(Array(n), () => new Array(n).fill("")));
+  } else if (n > p) {
+    const diff = n - p;
+    mat_weight.forEach((row) => {
+      row.push(...new Array(diff).fill(""));
+    });
+    mat_weight.push(...Array.from(Array(diff), () => new Array(n).fill("")));
+  } else if (n < p && !isUndefined(removedIdx)) {
+    mat_weight.splice(removedIdx, 1);
+    mat_weight.forEach((row) => {
+      row.splice(removedIdx, 1);
+    });
+  }
   for (let i = 0; i < n; i++) {
     for (let j = 0; j < n; j++) {
-      if (j == i) {
-        mat_weight[i][j] = "1";
-      }
+      if (j == i) mat_weight[i][j] = "1";
     }
   }
-  isMatricesGenerated;
+  ahp.CR = -1; //resetting ahp
 }
+
 function generate() {
   let tempValid: boolean = true;
   for (let i = 0; i < mat_weight.length; i++) {
@@ -167,11 +187,31 @@ function checkForm(): boolean {
   if (!kategoriNama.value || !kategoriDefinisi.value) {
     isValid.value = false;
     return false;
-  } else {
-    isValid.value = true;
-    return true;
+  } else if (kategoriDefinisi.value.length > 0) {
+    const temp = removeTags(kategoriDefinisi.value);
+    if (temp.length < 1) {
+      isValid.value = false;
+      return false;
+    }
+  } else if (mat_weight.length > 0) {
+    mat_weight.forEach((row) => {
+      row.forEach((item) => {
+        if (item.length < 1) {
+          isValid.value = false;
+          return false;
+        }
+      });
+    });
   }
+  isValid.value = true;
+  return true;
 }
+function removeTags(str: string) {
+  // Regular expression to identify HTML tags in the input string.
+  // Replacing the identified HTML tag with a null string.
+  return str.replace(/(<([^>]+)>)/gi, "");
+}
+
 const runChecking = computed(() => {
   return checkForm();
 });
@@ -205,6 +245,7 @@ async function sendData() {
   if (kategoriId.value) {
     // (loop) buat indikatorKategori baru (tanpa indikator baru), await loop?
     chosenIndicator.forEach((item, idx) => {
+      console.log("send data : ", idx);
       sendKategoriIndikator({
         input: {
           branch_kd,
@@ -220,6 +261,13 @@ async function sendData() {
         isDataLoading.value = false;
         isDataError.value = true;
         return;
+      });
+      resultKategoriIndikator(() => {
+        if (idx === chosenIndicator.length - 1) {
+          isDataLoading.value = false;
+          isDataSent.value = true;
+          navigateTo({ path: "/pengaturan/kelolaIndikator" });
+        }
       });
     });
   } else {
@@ -276,7 +324,7 @@ async function sendData() {
                 {{ props.row.is_benefit ? "Ya" : "Tidak" }}
               </span>
               <span v-else-if="props.column.field == 'definisi'">
-                <div v-html="props.row.definisi" class="wysiwyg"></div>
+                <div v-html="props.row.definisi" class="wysiwyg line-clamp-3" :title="props.row.definisi"></div>
               </span>
               <span v-else-if="props.column.field == 'aksi'">
                 <div class="flex justify-center">
@@ -295,17 +343,13 @@ async function sendData() {
   <!-- Matriks Perbandingan-->
   <section>
     <h5 class="mb-3">Matriks Perbandingan</h5>
-    <div class="mb-3">
-      <BaseButtonMode shape="square" mode="outlined" :not-active="chosenIndicator.length < 1" @click="makeMatrices()">Buat Matriks Perbandingan Indikator </BaseButtonMode>
-    </div>
     <div v-if="mat_weight.length > 0" v-for="(item, i) in mat_weight" :key="i">
-      <!-- FIX GRID SIZE -->
       <div v-if="i == 0" class="grid grid-flow-col auto-cols-max gap-4 mb-4">
-        <div class="min-w-24"></div>
-        <div v-for="(item, j) in mat_weight[i]" :key="j" class="min-w-24">{{ chosenIndicator[j].nama }}</div>
+        <div class="w-24"></div>
+        <div v-for="(item, j) in mat_weight[i]" :key="j" class="w-24 truncate">{{ chosenIndicator[j].nama }}</div>
       </div>
       <div class="grid grid-flow-col auto-cols-max gap-4 mb-4">
-        <div class="min-w-24">{{ chosenIndicator[i].nama }}</div>
+        <div class="w-24 truncate">{{ chosenIndicator[i].nama }}</div>
         <input
           v-for="(item, j) in mat_weight[i]"
           v-model="mat_weight[i][j]"
@@ -317,6 +361,31 @@ async function sendData() {
         />
       </div>
     </div>
+    <!-- <table>
+      <thead>
+        <tr>
+          <td></td>
+          <td v-for="(item, j) in chosenIndicator" :key="j" class="pe-3 min-w-24"><span class="flex justify-center">{{ item.nama }}</span></td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(item, i) in mat_weight" :key="i">
+          <td  class="pe-3 min-w-24">{{ chosenIndicator[i].nama }}</td>
+          <td v-for="(item, j) in mat_weight[i]">
+            <span class="flex justify-center">
+              <input
+                v-model="mat_weight[i][j]"
+                :key="i+j"
+                :disabled="j <= i"
+                @keyup.enter="generate()"
+                type="text"
+                class="w-24 me-3 border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
+              />
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table> -->
     <BaseButtonMode v-if="mat_weight.length > 0" shape="square" mode="outlined" class="me-3 font-semibold" @click.prevent="generate()">Cek Konsistensi</BaseButtonMode>
     <div class="my-3 p-3 flex item-center text-red-600 border rounded-lg" v-if="!isMatricesValid"><IconWarning class="w-6 h-6 me-2" />Pastikan skala yang dimasukkan antara 1-9</div>
     <div class="my-3 p-3 flex item-center text-red-600 border rounded-lg" v-if="!ahp.isConsistent && isMatricesValid">
@@ -325,17 +394,21 @@ async function sendData() {
     <div class="my-3 p-3 flex item-center border rounded-lg" v-if="ahp.isConsistent && ahp.CR != -1">Rasio konsistensi = {{ round(ahp.CR, 3) }} menunjukkan perbandingan konsisten</div>
   </section>
   <!-- Validasi -->
-  <div class="my-3 p-3 flex item-center text-red-600 border rounded-lg" v-if="!isValid"><IconWarning class="w-6 h-6 me-2" />Pastikan form telah terisi semua!</div>
+  <div class="my-3 p-3 flex item-center text-red-600 border rounded-lg" v-if="!isValid || !ahp.isConsistent || !isMatricesValid"><IconWarning class="w-6 h-6 me-2" />Pastikan form telah terisi semua dan perbandingan konsisten!</div>
   <div class="flex justify-end">
     <ModalBase ref="createCatModal">
       <template #header><h6 class="font-bold text-gray-800">Buat kategori penilaian</h6></template>
       <template #body>
         <div class="mt-1 text-gray-800">
           <h6>Kategori : {{ kategoriNama }}</h6>
-          <p>Daftar indikator</p>
-          <ol class="list-decimal ps-5">
-            <li v-for="item in chosenIndicator">{{ item.nama }}</li>
-          </ol>
+          <p>Daftar indikator dan bobotnya</p>
+          <table>
+            <tr v-for="(item, idx) in chosenIndicator">
+              <td>{{ idx + 1 }}.</td>
+              <td>{{ item.nama }}</td>
+              <td>: {{ round(ahp.weight[idx], 3) }}</td>
+            </tr>
+          </table>
         </div>
         <div class="my-3 flex item-center text-red-600" v-if="!isValid"><IconWarning class="w-6 h-6 me-2" />Pastikan form telah terisi semua!</div>
         <div class="my-3 flex item-center text-red-600" v-if="!isMatricesValid"><IconWarning class="w-6 h-6 me-2" />Pastikan skala yang dimasukkan antara 1-9 pada matriks perbandingan</div>
@@ -347,8 +420,7 @@ async function sendData() {
     <NuxtLink to="/pengaturan/kelolaIndikator">
       <BaseButtonMode shape="square" mode="outlined" class="me-3 font-semibold" :data-valid="runChecking">Batal</BaseButtonMode>
     </NuxtLink>
-    <BaseButtonMode shape="square" mode="normal" @click.prevent="createCatModal?.open()" :not-active="!isValid || !isMatricesValid || !ahp.isConsistent">Buat Indikator</BaseButtonMode>
-    <BaseButtonMode shape="square" mode="normal" @click.prevent="isDataSent = !isDataSent">Toggle</BaseButtonMode>
+    <BaseButtonMode shape="square" mode="normal" @click.prevent="createCatModal?.open()" :not-active="!isValid || !isMatricesValid || !ahp.isConsistent || chosenIndicator.length < 1  || ahp.CR == -1">Buat Kategori</BaseButtonMode>
   </div>
 
   <ModalSuccess v-if="isDataSent" @close="isDataSent = !isDataSent" />

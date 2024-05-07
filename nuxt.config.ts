@@ -18,11 +18,16 @@ export default defineNuxtConfig({
     domains: ["evaluasi-sobat.vercel.com"],
   },
   plugins: ["~/plugins/preline.client.ts",
-    "~/plugins/my-apollo-client.ts", 
+    "~/plugins/my-apollo-client.ts", "~/plugins/vue-select.ts",
     { src: "~/plugins/vue-good-table-next.js", ssr: false },
     { src: "~/plugins/vue-quill.ts", mode: "client" },
-    { src: "~/plugins/vue-select.ts", mode: "client" },
+    // { src: "~/plugins/vue-select.ts", mode: "client" },
   ],
+  // vue: {  
+  //   compilerOptions: {
+  //     isCustomElement: (tag) => ["v-select", 'QuillEditor'].includes(tag),
+  //   },
+  // },
   modules: ["@nuxtjs/apollo", "@vueuse/nuxt", "@nuxt/image", "@vee-validate/nuxt", "nuxt-lodash", "@pinia/nuxt"],
   apollo: {
     clients: {

@@ -46,10 +46,12 @@ const columns = [
 
 // query data
 
-let dataTable: Kategori[] = [];
-const { data: result, error, refresh } = await useAsyncQuery(useTableCategories());
+const dataTable: Kategori[] = reactive([]);
+const { data: result, error, execute: refreshTable } = await useAsyncQuery(useTableCategories());
+function structData(){
 try {
   const data = computed(() => result.value?.allKategori);
+  if(dataTable.length > 0) dataTable.length = 0;
   data.value.forEach((item: Item) => {
     let temp = "";
     item.KategoriIndikator.forEach((ind) => {
@@ -67,9 +69,8 @@ try {
 } catch (error) {
   console.log(error);
 }
-
-const rows = [{ id: 112728, nama: "kategori 1", indikator: "indikator1, indikator2, indikator3", tanggal: "2020-01-12" }];
-
+}
+structData();
 // Update data
 
 // delete data
@@ -94,9 +95,13 @@ async function deleteData(id: string, nama: string): Promise<void> {
     })
     resultDeleteKategori((result) => {
       isDataLoading.value = false;
-      isDataSent.value = true;
-      // reloadNuxtApp();
-      refresh();
+      reloadNuxtApp();
+      /*isDataSent.value = true;
+      refreshTable(useTableCategories());
+      await useWaitS(3);
+      structData();
+      console.log(dataTable);
+      isDataSent.value = false;*/
     });
   }
 }
@@ -136,18 +141,6 @@ const isDataError = ref(false);
       </span>
     </template>
   </vue-good-table>
-  <!-- {{ result }}
-  <br />
-  <br />
-  <br />
-  {{ data}}<br />
-  <br />
-  <br />
-  {{ dataTable }}
-  <button class="rounded-lg bg-red-200 p-3" @click="cek()">CEk</button>
-  <br>
-  <div v-if="!pending">{{ data[0]?.nama }}</div>
-  <div v-if="loading">Still Loading...</div> -->
   <!-- Modal konfirmasi-->
   <ModalBase2 v-if="confirmationModal" @close="confirmationModal = !confirmationModal">
     <template #header><h5 class="font-bold text-gray-800">Hapus kategori penilaian?</h5></template>

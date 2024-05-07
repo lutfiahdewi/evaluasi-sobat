@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import { boolean } from 'mathjs';
+
 defineProps<{
   konfirmasi: number; // 0:tidak perlu konfirmasi, 1:perlu
   kegiatan: number; // 0:blm jalan; 1: berjalan; 2: selesai=>evaluasi
   status: number; // 0: blm disetujui operator
   query: string;
+  notActive?: boolean;
 }>();
 type Mode = "normal" | "outlined" | "gray";
 var mode: Mode = "outlined";
@@ -26,7 +29,7 @@ function getMode(status: number, kegiatan: number, konfirmasi: number) {
 </script>
 
 <template>
-  <NuxtLink v-if="status !== 3" :to="'/evaluasi/nilaimitra/' + query">
+  <NuxtLink v-if="status !== 3 && !notActive" :to="'/evaluasi/nilaimitra/' + query">
     <BaseButtonMode shape="pill" :mode="getMode(status, kegiatan, konfirmasi)">
       {{ statusPersetujuan }}
     </BaseButtonMode>

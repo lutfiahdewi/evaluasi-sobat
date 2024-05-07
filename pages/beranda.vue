@@ -7,7 +7,7 @@ definePageMeta({
 });
 
 const token = useCookie("token");
-console.log("cookie: ", token.value)
+// console.log("cookie: ", token.value)
 </script>
 
 <template>

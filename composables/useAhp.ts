@@ -52,11 +52,11 @@ export default function useAhp(matrix: string[][]) {
         return false;
     }
   }
-  console.log("total col  =", totalCol);
+  /*console.log("total col  =", totalCol);
   console.log("norm mat =", normalizedMat);
   console.log("vp =", vp);
   console.log("weight =", weight);
   console.log("eigen =", eigen);
-  console.log("CI =", CI);
+  console.log("CI =", CI);*/
   return {isConsistent, CR, weight};
 }

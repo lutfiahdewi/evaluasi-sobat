@@ -38,7 +38,9 @@ export const useGetAllKategori = () => {
   return query;
 };
 // Getting a Kategori Nested
-// input: id
+/**
+ * @param?: id
+ */
 export const useGetKategori = () => {
   const query = gql`
     query ($id: Int!) {
@@ -81,6 +83,19 @@ export const useCreateKategori = () => {
   return query;
 };
 
+// updating a kategori
+export const useUpdateKategori = () => {
+  const query = gql`
+    mutation ($input: KategoriInputType!, $id: Int!) {
+      updateKategori(input: $input, id: $id) {
+        kategori_id
+        nama
+        definisi
+      }
+    }
+  `;
+  return query;
+};
 //Deleting a kategori (and connection to kategoriIndikator)
 export const useDeleteKategori = () => {
   const query = gql`
@@ -234,6 +249,53 @@ export const useCreateKategoriIndikator = () => {
           indikator_id
           nama
         }
+      }
+    }
+  `;
+};
+
+// update kategoriIndikator
+export const useUpdateKategoriIndikator = () => {
+  return gql`
+    mutation ($input: KategoriIndikatorInputType!, $id: Int!) {
+      updateKategoriIndikator(input: $input, id: $id) {
+        __typename
+        kategoriIndikator_id
+        branch_kd
+        indikator_id
+        kategori_id
+        bobot
+        no_urut
+        perbandingan
+        kategori {
+          kategori_id
+          nama
+          definisi
+        }
+        indikator {
+          indikator_id
+          branch_kd
+          nama
+          is_benefit
+          definisi
+        }
+      }
+    }
+  `;
+};
+
+// delete kategoriIndikator
+export const useDeleteKategoriIndikator = () => {
+  return gql`
+    mutation ($id: Int!) {
+      deleteKategoriIndikator(id: $id) {
+        kategoriIndikator_id
+        branch_kd
+        indikator_id
+        kategori_id
+        bobot
+        no_urut
+        perbandingan
       }
     }
   `;
@@ -496,6 +558,14 @@ export const useSearchPenugasanStruktur = () => {
         parent
         status
       }
+    }
+  `;
+};
+// countSearch(query by filtering )
+export const useCountSearchPenugasanStruktur = () => {
+  return gql`
+    query ($keg_kd: String!, $branch_kd: String!, $posisi_kd: String!) {
+      countSearchPenugasanStruktur(keg_kd: $keg_kd, branch_kd: $branch_kd, posisi_kd: $posisi_kd)
     }
   `;
 };

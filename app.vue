@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 useHead({
   titleTemplate: (titleChild) => {
     return titleChild ? `${titleChild} - Evaluasi SOBAT Mitra` : "Evaluasi SOBAT Mitra";
@@ -16,6 +15,8 @@ const authorizedRole = useCookie('authorizedRole');
 if (authorizedRole.value === undefined || authorizedRole.value === null){
     authorizedRole.value = "default";
 }
+// const nuxtApp = useNuxtApp()
+// nuxtApp.vueApp.component('QuillEditor', QuillEditor);
 </script>
 
 <template>
