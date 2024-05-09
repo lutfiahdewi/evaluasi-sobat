@@ -403,7 +403,7 @@ function saveRank() {
         </tbody>
       </table>
     </div>
-    <div class="my-3 p-3 flex item-center text-red-600 border rounded-lg" v-if="!isDataValid"><IconWarning class="w-6 h-6 me-2" />Pastikan form telah terisi semua!</div>
+    <div class="my-3 p-3 flex item-center text-red-600 border rounded-lg" v-if="!isDataValid"><IconWarning class="w-6 h-6 me-2" />Pastikan semua nilai petugas telah terisi semua!</div>
     <div class="flex justify-end mt-3" v-if="isOperatorEditable">
       <BaseButtonMode v-if="!isOperatorConfirmed && isOperatorEditable" shape="square" mode="outlined" class="py-3 px-4" @click.prevent="saveChanges()">Simpan Perubahan</BaseButtonMode>
     </div>

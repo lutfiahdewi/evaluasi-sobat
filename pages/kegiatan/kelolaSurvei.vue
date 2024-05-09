@@ -447,7 +447,7 @@ async function sendData2(data: survei) {
                   class="col-span-3 py-3 px-4 block w-full border-gray-200 rounded-lg mb-3 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
                 >
                   <option selected disabled>Pilih kategori</option>
-                  <option v-for="item in dataKategori" :value="item.kategori_id">{{ item.nama }}</option>
+                  <option v-for="item in dataKategori" :value="item.kategori_id" :disabled="item.nama == 'Umum' ">{{ item.nama }}</option>
                 </Field>
                 <ErrorMessage name="evaluasiSurvei" />
               </div>

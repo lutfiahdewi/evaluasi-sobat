@@ -13,5 +13,27 @@ activeBar.value = "Profil";
 
 <template>
   <h3 class="font-bold mb-3">Profil</h3>
-
+  <table>
+    <tr>
+      <td>Nama</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Email</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Username</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Status</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Status Kinerja</td>
+      <td></td>
+    </tr>
+    
+  </table>
 </template>

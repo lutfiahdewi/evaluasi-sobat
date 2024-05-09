@@ -1,10 +1,16 @@
 <script setup lang="ts">
 import { logErrorMessages } from "@vue/apollo-util";
 import { useGetNilaiKategoriIndikator, useUpdateNilaiKategoriIndikator } from "~/composables/useQueries";
+import * as XLSX from "xlsx";
+
 useSeoMeta({
   title: "Nilai Mitra",
 });
 
+interface MixedDictionary {
+  // staticKey: string;
+  [key: string]: string | number | undefined; // Can accommodate the staticKey too
+}
 interface evaluatee {
   id: number;
   username: string;
@@ -14,6 +20,7 @@ interface evaluatee {
 type indicator = {
   urutan: number;
   nama: string;
+  definisi: string;
   kategoriIndikator_id: number;
 };
 type savedNilai = {
@@ -21,7 +28,6 @@ type savedNilai = {
   nilai: string;
 };
 //modal
-const isDataSent = ref(false);
 const isDataLoading = ref(false);
 const isDataError = ref(false);
 // query
@@ -30,6 +36,9 @@ const { survei_kd, keg_kd, branch_kd, posisi_kd, tahun } = route.query;
 
 // Getting data
 // 1. poskegsurvei bersesuaian
+const { data: resultKegSurvei } = await useAsyncQuery(useGetKegSurvei(), { survei_kd, keg_kd });
+const dataKegSurvei = resultKegSurvei.value?.KegSurvei[0];
+const isOperatorEditable = ref();
 
 // 1.b petugas survei
 // 2. struktur penugasan, user= parent. Mencari petugas yang akan dinilai
@@ -39,6 +48,8 @@ const dataPenugasanStruktur: any[] = resultPenugasanStruktur.value?.searchPenuga
 // 3. kategori nested, get indikator name. Mencari kategori penilaian sesuai kegiatan survei beserta kategori umum(wajib)
 const { data: resultJumPosisiPetugasKegSurvei } = await useAsyncQuery(useSearchJumPosisiPetugasKegSurvei(), { survei_kd, keg_kd, branch_kd, posisi_kd });
 const dataJumPosisiPetugasKegSurvei: any[] = resultJumPosisiPetugasKegSurvei.value?.searchJumPosisiPetugasKegSurvei;
+const isOperatorConfirmed = ref();
+
 const { data: resultKategoriUmum } = await useAsyncQuery(useGetKategori(), { id: 1 });
 const dataKategoriUmum: any[] = resultKategoriUmum.value?.Kategori.KategoriIndikator;
 
@@ -56,6 +67,8 @@ try {
     console.log(resultKategoriUmum.value);
     throw new Error("Gagal mendapatkan kategori umum!");
   }
+  isOperatorEditable.value = dataKegSurvei.is_confirm;
+  isOperatorConfirmed.value = dataJumPosisiPetugasKegSurvei[0].is_confirmed;
   for (const item of dataPenugasanStruktur) {
     const temp: evaluatee = {
       id: item.User.user_id,
@@ -67,6 +80,7 @@ try {
     const temp: indicator = {
       urutan: item.no_urut,
       nama: item.indikator.nama,
+      definisi: item.indikator.definisi,
       kategoriIndikator_id: parseInt(item.kategoriIndikator_id),
     };
     Indicators.push(temp);
@@ -76,6 +90,7 @@ try {
     const temp: indicator = {
       urutan: item.no_urut + n,
       nama: item.indikator.nama,
+      definisi: item.indikator.definisi,
       kategoriIndikator_id: parseInt(item.kategoriIndikator_id),
     };
     Indicators.push(temp);
@@ -87,8 +102,8 @@ Indicators = useSortBy(Indicators, ["urutan"]);
 const kategoriIndikator_id = Indicators.map((ind) => ind.kategoriIndikator_id);
 const i = Evaluatees.length;
 const j = Indicators.length;
-const dataNilai: string[][] = reactive(Array.from(Array(i), () => new Array(j).fill('')));
-const dataNilaiId: string[][] = reactive(Array.from(Array(i), () => new Array(j).fill('')));
+const dataNilai: string[][] = reactive(Array.from(Array(i), () => new Array(j).fill("")));
+const dataNilaiId: string[][] = reactive(Array.from(Array(i), () => new Array(j).fill("")));
 const dataNilaiValidation: boolean[][] = reactive(Array.from(Array(i), () => new Array(j).fill(true)));
 const isDataFinalized = ref(false); //cek data terkahir
 // Masukan data nilai yang telah ada
@@ -97,7 +112,7 @@ if (dataSavedNilai.length > 0) {
     for (let j = 0; j < Indicators.length; j++) {
       let temp = useFind(dataSavedNilai, { username: Evaluatees[i].username, kategoriIndikator_id: Indicators[j].kategoriIndikator_id });
       if (temp) {
-        if(i== (Evaluatees.length-1) && j==(Indicators.length-1)) isDataFinalized.value = temp.is_final;
+        if (i == Evaluatees.length - 1 && j == Indicators.length - 1) isDataFinalized.value = temp.is_final;
         dataNilaiId[i][j] = temp.nilaikategoriindikator_id;
         dataNilai[i][j] = temp.nilai;
       }
@@ -114,14 +129,11 @@ function validateForm() {
   for (let i = 0; i < dataNilai.length; i++) {
     for (let j = 0; j < dataNilai[i].length; j++) {
       if (dataNilai[i][j] === "0" || isNil(dataNilai[i][j])) {
-        dataNilaiValidation[i][j] = false
-        if(dataValid.value) dataValid.value = false
-      };
+        dataNilaiValidation[i][j] = false;
+        if (dataValid.value) dataValid.value = false;
+      }
     }
   }
-  // let temp = useWithout(dataNilaiValidation, [true]);
-  // let temp = dataNilaiValidation.map(b => b===false);
-  // if (temp.length > 0) dataValid.value = false;
 }
 // send data
 function sendData(is_final: boolean) {
@@ -159,16 +171,14 @@ function createDataNilai(is_final: boolean) {
       logErrorMessages(error);
       isDataLoading.value = false;
       isDataError.value = true;
-      // break;
       return;
     });
-    console.log(dataNilaiKategoriIndikator);
+    // console.log(dataNilaiKategoriIndikator);
   }
-  resultNilaiKategoriIndikator(async() => {
+  resultNilaiKategoriIndikator(async () => {
     isDataLoading.value = false;
-    // isDataSent.value = true;
-    const waiting =  await useWaitS(2);
-    if(waiting) reloadNuxtApp();
+    const waiting = await useWaitS(2);
+    if (waiting) reloadNuxtApp();
   });
 }
 function updateDataNilai(is_final: boolean) {
@@ -194,17 +204,60 @@ function updateDataNilai(is_final: boolean) {
   }
   resultUpdateNilai(async () => {
     isDataLoading.value = false;
-    // isDataSent.value = true;
-    // reload/navigate
-    const waiting =  await useWaitS(2);
-    if(waiting) reloadNuxtApp();
+    const waiting = await useWaitS(2);
+    if (waiting) reloadNuxtApp();
   });
 }
-// console.log(Evaluatees)
+
 function cek() {
   validateForm();
-  console.log(dataNilai);
-  console.log(dataNilaiValidation);
+}
+
+function downloadTemplate() {
+  const dataTemplate: MixedDictionary[] = [];
+  Evaluatees.forEach((item, i) => {
+    let temp: MixedDictionary = {
+      id: item.id,
+      peringkat: item.nama ?? item.username,
+    };
+    Indicators.forEach((ind, j) => {
+      temp[ind.nama] = dataNilai[i][j];
+    });
+    dataTemplate.push(temp);
+  });
+  const workbook = XLSX.utils.book_new();
+  const worksheet = XLSX.utils.json_to_sheet(dataTemplate);
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Penilaian");
+  const title: string = (dataKegSurvei ? dataKegSurvei?.Survei?.nama + " " + dataKegSurvei?.Kegiatan?.nama : "Survei Kegiatan ") + (dataJumPosisiPetugasKegSurvei ? dataJumPosisiPetugasKegSurvei[0].Posisi.nama : "Posisi ");
+  XLSX.writeFile(workbook, "Template Penilaian Evaluasi " + title + ".xlsx");
+}
+const fileInput = ref<HTMLInputElement | null>(null);
+const files = ref();
+
+function handleFileChange() {
+  files.value = fileInput.value?.files;
+  readTemplate();
+}
+
+async function readTemplate() {
+  try {
+    const file = files.value[0];
+    const data = await file.arrayBuffer();
+    const workbook = XLSX.read(data);
+    var first_sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const uploadedData: MixedDictionary[] = XLSX.utils.sheet_to_json(first_sheet);
+
+    for (let i = 0; i < Evaluatees.length; i++) {
+      for (let j = 0; j < Indicators.length; j++) {
+        dataNilai[i][j] = !isUndefined(uploadedData[i][Indicators[j].nama]) ? uploadedData[i][Indicators[j].nama].toString() : "";
+        if (i == j) console.log(uploadedData[i][Indicators[j].nama]);
+      }
+    }
+    const delay = await useWaitS(1.75);
+    if (delay) sendData(false);
+  } catch (e) {
+    console.log(e);
+  }
 }
 </script>
 
@@ -212,32 +265,86 @@ function cek() {
   <h3 class="font-bold">Form Penilaian</h3>
 
   <section>
-    <div class="detail">Tetang kegiatan</div>
-    <div class="flex justify-between items-center">
-      <h6>Nilai menggunakan excel :</h6>
-      <div class="flex">
-        <BaseButtonMode shape="square" mode="normal" :class="'me-5'">
-          <div class="flex items-center">
-            Unduh Template Penilaian
-            <IconDownload />
+    <div class="detail">
+      <div class="hs-accordion-group mb-6">
+        <div class="hs-accordion" id="hs-basic-with-title-and-arrow-stretched-heading-one">
+          <button
+            class="hs-accordion-toggle hs-accordion-active:text-blue-700 hs-accordion-active:border-blue-700 p-3 inline-flex items-center justify-between gap-x-3 w-full text-start hover:bg-slate-200 rounded-lg border border-slate-500 disabled:opacity-50 disabled:pointer-events-none"
+            aria-controls="hs-basic-with-title-and-arrow-stretched-collapse-one"
+          >
+            Detail Kegiatan
+            <IconArrowDown class="hs-accordion-active:hidden block size-4" />
+            <IconArrowUp class="hs-accordion-active:block hidden size-4" />
+          </button>
+          <div
+            id="hs-basic-with-title-and-arrow-stretched-collapse-one"
+            class="hs-accordion-content bg-slate-200 rounded hidden w-full p-3 overflow-hidden transition-[height] duration-300"
+            aria-labelledby="hs-basic-with-title-and-arrow-stretched-heading-one"
+          >
+            <table class="my-3">
+              <tr class="">
+                <td class="mb-2 pe-3">Survei</td>
+                <td class="mb-2">: {{ dataKegSurvei?.Survei?.nama }}</td>
+              </tr>
+              <tr>
+                <td class="mb-2 pe-3">Kegiatan</td>
+                <td class="mb-2">: {{ dataKegSurvei?.Kegiatan?.nama }}</td>
+              </tr>
+              <tr>
+                <td class="mb-2 pe-3">Posisi</td>
+                <td class="mb-2">: {{ dataJumPosisiPetugasKegSurvei ? dataJumPosisiPetugasKegSurvei[0].Posisi.nama : "" }}</td>
+              </tr>
+              <tr>
+                <td class="mb-2 pe-3">Opsi Persetujuan</td>
+                <td class="mb-2">: {{ isOperatorEditable ? "Perlu Persetujuan" : "Tanpa Persetujuan" }}</td>
+              </tr>
+              <tr v-if="isOperatorEditable">
+                <td class="mb-2 pe-3">Status Persetujuan</td>
+                <td class="mb-2">: {{ isOperatorConfirmed ? "Telah Disetujui" : "Belum Disetujui" }}</td>
+              </tr>
+            </table>
           </div>
-        </BaseButtonMode>
-        <!-- <BaseButtonMode shape="square" mode="outlined">
-          <div class="flex items-center">
-            Unggah Penilaian
-            <IconUpload/>
+        </div>
+        <div class="hs-accordion" id="hs-basic-two">
+          <button
+            class="hs-accordion-toggle hs-accordion-active:text-blue-700 hs-accordion-active:border-blue-700 p-3 inline-flex items-center justify-between gap-x-3 w-full text-start hover:bg-slate-200 rounded-lg border border-slate-500 disabled:opacity-50 disabled:pointer-events-none"
+            aria-controls="hs-basic-two"
+          >
+            Penjelasan indikator penilaian
+            <IconArrowDown class="hs-accordion-active:hidden block size-4" />
+            <IconArrowUp class="hs-accordion-active:block hidden size-4" />
+          </button>
+          <div id="hs-basic-two" class="hs-accordion-content bg-slate-200 rounded hidden w-full p-3 overflow-hidden transition-[height] duration-300" aria-labelledby="hs-basic-two">
+            <ul>
+              <li v-for="ind in Indicators" :key="ind.urutan" class="mb-2">
+                {{ ind.nama }} :
+                <div v-html="ind.definisi" class="wysiwyg ps-4" ></div>
+              </li>
+            </ul>
           </div>
-        </BaseButtonMode> -->
+        </div>
       </div>
     </div>
-    <div class="flex justify-between items-center mt-3">
+    <div class="flex justify-between items-center ps-3">
+      <h6>Nilai menggunakan excel :</h6>
+      <BaseButtonMode shape="square" mode="normal" :class="'me-5'" @click="downloadTemplate()">
+        <div class="flex items-center">
+          Unduh Template Penilaian
+          <IconDownload />
+        </div>
+      </BaseButtonMode>
+    </div>
+    <div class="flex justify-between items-center mt-3 ps-3">
       <h6>Unggah Penilaian :</h6>
       <div class="flex">
         <form>
           <label class="block">
             <input
+              ref="fileInput"
               type="file"
+              @change="handleFileChange"
               class="block w-full text-sm text-gray-500 file:me-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 file:disabled:opacity-50 file:disabled:pointer-events-none"
+              accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             />
           </label>
         </form>
@@ -248,7 +355,7 @@ function cek() {
   <section>
     <form class="">
       <div class="table-container rounded overflow-auto max-h-[480px] 2xl:max-h-[720px]">
-        <table class="bg-white min-w-full">
+        <table class="bg-white min-w-full" id="penilaian">
           <thead class="text-slate-800 text-lg border-b border-slate-500 shadow">
             <tr>
               <th class="py-3 px-6 bg-white">Petugas</th>
@@ -276,7 +383,6 @@ function cek() {
                     :class="!dataNilaiValidation[i][j] && 'border-red-500 '"
                     @click="dataNilaiValidation[i][j] = true"
                     class="py-2 px-3 w-24 border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
-                    placeholder=""
                     :disabled="isDataFinalized"
                   />
                 </div>
@@ -288,14 +394,11 @@ function cek() {
       <div v-if="!dataValid" class="my-3 p-2 flex items-center rounded-lg border border-red-500 text-red-500 font-semibold"><IconWarning class="h-8 w-8 me-2" /> Pastikan seluruh nilai telah diiisi untuk memfinalisasi!</div>
       <div class="submission flex justify-end mt-6">
         <BaseButtonMode shape="square" mode="outlined" class="me-5" @click.prevent="sendData(false)" :not-active="isDataFinalized"> Simpan Data </BaseButtonMode>
-        <BaseButtonMode shape="square" mode="normal" @click.prevent="sendData(true)"  :not-active="isDataFinalized">Finalisasi</BaseButtonMode>
-        <!-- <BaseButtonMode shape="square" mode="normal" @click.prevent="cek()">Cekingg</BaseButtonMode> -->
-        <!-- http://localhost:3000/evaluasi/nilaimitra/kegiatan?survei_kd=0203A&keg_kd=0123B&branch_kd=000abc&posisi_kd=0123C -->
+        <BaseButtonMode shape="square" mode="normal" @click.prevent="sendData(true)" :not-active="isDataFinalized">Finalisasi</BaseButtonMode>
       </div>
     </form>
   </section>
   <!-- Modal -->
-  <ModalSuccess v-if="isDataSent" @close="isDataSent = !isDataSent" />
   <ModalLoading v-if="isDataLoading" @close="isDataLoading = !isDataLoading" />
   <ModalError v-if="isDataError" @close="isDataError = !isDataError" />
 </template>
@@ -307,17 +410,17 @@ function cek() {
 tr td {
   border: 1px solid blueviolet;
 } */
-table tr th:first-child,
-table td:first-child {
+#penilaian tr th:first-child,
+#penilaian td:first-child {
   position: sticky;
   left: 0;
   z-index: 10;
   background: #fff;
 }
-table tr th:first-child {
+#penilaian tr th:first-child {
   z-index: 11;
 }
-table tr th {
+#penilaian tr th {
   position: sticky;
   top: 0;
   z-index: 9;

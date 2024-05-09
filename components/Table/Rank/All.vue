@@ -57,7 +57,7 @@ const { data: resultKategoriUmum } = await useAsyncQuery(useGetKategori(), { id:
 const dataKategoriUmum: any[] = resultKategoriUmum.value?.Kategori.KategoriIndikator;
 let Indicators_umum: indicator[] = [];
 try {
-  if (useToLower(C) !== "umum") {
+  if (useToLower(resultKategoriUmum.value?.Kategori.nama) !== "umum") {
     console.log(resultKategoriUmum.value);
     throw new Error("Gagal mendapatkan kategori umum!");
   }
@@ -166,7 +166,7 @@ function updateRank(){
 <template>
   <section>
     <h6 class="font-semibold mb-3">Peringkat Semua Mitra</h6>
-    <BaseButtonMode mode="normal" shape="square" v-if="dataRankMitra.length < 1" @click="generateRank()">Generate peringkat</BaseButtonMode>
+    <BaseButtonMode class="mb-3" mode="normal" shape="square" v-if="dataRankMitra.length < 1" @click="generateRank()">Generate peringkat</BaseButtonMode>
     <vue-good-table
       :columns="column"
       :rows="dataRank"

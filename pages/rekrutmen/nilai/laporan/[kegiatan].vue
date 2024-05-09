@@ -210,7 +210,7 @@ function downloadData() {
   XLSX.utils.book_append_sheet(workbook, worksheet2, "Kategori "+Indicators_posisi[0].kategori);
 
   // Write the workbook to a file
-  const title :string = (dataKegSurvei ? dataKegSurvei?.Survei?.nama + " " + dataKegSurvei?.Kegiatan?.nama : "Survei Kegiatan " ) +  (dataJumPosisiPetugasKegSurvei ? dataJumPosisiPetugasKegSurvei[0].Posisi.nama : "Posisi ")
+  const title :string = (dataKegSurvei ? dataKegSurvei?.Survei?.nama + " " + dataKegSurvei?.Kegiatan?.nama : "Survei Kegiatan " ) +  (dataJumPosisiPetugasKegSurvei ? dataJumPosisiPetugasKegSurvei[0].Posisi.nama : "Posisi ");
   XLSX.writeFile(workbook, "Peringkat Evaluasi " + title +".xlsx");
 }
 

@@ -54,32 +54,34 @@ const dataJumPosisiPetugasKegSurvei: any[] = resultJumPosisiPetugasKegSurvei.val
 const { data: resultPetugasSurvei } = await useAsyncQuery(useGetPetugasSurvei());
 const dataPetugasSurvei: any[] = resultPetugasSurvei.value?.PetugasSurvei;
 
-
 let dataTable: dataRow[] = reactive([]);
 
 try {
-  dataKegSurvei.forEach((item,idx) => {
+  dataKegSurvei.forEach(async (item, idx) => {
     const i = useFindIndex(dataJumPosisiPetugasKegSurvei, { survei_kd: item.Survei?.kode, keg_kd: item.Kegiatan?.kode });
     const j = useFindIndex(dataPetugasSurvei, { survei_kd: item.Survei?.kode, keg_kd: item.Kegiatan?.kode });
-    
+
     if (i >= 0 && j >= 0) {
       // query penugasan struktur (membawahi pada poskegsurvei apa(brp))
-      const { result: countPenugasanStruktur} = useQuery(useCountSearchPenugasanStruktur(), { keg_kd:item.Kegiatan?.kode , branch_kd: dataPetugasSurvei[j].branch_kd, posisi_kd: dataPetugasSurvei[j].posisi_kd });
-      const temp: dataRow = {
-        namaSurvei: item.Survei?.nama,
-        namaSurvei_kd: item.Survei?.kode,
-        kegiatanSurvei: item.Kegiatan?.nama,
-        kegiatanSurvei_kd: item.Kegiatan?.kode,
-        statusSurvei: item.status,
-        posisiSurvei: dataPetugasSurvei[j].Posisi?.nama,
-        posisiSurvei_kd: dataPetugasSurvei[j].posisi_kd,
-        branch_kd: dataPetugasSurvei[j].branch_kd,
-        statusEvaluasiSurvei: dataJumPosisiPetugasKegSurvei[i].is_confirmed,
-        tahunSurvei: item.Survei?.tahun,
-        konfirmasiEvaluasiSurvei: item.is_confirm,
-        countPenugasanStruktur: countPenugasanStruktur.value,
-      };
-      dataTable.push(temp);
+      const { data: countPenugasanStruktur } = await useAsyncQuery(useCountSearchPenugasanStruktur(), { keg_kd: item.Kegiatan?.kode, branch_kd: dataPetugasSurvei[j].branch_kd, posisi_kd: dataPetugasSurvei[j].posisi_kd });
+      // if(idx = dataKegSurvei.length-1) console.log(countPenugasanStruktur.value)
+      if (countPenugasanStruktur.value) {
+        const temp: dataRow = {
+          namaSurvei: item.Survei?.nama,
+          namaSurvei_kd: item.Survei?.kode,
+          kegiatanSurvei: item.Kegiatan?.nama,
+          kegiatanSurvei_kd: item.Kegiatan?.kode,
+          statusSurvei: item.status,
+          posisiSurvei: dataPetugasSurvei[j].Posisi?.nama,
+          posisiSurvei_kd: dataPetugasSurvei[j].posisi_kd,
+          branch_kd: dataPetugasSurvei[j].branch_kd,
+          statusEvaluasiSurvei: dataJumPosisiPetugasKegSurvei[i].is_confirmed,
+          tahunSurvei: item.Survei?.tahun,
+          konfirmasiEvaluasiSurvei: item.is_confirm,
+          countPenugasanStruktur: countPenugasanStruktur.value?.countSearchPenugasanStruktur,
+        };
+        dataTable.push(temp);
+      }
     }
   });
 } catch (error) {
@@ -93,17 +95,15 @@ try {
     <vue-good-table :columns="columns" :rows="dataTable">
       <template #table-row="props">
         <span v-if="props.column.field == 'statusSurvei'">
-          <div class="flex justify-center">
-            <ButtonKegiatan :status="parseInt(props.row.statusSurvei)" />
-          </div>
+          <div class="flex justify-center"><ButtonKegiatan :status="parseInt(props.row.statusSurvei)" class="" /></div>
         </span>
         <span v-else-if="props.column.field == 'statusEvaluasiSurvei'">
           <div class="flex justify-center">
             <ButtonPersetujuan
               :not-active="props.row.countPenugasanStruktur < 1"
               :kegiatan="parseInt(props.row.statusSurvei)"
-              :konfirmasi="parseInt(props.row.konfirmasiEvaluasiSurvei)"
-              :status="parseInt(props.row.statusEvaluasiSurvei)"
+              :konfirmasi="props.row.konfirmasiEvaluasiSurvei"
+              :status="props.row.statusEvaluasiSurvei"
               :query="'kegiatan?survei_kd=' + props.row.namaSurvei_kd + '&keg_kd=' + props.row.kegiatanSurvei_kd + '&branch_kd=' + props.row.branch_kd + '&posisi_kd=' + props.row.posisiSurvei_kd + '&tahun=' + props.row.tahunSurvei"
             />
           </div>
