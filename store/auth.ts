@@ -41,6 +41,7 @@ export const useAuthStore = defineStore("auth", {
     authenticated: false,
     loading: false,
     username: "",
+    name: "",
     roleId: -1,
     role: "default",
   }),
@@ -49,6 +50,7 @@ export const useAuthStore = defineStore("auth", {
       return state.username;
     },
     getRole: (state) => state.role,
+    getName: (state) => state.name,
   },
   actions: {
     async authenticateUser({ email, password }: UserPayloadInterface): Promise<boolean> {
@@ -62,10 +64,11 @@ export const useAuthStore = defineStore("auth", {
         token.value = result?.data.login.token; // set token to cookie
         if (result?.data) {
           this.username = result?.data.login.user.username;
+          this.name = result?.data.login.user.nama;
           this.roleId = result?.data.login.user.UserRole[0].role_id;
           this.role = validateRole(this.roleId);
-          authorizedRole.value =this.role;
-          operator.value = this.roleId == 2 ? 'true' : undefined;
+          authorizedRole.value = this.role;
+          operator.value = this.roleId == 2 ? "true" : undefined;
           this.authenticated = true;
         }
         return true;

@@ -42,7 +42,7 @@ const isOperatorEditable = ref();
 
 // 1.b petugas survei
 // 2. struktur penugasan, user= parent. Mencari petugas yang akan dinilai
-const { data: resultPenugasanStruktur } = await useAsyncQuery(useSearchPenugasanStruktur(), { keg_kd, branch_kd, posisi_kd });
+const { data: resultPenugasanStruktur } = await useAsyncQuery(useSearchPenugasanStruktur(), { survei_kd, keg_kd, branch_kd, posisi_kd });
 const dataPenugasanStruktur: any[] = resultPenugasanStruktur.value?.searchPenugasanStruktur;
 
 // 3. kategori nested, get indikator name. Mencari kategori penilaian sesuai kegiatan survei beserta kategori umum(wajib)
@@ -53,9 +53,7 @@ const isOperatorConfirmed = ref();
 const { data: resultKategoriUmum } = await useAsyncQuery(useGetKategori(), { id: 1 });
 const dataKategoriUmum: any[] = resultKategoriUmum.value?.Kategori.KategoriIndikator;
 
-// 4. Nilai yang pernah disimpan
-const { data: resultSavedNilai } = await useAsyncQuery(useGetNilaiKategoriIndikator(), { survei_kd, keg_kd, branch_kd, posisi_kd });
-const dataSavedNilai: any[] = resultSavedNilai.value?.NilaiKategoriIndikator;
+// 4. Nilai yang pernah disimpan(saat load data)
 
 // initialize data
 // data query: user & indicators; data nilai yg telah disimpan -> bind dg data input: dataNliai
@@ -63,7 +61,7 @@ let Evaluatees: evaluatee[] = [];
 let Indicators: indicator[] = [];
 
 try {
-  if (useToLower(resultKategoriUmum.value?.Kategori.nama) !== "umum") {
+  if (!useIncludes(useToLower(resultKategoriUmum.value?.Kategori.nama), "umum")) {
     console.log(resultKategoriUmum.value);
     throw new Error("Gagal mendapatkan kategori umum!");
   }
@@ -107,42 +105,64 @@ const dataNilaiId: string[][] = reactive(Array.from(Array(i), () => new Array(j)
 const dataNilaiValidation: boolean[][] = reactive(Array.from(Array(i), () => new Array(j).fill(true)));
 const isDataFinalized = ref(false); //cek data terkahir
 // Masukan data nilai yang telah ada
-if (dataSavedNilai.length > 0) {
+async function loadSavedData() {
   for (let i = 0; i < Evaluatees.length; i++) {
-    for (let j = 0; j < Indicators.length; j++) {
-      let temp = useFind(dataSavedNilai, { username: Evaluatees[i].username, kategoriIndikator_id: Indicators[j].kategoriIndikator_id });
-      if (temp) {
-        if (i == Evaluatees.length - 1 && j == Indicators.length - 1) isDataFinalized.value = temp.is_final;
-        dataNilaiId[i][j] = temp.nilaikategoriindikator_id;
-        dataNilai[i][j] = temp.nilai;
+    // 4. Nilai yang pernah disimpan
+    const { data: resultSavedNilai } = await useAsyncQuery(useGetNilaiKategoriIndikator(), { survei_kd, keg_kd, branch_kd, posisi_kd, username: Evaluatees[i].username });
+    if (resultSavedNilai.value) {
+      for (let j = 0; j < Indicators.length; j++) {
+        let temp = useFind(resultSavedNilai.value?.NilaiKategoriIndikator, { kategoriIndikator_id: Indicators[j].kategoriIndikator_id });
+        if (temp) {
+          if (i == Evaluatees.length - 1 && j == Indicators.length - 1) isDataFinalized.value = temp.is_final;
+          dataNilaiId[i][j] = temp.nilaikategoriindikator_id;
+          dataNilai[i][j] = temp.nilai;
+        }
       }
     }
   }
 }
+loadSavedData();
 /**
  * Sending data
  */
 // validation input: untuk finalisasi, data tidak boleh kososng.
 const dataValid = ref(true);
+const dataScaleValid = ref(true);
+const dataScale = ["1", "2", "3", "4", "5"];
 function validateForm() {
   dataValid.value = true;
   for (let i = 0; i < dataNilai.length; i++) {
     for (let j = 0; j < dataNilai[i].length; j++) {
-      if (dataNilai[i][j] === "0" || isNil(dataNilai[i][j])) {
+      if (!useIncludes(dataScale, dataNilai[i][j]) || isNil(dataNilai[i][j])) {
         dataNilaiValidation[i][j] = false;
+        validateInput(i, j);
         if (dataValid.value) dataValid.value = false;
       }
     }
   }
 }
+function validateInput(i: number, j: number) {
+  if (!isNil(dataNilai[i][j])) {
+    if (!useIncludes(dataScale, dataNilai[i][j].toString())) {
+      dataNilaiValidation[i][j] = false;
+    }
+    dataScaleValid.value = !useIncludes(useFlatMapDeep(dataNilaiValidation), false);
+  }
+}
+
 // send data
 function sendData(is_final: boolean) {
   if (is_final) {
     validateForm();
-    if (!dataValid.value) return;
+    if (!dataValid.value || !dataScaleValid.value) return;
+  } else {
+    dataNilai.forEach((row, i) => {
+      row.forEach((_: any, j: number) => validateInput(i, j));
+    });
+    if (!dataScaleValid.value) return;
   }
   isDataLoading.value = true;
-  if (dataSavedNilai.length > 0) {
+  if (dataNilaiId[0][0] != "") {
     updateDataNilai(is_final);
   } else {
     createDataNilai(is_final);
@@ -193,13 +213,14 @@ function updateDataNilai(is_final: boolean) {
         is_final,
       });
       errorUpdateNilai((error) => {
+        // console.log({ id: dataNilaiId[i][j], nilai: dataNilai[i][j], is_final });
         logErrorMessages(error);
         isDataLoading.value = false;
         isDataError.value = true;
         // break;
         return;
       });
-      console.log(dataNilaiKategoriIndikator);
+      // console.log(dataNilaiKategoriIndikator);
     }
   }
   resultUpdateNilai(async () => {
@@ -209,16 +230,13 @@ function updateDataNilai(is_final: boolean) {
   });
 }
 
-function cek() {
-  validateForm();
-}
-
+// Export template and read data
 function downloadTemplate() {
   const dataTemplate: MixedDictionary[] = [];
   Evaluatees.forEach((item, i) => {
     let temp: MixedDictionary = {
       id: item.id,
-      peringkat: item.nama ?? item.username,
+      petugas: item.nama ?? item.username,
     };
     Indicators.forEach((ind, j) => {
       temp[ind.nama] = dataNilai[i][j];
@@ -228,7 +246,7 @@ function downloadTemplate() {
   const workbook = XLSX.utils.book_new();
   const worksheet = XLSX.utils.json_to_sheet(dataTemplate);
   XLSX.utils.book_append_sheet(workbook, worksheet, "Penilaian");
-  const title: string = (dataKegSurvei ? dataKegSurvei?.Survei?.nama + " " + dataKegSurvei?.Kegiatan?.nama : "Survei Kegiatan ") + (dataJumPosisiPetugasKegSurvei ? dataJumPosisiPetugasKegSurvei[0].Posisi.nama : "Posisi ");
+  const title: string = (dataKegSurvei ? dataKegSurvei?.Survei?.nama + " " + dataKegSurvei?.Kegiatan?.nama : "Survei Kegiatan ") + (dataJumPosisiPetugasKegSurvei ? " " + dataJumPosisiPetugasKegSurvei[0].Posisi.nama : " Posisi");
   XLSX.writeFile(workbook, "Template Penilaian Evaluasi " + title + ".xlsx");
 }
 const fileInput = ref<HTMLInputElement | null>(null);
@@ -238,23 +256,35 @@ function handleFileChange() {
   files.value = fileInput.value?.files;
   readTemplate();
 }
-
+const isFileSame = ref(true);
 async function readTemplate() {
   try {
     const file = files.value[0];
-    const data = await file.arrayBuffer();
-    const workbook = XLSX.read(data);
-    var first_sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const uploadedData: MixedDictionary[] = XLSX.utils.sheet_to_json(first_sheet);
-
-    for (let i = 0; i < Evaluatees.length; i++) {
-      for (let j = 0; j < Indicators.length; j++) {
-        dataNilai[i][j] = !isUndefined(uploadedData[i][Indicators[j].nama]) ? uploadedData[i][Indicators[j].nama].toString() : "";
-        if (i == j) console.log(uploadedData[i][Indicators[j].nama]);
+    const title: string = (dataKegSurvei ? dataKegSurvei?.Survei?.nama + " " + dataKegSurvei?.Kegiatan?.nama : "Survei Kegiatan ") + (dataJumPosisiPetugasKegSurvei ? " " + dataJumPosisiPetugasKegSurvei[0].Posisi.nama : " Posisi");
+    isFileSame.value = useIncludes(file.name, title);
+    if (!isFileSame.value) {
+      // throw new Error("Nama file tidak sama!");
+      return;
+    } else {
+      const data = await file.arrayBuffer();
+      const workbook = XLSX.read(data);
+      var first_sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const uploadedData: MixedDictionary[] = XLSX.utils.sheet_to_json(first_sheet);
+      for (let i = 0; i < Evaluatees.length; i++) {
+        let matchPetugas = useFind(uploadedData, { id: Evaluatees[i].id });
+        if (!matchPetugas) {
+          isFileSame.value = false;
+          return;
+        } else {
+          for (let j = 0; j < Indicators.length; j++) {
+            dataNilai[i][j] = matchPetugas[Indicators[j].nama]?.toString() || '';
+            // console.log(matchPetugas[Indicators[j].nama])
+          }
+        }
       }
+      const delay = await useWaitS(0.05 * uploadedData.length);
+      // if (delay) sendData(false);
     }
-    const delay = await useWaitS(1.75);
-    if (delay) sendData(false);
   } catch (e) {
     console.log(e);
   }
@@ -265,7 +295,7 @@ async function readTemplate() {
   <h3 class="font-bold">Form Penilaian</h3>
 
   <section>
-    <div class="detail">
+    <div class="detail-kegiatan">
       <div class="hs-accordion-group mb-6">
         <div class="hs-accordion" id="hs-basic-with-title-and-arrow-stretched-heading-one">
           <button
@@ -318,7 +348,7 @@ async function readTemplate() {
             <ul>
               <li v-for="ind in Indicators" :key="ind.urutan" class="mb-2">
                 {{ ind.nama }} :
-                <div v-html="ind.definisi" class="wysiwyg ps-4" ></div>
+                <div v-html="ind.definisi" class="wysiwyg ps-4"></div>
               </li>
             </ul>
           </div>
@@ -343,6 +373,7 @@ async function readTemplate() {
               ref="fileInput"
               type="file"
               @change="handleFileChange"
+              :disabled="isDataFinalized"
               class="block w-full text-sm text-gray-500 file:me-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 file:disabled:opacity-50 file:disabled:pointer-events-none"
               accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             />
@@ -350,6 +381,7 @@ async function readTemplate() {
         </form>
       </div>
     </div>
+    <div v-if="!isFileSame" class="my-3 p-3 flex item-center text-red-600 border rounded-lg"><IconWarning class="w-6 h-6 me-2" />File yang diunggah tidak sama dengan template!</div>
   </section>
 
   <section>
@@ -384,6 +416,8 @@ async function readTemplate() {
                     @click="dataNilaiValidation[i][j] = true"
                     class="py-2 px-3 w-24 border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
                     :disabled="isDataFinalized"
+                    @focusout="validateInput(i, j)"
+                    @enter="validateInput(i, j)"
                   />
                 </div>
               </td>
@@ -391,6 +425,7 @@ async function readTemplate() {
           </tbody>
         </table>
       </div>
+      <div v-if="!dataScaleValid" class="my-3 p-2 flex items-center rounded-lg border border-red-500 text-red-500 font-semibold"><IconWarning class="h-8 w-8 me-2" /> Pastikan nilai antara 1-5 tanpa koma!</div>
       <div v-if="!dataValid" class="my-3 p-2 flex items-center rounded-lg border border-red-500 text-red-500 font-semibold"><IconWarning class="h-8 w-8 me-2" /> Pastikan seluruh nilai telah diiisi untuk memfinalisasi!</div>
       <div class="submission flex justify-end mt-6">
         <BaseButtonMode shape="square" mode="outlined" class="me-5" @click.prevent="sendData(false)" :not-active="isDataFinalized"> Simpan Data </BaseButtonMode>

@@ -97,8 +97,8 @@ try {
           <div class="flex justify-center">
             <ButtonPenilaian 
             :kegiatan="parseInt(props.row.statusSurvei)" 
-            :konfirmasi="parseInt(props.row.konfirmasiEvaluasiSurvei)"
-            :status="parseInt(props.row.statusEvaluasiSurvei)" 
+            :konfirmasi="props.row.konfirmasiEvaluasiSurvei"
+            :status="props.row.statusEvaluasiSurvei" 
             :query="'kegiatan?survei_kd='+props.row.namaSurvei_kd+'&keg_kd='+props.row.kegiatanSurvei_kd+'&branch_kd='+props.row.branch_kd+'&posisi_kd='+props.row.posisiSurvei_kd+'&tahun='+props.row.tahunSurvei" />
           </div>
         </span>

@@ -1,19 +1,19 @@
 <script setup lang="ts">
 defineProps<{
-  konfirmasi: number;// 0:tidak perlu konfirmasi, 1:perlu
+  konfirmasi: boolean; // 0:tidak perlu konfirmasi, 1:perlu
   kegiatan: number; // 0:blm jalan; 1: berjalan; 2: selesai=>evaluasi
-  status?: number; // 0: blm disetujui operator
+  status: boolean; // 0: blm disetujui operator
   query: string
 }>();
 type Mode = "normal" | "outlined" | "gray";
 var mode: Mode = "outlined";
 var statusPenilaian = "Belum dimulai";
-function getMode(status?: number, kegiatan: number, konfirmasi:number) {
+function getMode(status?: boolean, kegiatan: number, konfirmasi:boolean) {
   if(kegiatan===2){
-    if(konfirmasi==1 && status == 0){
+    if(konfirmasi && !status){
       mode = "normal";
       statusPenilaian = "Perlu persetujuan";
-    }else if(konfirmasi == 1 && status == 1){
+    }else if(konfirmasi && status){
       mode = "gray";
       statusPenilaian = "Selesai";
     }else{

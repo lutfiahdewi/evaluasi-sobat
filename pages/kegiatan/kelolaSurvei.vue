@@ -193,6 +193,7 @@ async function sendData2(data: survei) {
   const { mutate: sendPenugasanStruktur, onDone: resultPenugasanStruktur, onError: errorPenugasanStruktur } = useMutation(useCreateManyPenugasanStruktur());
   const res4 = await sendPenugasanStruktur({
     input: {
+      survei_kd: data.kodeSurvei,
       keg_kd: data.kegiatanSurvei,
       branch_kd,
       posisi_kd: data.posisiSurvei,
@@ -204,6 +205,7 @@ async function sendData2(data: survei) {
   });
   const res5 = await sendPenugasanStruktur({
     input: {
+      survei_kd: data.kodeSurvei,
       keg_kd: data.kegiatanSurvei,
       branch_kd,
       posisi_kd: data.posisiSurvei,
@@ -222,13 +224,11 @@ async function sendData2(data: survei) {
   if (res1 && res2 && res3 && res4 && res5) {
     isDataLoading.value = false;
     isDataSent.value = true;
-    async () => {
-      const temp = await useWaitS(1.5);
-      if (temp) {
-        isDataSent.value = false;
-        reloadNuxtApp();
-      }
-    };
+    const temp = await useWaitS(1.5);
+    if (temp) {
+      isDataSent.value = false;
+      reloadNuxtApp();
+    }
     return;
   }
 }
@@ -447,7 +447,7 @@ async function sendData2(data: survei) {
                   class="col-span-3 py-3 px-4 block w-full border-gray-200 rounded-lg mb-3 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
                 >
                   <option selected disabled>Pilih kategori</option>
-                  <option v-for="item in dataKategori" :value="item.kategori_id" :disabled="item.nama == 'Umum' ">{{ item.nama }}</option>
+                  <option v-for="item in dataKategori" :value="item.kategori_id" :disabled="item.kategori_id == '1'">{{ item.nama }}</option>
                 </Field>
                 <ErrorMessage name="evaluasiSurvei" />
               </div>
@@ -493,11 +493,11 @@ async function sendData2(data: survei) {
                 </tr>
                 <tr>
                   <td>Kegiatan</td>
-                  <td>{{ dataForm.kegiatanSurvei }}</td>
+                  <td>{{ useFind(dataKegiatan, {kode: dataForm.kegiatanSurvei})?.nama }}</td>
                 </tr>
                 <tr>
                   <td>Posisi</td>
-                  <td>{{ dataForm.posisiSurvei }}</td>
+                  <td>{{ useFind(dataPosisi, {kode:  dataForm.posisiSurvei})?.nama }}</td>
                 </tr>
                 <tr>
                   <td>Jumlah Petugas</td>
@@ -505,7 +505,7 @@ async function sendData2(data: survei) {
                 </tr>
                 <tr>
                   <td>Kategori Evaluasi</td>
-                  <td>{{ dataForm.evaluasiSurvei }}</td>
+                  <td>{{ useFind(dataKategori, {kategori_id: dataForm.evaluasiSurvei})?.nama }}</td>
                 </tr>
                 <tr>
                   <td>Konfirmasi Evaluasi</td>
@@ -539,12 +539,6 @@ async function sendData2(data: survei) {
   <ModalLoading v-if="isDataLoading" @close="isDataLoading = !isDataLoading" />
   <ModalError v-if="isDataError" @close="isDataError = !isDataError" />
 
-  <!-- <section>
-    data kategori: <br />
-    {{ dataKegiatan }}
-    <p>data result</p>
-    {{ resultPosisi }}
-  </section> -->
 </template>
 
 <style scoped>

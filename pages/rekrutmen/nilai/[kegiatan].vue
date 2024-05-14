@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ModalBase } from "#build/components";
 import { logErrorMessages } from "@vue/apollo-util";
+import { reject } from "lodash";
 import { round } from "mathjs";
 
 useSeoMeta({
@@ -55,19 +56,12 @@ let Indicators: indicator[] = [];
 let n: number;
 try {
   n = dataKategoriUmum.length; //splt data
-  isOperatorEditable.value = dataKegSurvei.is_confirm;
+  isOperatorEditable.value = dataKegSurvei.is_confirm; // false then is_confirmed always true, doesn't need any agreement.
   isOperatorConfirmed.value = dataJumPosisiPetugasKegSurvei[0].is_confirmed;
-  if (useToLower(resultKategoriUmum.value?.Kategori.nama) !== "umum") {
+  if (!useIncludes(useToLower(resultKategoriUmum.value?.Kategori.nama), "umum")) {
     console.log(resultKategoriUmum.value);
     throw new Error("Gagal mendapatkan kategori umum!");
   }
-  //   for (const item of dataPenugasanStruktur) {
-  //     const temp: evaluatee = {
-  //       id: item.User.user_id,
-  //       username: item.username,
-  //     };
-  //     Evaluatees.push(temp);
-  //   }
   for (const item of dataKategoriUmum) {
     const temp: indicator = {
       urutan: item.no_urut,
@@ -96,11 +90,16 @@ try {
 }
 Indicators = useSortBy(Indicators, ["urutan"]);
 //4. Semua username yang telibat mjd petugas(harus dinilai) pada PenugasanStruktur
-const { data: resultPenugasanStruktur } = await useAsyncQuery(useGetPenugasanStruktur(), { keg_kd, branch_kd, posisi_kd });
+const { data: resultPenugasanStruktur } = await useAsyncQuery(useGetPenugasanStruktur(), { survei_kd, keg_kd, branch_kd, posisi_kd });
 const dataPenugasanStruktur: any[] = resultPenugasanStruktur.value?.PenugasanStruktur;
-const Evaluatees: evaluatee[] = dataPenugasanStruktur?.map((item) => ({ id: item.User.user_id, username: item.username, nama: item.User.nama }));
+const Evaluatees: evaluatee[] = reactive([]);
+try{
+  Evaluatees.push(...dataPenugasanStruktur?.map((item) => ({ id: item.User.user_id, username: item.username, nama: item.User.nama })));
+}catch(e){
+  console.log(e);
+}
 //5. Buat data matriks nilai petugas dan kategori penilaian bersesuaian
-const p = Evaluatees?.length;
+const p = Evaluatees.length;
 const q = Indicators.length;
 const dataNilai: data_nilai[][] = reactive(Array.from(Array(p), () => new Array(q)));
 const progress = ref(0);
@@ -126,35 +125,65 @@ for (let i = 0; i < p; i++) {
 
 // warn/ prevent generate/confirm dg nilai kosong
 const isDataValid = ref(true);
+const isDataScaleValid = ref(true);
+const dataScale = ["1", "2", "3", "4", "5"];
 function validateValue() {
   return new Promise((resolve) => {
     isDataValid.value = true;
+    isDataScaleValid.value = true;
     console.log("validating data...");
     dataNilai.forEach((row) => {
       row.forEach((element) => {
-        if (!element.nilai || parseInt(element.nilai) == 0) {
+        const temp = element.nilai ? element.nilai.toString() : "";
+        if (!element.nilai) {
           element.valid = false;
           isDataValid.value = false;
         }
+        if (!useIncludes(dataScale, temp)) {
+          element.valid = false;
+          isDataScaleValid.value = false;
+        }
       });
     });
-    resolve(isDataValid.value);
+    resolve(isDataValid.value && isDataScaleValid.value);
   });
 }
+function validateInput(i: number, j: number) {
+  const temp = dataNilai[i][j].nilai ? dataNilai[i][j].nilai.toString() : "";
+  dataNilai[i][j].valid = useIncludes(dataScale, temp);
+  const validArr = dataNilai.flatMap((row) => {
+    return row.map((el) => el.valid);
+  });
+  isDataScaleValid.value = !useIncludes(validArr, false);
+}
 // Simpan perubahan
+function validateAll() {
+  return new Promise((resolve) => {
+    dataNilai.forEach((row, i) => {
+      row.forEach((el, j) => {
+        validateInput(i, j);
+      });
+    });
+    resolve(isDataScaleValid.value);
+  });
+}
 async function saveChanges() {
-  isDataLoading.value = true;
-  try {
-    const isUpdated = await updateDataNilai();
-    if (isUpdated) {
-      // async () => {
-      const waiting = await useWaitS(1.5);
-      if (waiting) reloadNuxtApp();
-      // };
+  const isValid = await validateAll();
+  // console.log(isValid);
+  if (!isValid) {
+    return;
+  } else {
+    isDataLoading.value = true;
+    try {
+      const isUpdated = await updateDataNilai();
+      if (isUpdated) {
+        const waiting = await useWaitS(1.5);
+        if (waiting) reloadNuxtApp();
+      }
+    } catch (e) {
+      isDataLoading.value = false;
+      isDataError.value = true;
     }
-  } catch (e) {
-    isDataLoading.value = false;
-    isDataError.value = true;
   }
 }
 // update data nilai termasuk sblm generate peringkat
@@ -165,16 +194,18 @@ function updateDataNilai() {
     // loop user
     for (let i = 0; i < Evaluatees.length; i++) {
       for (let j = 0; j < dataNilai[i].length; j++) {
-        sendUpdateNilai({
-          id: parseInt(dataNilai[i][j].id || "0"),
-          nilai: dataNilai[i][j].nilai ? parseInt(dataNilai[i][j].nilai) : null,
-          is_final: dataNilai[i][j].is_final,
-        });
-        errorUpdateNilai((error) => {
-          logErrorMessages(error);
-          reject(false);
-        });
-        // console.log(dataNilaiKategoriIndikator);
+        if (dataNilai[i][j].is_final) {
+          sendUpdateNilai({
+            id: parseInt(dataNilai[i][j].id || "0"),
+            nilai: dataNilai[i][j].nilai ? parseInt(dataNilai[i][j].nilai) : null,
+            is_final: dataNilai[i][j].is_final,
+          });
+          errorUpdateNilai((error) => {
+            logErrorMessages(error);
+            reject(false);
+          });
+          // console.log(dataNilaiKategoriIndikator);
+        }
       }
     }
     resultUpdateNilai(() => {
@@ -195,7 +226,6 @@ async function confirmData(): Promise<void> {
       const isUpdated = await updateDataNilai();
       const dataRanked = await generateRank();
       if (isUpdated && dataRanked) {
-        const savedRank = await saveRank();
         if (isOperatorEditable.value) {
           // ubah persetujuan menjadi true
           sendUpdateConfirmed({ id: parseInt(dataJumPosisiPetugasKegSurvei[0]?.jumposisipetugaskegsurvei_id), is_confirmed: true });
@@ -206,8 +236,10 @@ async function confirmData(): Promise<void> {
             throw new Error("Gagal mengupdate status persetujuan");
           });
         }
+        const savedRank = await saveRank();
         if (savedRank) {
           // arahkan ke halaman laporan peringkat
+          navigateTo({ path: "/rekrutmen/nilai/laporan/" + "kegiatan?survei_kd=" + survei_kd + "&keg_kd=" + keg_kd + "&branch_kd=" + branch_kd + "&posisi_kd=" + posisi_kd + "&tahun=" + tahun });
         }
       }
     } catch (e) {
@@ -335,7 +367,7 @@ function saveRank() {
       >Setujui Penilaian dan Buat Peringkat</BaseButtonMode
     >
     <BaseButtonMode
-      v-if="!isOperatorConfirmed && !isOperatorEditable"
+      v-if="isOperatorConfirmed && !isOperatorEditable"
       shape="square"
       mode="normal"
       class="py-2 px-4"
@@ -352,8 +384,8 @@ function saveRank() {
       "
       >Buat Peringkat</BaseButtonMode
     >
-    <NuxtLink :to="'/rekrutmen/nilai/laporan/'+'kegiatan?survei_kd='+survei_kd+'&keg_kd='+keg_kd+'&branch_kd='+branch_kd+'&posisi_kd='+posisi_kd+'&tahun='+tahun">
-      <BaseButtonMode v-if="isOperatorConfirmed" shape="square" mode="outlined" class="py-3 px-4" >Lihat Laporan Evaluasi</BaseButtonMode>
+    <NuxtLink :to="'/rekrutmen/nilai/laporan/' + 'kegiatan?survei_kd=' + survei_kd + '&keg_kd=' + keg_kd + '&branch_kd=' + branch_kd + '&posisi_kd=' + posisi_kd + '&tahun=' + tahun">
+      <BaseButtonMode v-if="isOperatorConfirmed && (progressPercentage == 100)" shape="square" mode="outlined" class="py-3 px-4 ms-3">Lihat Laporan Evaluasi</BaseButtonMode>
     </NuxtLink>
   </section>
   <section>
@@ -363,7 +395,6 @@ function saveRank() {
           <tr>
             <th class="py-3 px-4">Petugas</th>
             <th class="py-3 px-4" v-for="ind in Indicators" :key="ind.urutan">{{ ind.nama }}</th>
-            <!-- <th class="py-3 px-4" v-if="isOperatorEditable">Aksi</th> -->
           </tr>
         </thead>
         <tbody>
@@ -388,21 +419,17 @@ function saveRank() {
                   v-model="dataNilai[i][j].nilai"
                   @click="dataNilai[i][j].valid = true"
                   class="py-2 px-3 w-24 border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
-                  :class="!dataNilai[i][j].valid && 'border-red-500 '"
+                  :class="!dataNilai[i][j].valid && ' border-red-500 '"
                   :disabled="isOperatorConfirmed || !dataNilai[i][j].is_final || !dataNilai[i][j].id"
+                  @change="validateInput(i, j)"
                 />
               </div>
             </td>
-            <!-- <td v-if="isOperatorEditable">
-            <div class="flex justify-between px-3">
-              <IconEdit class="w-8 h-8 p-1 rounded-md bg-slate-600 text-white hover:bg-slate-700" />
-              <IconDelete class="w-8 h-8 p-[1px] rounded-md bg-red-600 text-white hover:bg-red-700 pointer-events-auto" />
-            </div>
-            </td> -->
           </tr>
         </tbody>
       </table>
     </div>
+    <div v-if="!isDataScaleValid" class="my-3 p-2 flex items-center rounded-lg border border-red-500 text-red-500 font-semibold"><IconWarning class="h-8 w-8 me-2" /> Pastikan nilai antara 1-5 tanpa koma!</div>
     <div class="my-3 p-3 flex item-center text-red-600 border rounded-lg" v-if="!isDataValid"><IconWarning class="w-6 h-6 me-2" />Pastikan semua nilai petugas telah terisi semua!</div>
     <div class="flex justify-end mt-3" v-if="isOperatorEditable">
       <BaseButtonMode v-if="!isOperatorConfirmed && isOperatorEditable" shape="square" mode="outlined" class="py-3 px-4" @click.prevent="saveChanges()">Simpan Perubahan</BaseButtonMode>

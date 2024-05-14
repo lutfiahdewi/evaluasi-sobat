@@ -12,8 +12,10 @@ const query = gql`
     }
   }
 `;
-
-const { data, loading, error } = await useAsyncQuery(query);
+const currentYear = new Date().getFullYear();
+const defaultYear :string[] = []
+defaultYear.push(currentYear.toString());
+const { data, error } = await useAsyncQuery(query);
 const dataColumn = [
   { label: "kategori", field: "kategori" },
   // { label: "Director", field: "director" },
@@ -48,7 +50,7 @@ const menuMitra = [
     child: [
       { title: "Cara Penilaian", url: "/evaluasi/carapenilaian" },
       { title: "Kegiatan", url: "/evaluasi/kegiatan" },
-      { title: "Nilai Mitra", url: "/evaluasi/nilaimitra" },
+      { title: "Nilai Mitra", url: "/" },
       { title: "Laporan", url: "/evaluasi/carapenilaian" },
     ],
   },
@@ -76,8 +78,10 @@ const dataProperty = ref("");
 </script>
 
 <template>
-  <!-- <ModalSuccess :show="true"/> -->
+ 
+  <TableRankAnnual :tahun="defaultYear"/>
   <section class="mb-6">
+    {{ currentYear }} 
     <h5>Query gql example</h5>
     <ul v-if="data">
       <li v-for="(item, i) in data?.allKategori" :key="i">{{ item?.nama }}</li>

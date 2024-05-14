@@ -51,19 +51,19 @@ const { data: resultJumPosisiPetugasKegSurvei, refresh, error } = await useAsync
 const dataJumPosisiPetugasKegSurvei: any[] = resultJumPosisiPetugasKegSurvei.value?.JumPosisiPetugasKegSurvei;
 
 // query petugas survei (sedang mengerjakan apa dan di posisi apa)
-const { data: resultPetugasSurvei } = await useAsyncQuery(useGetPetugasSurvei());
-const dataPetugasSurvei: any[] = resultPetugasSurvei.value?.PetugasSurvei;
+/*const { data: resultPetugasSurvei } = await useAsyncQuery(useGetPetugasSurvei());
+const dataPetugasSurvei: any[] = resultPetugasSurvei.value?.PetugasSurvei;*/
 
 let dataTable: dataRow[] = reactive([]);
 
 try {
   dataKegSurvei.forEach(async (item, idx) => {
     const i = useFindIndex(dataJumPosisiPetugasKegSurvei, { survei_kd: item.Survei?.kode, keg_kd: item.Kegiatan?.kode });
-    const j = useFindIndex(dataPetugasSurvei, { survei_kd: item.Survei?.kode, keg_kd: item.Kegiatan?.kode });
+    // const j = useFindIndex(dataPetugasSurvei, { survei_kd: item.Survei?.kode, keg_kd: item.Kegiatan?.kode });
 
-    if (i >= 0 && j >= 0) {
+    if (i > -1) {
       // query penugasan struktur (membawahi pada poskegsurvei apa(brp))
-      const { data: countPenugasanStruktur } = await useAsyncQuery(useCountSearchPenugasanStruktur(), { keg_kd: item.Kegiatan?.kode, branch_kd: dataPetugasSurvei[j].branch_kd, posisi_kd: dataPetugasSurvei[j].posisi_kd });
+      const { data: countPenugasanStruktur } = await useAsyncQuery(useCountSearchPenugasanStruktur(), { survei_kd: item.Survei?.kode, keg_kd: item.Kegiatan?.kode, branch_kd: dataJumPosisiPetugasKegSurvei[i].branch_kd, posisi_kd: dataJumPosisiPetugasKegSurvei[i].posisi_kd });
       // if(idx = dataKegSurvei.length-1) console.log(countPenugasanStruktur.value)
       if (countPenugasanStruktur.value) {
         const temp: dataRow = {
@@ -72,9 +72,9 @@ try {
           kegiatanSurvei: item.Kegiatan?.nama,
           kegiatanSurvei_kd: item.Kegiatan?.kode,
           statusSurvei: item.status,
-          posisiSurvei: dataPetugasSurvei[j].Posisi?.nama,
-          posisiSurvei_kd: dataPetugasSurvei[j].posisi_kd,
-          branch_kd: dataPetugasSurvei[j].branch_kd,
+          posisiSurvei: dataJumPosisiPetugasKegSurvei[i].Posisi?.nama,
+          posisiSurvei_kd: dataJumPosisiPetugasKegSurvei[i].posisi_kd,
+          branch_kd: dataJumPosisiPetugasKegSurvei[i].branch_kd,
           statusEvaluasiSurvei: dataJumPosisiPetugasKegSurvei[i].is_confirmed,
           tahunSurvei: item.Survei?.tahun,
           konfirmasiEvaluasiSurvei: item.is_confirm,

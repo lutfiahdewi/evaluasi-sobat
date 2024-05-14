@@ -20,6 +20,9 @@ function changeMenuClicked() {
   menuClicked.value = !menuClicked.value;
 }
 const authorizedRole = useCookie("authorizedRole");
+// const name = ref('');
+const { data: dataProfile } = await useAsyncQuery(useGetProfile());
+// name.value = dataProfile.value?.profile.nama
 </script>
 
 <template>
@@ -46,7 +49,7 @@ const authorizedRole = useCookie("authorizedRole");
       </div>
       <!-- Menu section for full view -->
       <div class="body2 lg:text-base file:menu sm:flex sm:justify-start hidden sm:show sm:max-w-[450px] sm:overflow-x-auto lg:max-w-none">
-        <div class="mx-1" v-for="menu in props.menus" :key="menu.title.toString">
+        <div class="mx-1" v-for="menu in props.menus" :key="menu.title.toString()">
           <AppMenuItem :menu="menu" :active="props.activeBar === menu.title" />
         </div>
       </div>
@@ -57,7 +60,7 @@ const authorizedRole = useCookie("authorizedRole");
       <AppDropdown :menu-dropdown="menuProfile">
         <IconUser class="w-10 h-10" />
       </AppDropdown>
-      <span class="body1 ms-2 hidden lg:inline">Halo, kakakk</span>
+      <span class="body1 ms-2 hidden lg:inline">Halo{{   dataProfile ? ', '+ dataProfile.profile.nama : ''}}</span>
     </div>
     <!-- Unauthorized Profile -->
     <div class="flex justify-end items-center" v-else>

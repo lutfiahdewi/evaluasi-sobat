@@ -29,7 +29,7 @@ function getMode(status: boolean, kegiatan: number, konfirmasi: boolean) {
 </script>
 
 <template>
-  <NuxtLink v-if="!status && !notActive" :to="'/evaluasi/nilaiMitra/' + query">
+  <NuxtLink v-if="(konfirmasi ? !status : true) && !notActive" :to="'/evaluasi/nilaiMitra/' + query">
     <BaseButtonMode shape="pill" :mode="getMode(status, kegiatan, konfirmasi)">
       {{ statusPersetujuan }}
     </BaseButtonMode>

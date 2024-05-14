@@ -17,9 +17,6 @@ const menuAdmin = [
       { title: "Seleksi Petugas", url: "" },
       { title: "Petugas Organik", url: "" },
       { title: "Kelola Akun Petugas", url: "" },
-      { title: "Evaluasi Kegiatan", url: "/rekrutmen/evaluasi" },
-      { title: "Daftar Nilai Evaluasi", url: "/rekrutmen/nilaiEvaluasi" },
-      { title: "Daftar Peringkat", url: "/rekrutmen/peringkat" },
     ],
   },
   { title: "Penugasan", url: "" },
@@ -36,6 +33,11 @@ const menuAdmin = [
 ];
 const operator = useCookie("operator");
 if(operator.value){
+  menuAdmin[2].child?.push(...[
+      { title: "Evaluasi Kegiatan", url: "/rekrutmen/evaluasi" },
+      { title: "Daftar Nilai Evaluasi", url: "/rekrutmen/nilaiEvaluasi" },
+      { title: "Daftar Peringkat", url: "/rekrutmen/peringkat" },
+    ]);
   menuAdmin[1].child = undefined;
   menuAdmin[5].child = undefined;
 }

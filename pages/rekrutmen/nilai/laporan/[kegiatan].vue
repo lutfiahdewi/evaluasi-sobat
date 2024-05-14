@@ -60,7 +60,7 @@ let Indicators_umum: indicator[] = [];
 let Indicators_posisi: indicator[] = [];
 
 try {
-  if (useToLower(resultKategoriUmum.value?.Kategori.nama) !== "umum") {
+  if(!useIncludes(useToLower(resultKategoriUmum.value?.Kategori.nama),  "umum")){
     console.log(resultKategoriUmum.value);
     throw new Error("Gagal mendapatkan kategori umum!");
   }
@@ -93,7 +93,7 @@ try {
 Indicators_umum = useSortBy(Indicators_umum, ["urutan"]);
 Indicators_posisi = useSortBy(Indicators_posisi, ["urutan"]);
 //4. Semua username yang telibat mjd petugas(harus dinilai) pada PenugasanStruktur
-const { data: resultPenugasanStruktur } = await useAsyncQuery(useGetPenugasanStruktur(), { keg_kd, branch_kd, posisi_kd });
+const { data: resultPenugasanStruktur } = await useAsyncQuery(useGetPenugasanStruktur(), { survei_kd, keg_kd, branch_kd, posisi_kd });
 const dataPenugasanStruktur: any[] = resultPenugasanStruktur.value?.PenugasanStruktur;
 const Evaluatees: evaluatee[] = dataPenugasanStruktur?.map((item) => ({ id: item.User.user_id, username: item.username, nama: item.User.nama }));
 //5. Buat data matriks nilai petugas dan kategori penilaian bersesuaian
@@ -132,15 +132,20 @@ function generateRank(
   }[]
 > {
   return new Promise((resolve, reject) => {
-    const score: number[][] = data.map((row) => row.map((col) => parseInt(col.nilai || "0", 10)));
-    const weight: number[] = indicators.map((ind) => ind.bobot);
-    const is_benefit: boolean[] = indicators.map((ind) => (ind.is_benefit == 1 ? true : false));
-    const evaluatees: { name?: string; username: string }[] = Evaluatees.map((e) => ({ name: e.nama, username: e.username }));
-    const dataResult = useTopsis(score, weight, is_benefit, evaluatees);
-    if (!dataResult) {
-      reject("Gagal membuat rank");
-    } else {
-      resolve(dataResult);
+    try{
+      const score: number[][] = data.map((row) => row.map((col) => parseInt(col.nilai || "0", 10)));
+      const weight: number[] = indicators.map((ind) => ind.bobot);
+      const is_benefit: boolean[] = indicators.map((ind) => (ind.is_benefit == 1 ? true : false));
+      const evaluatees: { name?: string; username: string }[] = Evaluatees.map((e) => ({ name: e.nama, username: e.username }));
+      const dataResult = useTopsis(score, weight, is_benefit, evaluatees);
+      if (!dataResult) {
+        reject("Gagal membuat rank");
+      } else {
+        resolve(dataResult);
+      }
+    }catch(e){
+      console.log(e);
+      reject(false);
     }
   });
 }

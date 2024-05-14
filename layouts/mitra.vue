@@ -3,7 +3,7 @@ defineProps<{
   activeBar?: string;
 }>();
 const menuMitra = [
-  { title: "Beranda", url: "/" },
+  { title: "Beranda", url: "/beranda" },
   { title: "Daftar Survei", url: "" },
   {
     title: "Evaluasi",

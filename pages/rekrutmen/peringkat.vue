@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import All from '~/components/Table/Rank/All.vue';
-import Yearly from '~/components/Table/Rank/Yearly.vue';
-import Position from '~/components/Table/Rank/Position.vue';
+import All from "~/components/Table/Rank/All.vue";
+import Yearly from "~/components/Table/Rank/Yearly.vue";
+import Position from "~/components/Table/Rank/Position.vue";
 useSeoMeta({
   title: "Peringkat Mitra",
 });
@@ -29,84 +29,60 @@ function posisiOn() {
   tahunanOpt.value = false;
   posisiOpt.value = true;
 }
-const columns = [
-  {
-    label: "ID",
-    field: "sobat_id",
-  },
-  {
-    label: "Nama Mitra",
-    field: "nama",
-  },
-  {
-    label: "Survei",
-    field: "survei",
-  },
-  {
-    label: "Kegiatan",
-    field: "kegiatan",
-  },
-  {
-    label: "Posisi",
-    field: "posisi",
-  },
-  {
-    label: "Tahun",
-    field: "tanggal",
-    type: "date",
-    dateInputFormat: "yyyy-MM-dd",
-    dateOutputFormat: "yyyy",
-  },
-  {
-    label: "Nilai",
-    field: "nilai",
-  },
-];
-const rows = [
-  { sobat_id: 112728, nama: "mitra 1", nilai: 87, survei: "Sensus Penduduk 2020", kegiatan: "Lapangan", tanggal: "2020-01-12", status: 3, persetujuan: 2 },
-  { sobat_id: 138934, nama: "mitra 2", nilai: 88, survei: "Sensus Penduduk 2020", kegiatan: "Lapangan", tanggal: "2020-01-12", status: 2, persetujuan: 2 },
-  { sobat_id: 412125, nama: "mitra 3", nilai: 78, survei: "SAKERNAS 2021", kegiatan: "Lapangan", tanggal: "2021-01-12", status: 1, persetujuan: 1 },
-  { sobat_id: 598748, nama: "mitra 4", nilai: 89, survei: "Survei 2022", kegiatan: "Lapangan", tanggal: "2022-02-12", status: 1, persetujuan: 0 },
-  { sobat_id: 321325, nama: "mitra 5", nilai: 81, survei: "SUSENAS 2022", kegiatan: "Lapangan", tanggal: "2022-08-17", status: 1, persetujuan: 2 },
-  { sobat_id: 298749, nama: "mitra 6", nilai: 93, survei: "Sensus Pertanian 2023", kegiatan: "Lapangan", tanggal: "2022-01-12", status: 0, persetujuan: 0 },
-];
+
+//data filter
+// 1. Survei
+const selectedSurvei = ref([]);
+const { data: resultSurvei } = await useAsyncQuery(useGetSurvei());
+const dataSurvei: { survei_id: number; nama: string; kode: string; tahun: string; tipe: number; unit_kd: string }[] = resultSurvei.value?.Survei;
+// console.log(dataSurvei);
+
+// 2. Kegiatan
+const selectedKegiatan = ref([]);
+const { data: resultKegiatan } = await useAsyncQuery(useGetKegiatan());
+const dataKegiatan: any[] = resultKegiatan.value?.Kegiatan;
+// 3. Posisi
+const selectedPosisi = ref([]);
+const { data: resultPosisi } = await useAsyncQuery(useGetPosisi());
+const dataPosisi: { nama: string; kode: string; posisi_id: number }[] = resultPosisi.value?.Posisi;
+// 4. Tahun
+const selectedTahun = ref([]);
+const dataTahun = useUniqBy(dataSurvei, 'tahun')
 </script>
 
 <template>
   <h3 class="font-bold mb-3">Peringkat Mitra</h3>
   <section>
     <h6 class="font-semibold mb-3">Tampilkan peringkat:</h6>
-    <div class="rank-option flex justify-start">
+    <div class="rank-option flex justify-start mb-6">
       <BaseButtonMode shape="square" :mode="semuaPetugasOpt ? 'normal' : 'outlined'" class="py-2 px-4 me-3 text-xl" @click="semuaPetugasOn()">Semua Mitra</BaseButtonMode>
       <BaseButtonMode shape="square" :mode="tahunanOpt ? 'normal' : 'outlined'" class="py-2 px-4 me-3" @click="tahunanOn()">Tahunan</BaseButtonMode>
       <BaseButtonMode shape="square" :mode="posisiOpt ? 'normal' : 'outlined'" class="py-2 px-4 me-3" @click="posisiOn()">Posisi tertentu</BaseButtonMode>
     </div>
-  </section>
-  <section>
     <h6 class="font-semibold mb-3">Filter peringkat:</h6>
-    <div class="grid grid-cols-6">
-      <h6 class="mb-3">Survei:</h6>
-      <input type="text" class="col-span-5 mb-3 py-2 px-3 block w-full border-slate-400 rounded-lg body2 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none" placeholder="Filter survei" />
-      <h6 class="mb-3">Kegiatan:</h6>
-      <input type="text" class="col-span-5 mb-3 py-2 px-3 block w-full border-slate-400 rounded-lg body2 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none" placeholder="Filter kegiatan" />
-      <h6 class="mb-3">Posisi:</h6>
-      <select class="col-span-2 py-2 px-3 pe-9 block w-full bg-gray-100 border-slate-400 rounded-lg body2 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none">
-        <option selected disabled class="text-slate-300">Pilih Posisi</option>
-        <option>1</option>
-        <option>2</option>
-        <option>3</option>
-      </select>
-      <h6 class="justify-self-center mb-3">Tahun:</h6>
-      <select class="col-span-2 py-2 px-3 pe-9 block w-full bg-gray-100 border-slate-400 rounded-lg body2 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none">
-        <option selected disabled class="text-slate-300">Pilih Tahun</option>
-        <option>2020</option>
-        <option>2021</option>
-        <option>2022</option>
-      </select>
+    <div class="grid grid-cols-6 mb-3">
+      <label for="survei" class="text-xl self-center">Survei:</label>
+      <div class="col-span-5 mb-3 block w-full bg-slate-50 border-slate-400 rounded-lg text-slate-600">
+        <v-select id="opsi" multiple v-model="selectedSurvei" :options="dataSurvei" :reduce="(dataSurvei) => dataSurvei.survei_id" label="nama" placeholder="Pilih satu atau lebih survei"></v-select>
+      </div>
+      <label for="kegiatan" class="text-xl self-center">Kegiatan:</label>
+      <div class="col-span-5 mb-3 block w-full bg-slate-50 border-slate-400 rounded-lg text-slate-600">
+        <v-select id="opsi" multiple v-model="selectedKegiatan" :options="dataKegiatan" :reduce="(dataKegiatan) => dataKegiatan.kegiatan_id" label="nama" placeholder="Pilih satu atau lebih kegiatan"></v-select>
+      </div>
+      <label class="text-xl self-center" for="posisi">Posisi:</label>
+      <div class="col-span-2 block w-full bg-slate-50 border-slate-400 rounded-lg text-slate-600">
+        <v-select id="opsi" v-model="selectedPosisi" :options="dataPosisi" :reduce="(dataPosisi) => dataPosisi.posisi_id" label="nama" placeholder="Pilih posisi"></v-select>
+      </div>
+      <label for="tahun" class="text-xl justify-self-center self-center">Tahun:</label>
+      <div class="col-span-2 block w-full bg-slate-50 border-slate-400 rounded-lg text-slate-600">
+        <v-select id="opsi" multiple v-model="selectedTahun" :options="dataTahun" :reduce="(dataTahun) => dataSurvei.tahun" label="tahun" placeholder="Pilih satu atau lebih tahun"></v-select>
+      </div>
     </div>
   </section>
   <Transition name="fade" mode="out-in">
-    <component :is="activeComponent"></component>
+    <KeepAlive>
+      <component :is="activeComponent" filter="abc123" :survei_id="selectedSurvei"></component>
+    </KeepAlive>
   </Transition>
 </template>
 
@@ -120,4 +96,4 @@ const rows = [
 .fade-leave-to {
   opacity: 0;
 }
-</style>
+</style>: { survei_id: any; }: { survei_id: any; }: { survei_id: any; }: { kegiatan_id: any; }: { kegiatan_id: any; }: { kegiatan_id: any; }

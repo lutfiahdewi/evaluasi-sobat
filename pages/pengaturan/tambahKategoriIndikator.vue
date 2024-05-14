@@ -17,7 +17,7 @@ interface indicator {
 }
 
 // initialization
-const count = useState<string>("indicators");//jumlah indikator yang telah dipilih
+const count = useState<string>("indicators"); //jumlah indikator yang telah dipilih
 /*if (count.value == undefined) {
   count.value = "4";
 }*/
@@ -215,28 +215,15 @@ function sendData() {
           />
         </div>
         <div>
-          <label for="weight-label" class="block font-medium mb-2">Jumlah Indikator</label>
-          <select v-model="count" id="weight-label" class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none" disabled>
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-            <option>4</option>
-            <option>5</option>
-            <option>6</option>
-            <option>7</option>
-            <option>8</option>
-            <option>9</option>
-          </select>
+          <label for="count-label" class="block font-medium mb-2">Jumlah Indikator</label>
+          <input v-model="count" id="count-label" class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none" disabled>
+          </input>
         </div>
         <div class="col-span-2">
           <label for="textarea-label" class="block font-medium mb-2">Konsep dan Definisi</label>
-          <textarea
-            v-model="kategoriDefinisi"
-            id="textarea-label"
-            class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
-            rows="4"
-            placeholder="Penjelasan mengenai kategori indikator"
-          ></textarea>
+          <div class="bg-slate-50 border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none" id="textarea-label">
+            <QuillEditor placeholder="Penjelasan mengenai kategori indikator"  v-model:content="kategoriDefinisi" theme="snow" contentType="html" />
+        </div>
         </div>
       </div>
     </section>
@@ -280,13 +267,9 @@ function sendData() {
         </div>
         <div class="col-span-2">
           <label :for="'textarea-label' + i" class="block font-medium mb-2">Konsep dan Definisi</label>
-          <textarea
-            v-model="arr_indicators[i].definisi"
-            :id="'textarea-label' + i"
-            class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
-            rows="3"
-            :placeholder="'Penjelasan mengenai indikator ' + (i + 1)"
-          ></textarea>
+          <div class="bg-slate-50 border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none" id="textarea-label">
+          <QuillEditor placeholder="'Penjelasan mengenai indikator ' + (i + 1)" v-model:content="arr_indicators[i].definisi" theme="snow" contentType="html" />
+        </div>
         </div>
       </div>
     </section>
@@ -327,9 +310,13 @@ function sendData() {
           <div class="mt-1 text-gray-800">
             <h6>Kategori : {{ kategoriNama }}</h6>
             <p>Daftar indikator</p>
-            <ol class="list-decimal ps-5">
-              <li v-for="(item, i) in arr_indicators">{{ arr_indicators[i].nama }}</li>
-            </ol>
+            <table>
+              <tr v-for="(item, idx) in arr_indicators">
+                <td>{{ idx + 1 }}.</td>
+                <td>{{ item.nama }}</td>
+                <td>: {{ round(ahp.weight[idx], 3) }}</td>
+              </tr>
+            </table>
           </div>
           <div class="my-3 flex item-center text-red-600" v-if="!isValid"><IconWarning class="w-6 h-6 me-2" />Pastikan form telah terisi semua!</div>
           <div class="my-3 flex item-center text-red-600" v-if="!isMatricesValid"><IconWarning class="w-6 h-6 me-2" />Pastikan skala yang dimasukkan antara 1-9 pada matriks perbandingan</div>
@@ -342,7 +329,6 @@ function sendData() {
         <BaseButtonMode shape="square" mode="outlined" class="me-3 font-semibold" :data-valid="runChecking">Batal</BaseButtonMode>
       </NuxtLink>
       <BaseButtonMode shape="square" mode="normal" @click.prevent="createCatModal?.open()" :not-active="!isValid || !isMatricesValid || !ahp.isConsistent">Buat Indikator</BaseButtonMode>
-      <BaseButtonMode shape="square" mode="normal" @click.prevent="isDataSent = !isDataSent">Toggle</BaseButtonMode>
     </div>
   </form>
 

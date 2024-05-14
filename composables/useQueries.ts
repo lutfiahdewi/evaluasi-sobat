@@ -14,10 +14,38 @@ export const useLogin = () => {
         token
         user {
           username
+          nama
           is_pegawai
           UserRole {
             role_id
           }
+        }
+      }
+    }
+  `;
+  return query;
+};
+
+// profil
+export const useGetProfile = () => {
+  const query = gql`
+    query {
+      profile {
+        user_id
+        username
+        nama
+        email
+        is_pegawai
+        UserRole {
+          user_role_id
+          role_id
+          status
+        }
+        MitraTahunKerja {
+          mitratahunkerja_id
+          branch_kd
+          tahun
+          status
         }
       }
     }
@@ -320,6 +348,21 @@ export const useCreateSurvei = () => {
     }
   `;
 };
+// Get all or single Survei
+export const useGetSurvei = () => {
+  return gql`
+    query ($kode: String) {
+      Survei(kode: $kode) {
+        survei_id
+        kode
+        nama
+        tahun
+        tipe
+        unit_kd
+      }
+    }
+  `;
+};
 
 /**
  * Kegiatan
@@ -440,6 +483,7 @@ export const useGetJumPosisiPetugasKegSurvei = () => {
         Posisi {
           nama
         }
+        branch_kd
         jumlah
         is_confirmed
       }
@@ -548,8 +592,8 @@ export const useCreateManyPenugasanStruktur = () => {
 // search(query by filtering )
 export const useSearchPenugasanStruktur = () => {
   return gql`
-    query ($keg_kd: String!, $branch_kd: String!, $posisi_kd: String!) {
-      searchPenugasanStruktur(keg_kd: $keg_kd, branch_kd: $branch_kd, posisi_kd: $posisi_kd) {
+    query ($keg_kd: String!, $survei_kd: String!, $branch_kd: String!, $posisi_kd: String!) {
+      searchPenugasanStruktur(keg_kd: $keg_kd, survei_kd: $survei_kd, branch_kd: $branch_kd, posisi_kd: $posisi_kd) {
         username
         User {
           user_id
@@ -564,16 +608,16 @@ export const useSearchPenugasanStruktur = () => {
 // countSearch(query by filtering )
 export const useCountSearchPenugasanStruktur = () => {
   return gql`
-    query ($keg_kd: String!, $branch_kd: String!, $posisi_kd: String!) {
-      countSearchPenugasanStruktur(keg_kd: $keg_kd, branch_kd: $branch_kd, posisi_kd: $posisi_kd)
+    query ($survei_kd: String!, $keg_kd: String!, $branch_kd: String!, $posisi_kd: String!) {
+      countSearchPenugasanStruktur(survei_kd: $survei_kd, keg_kd: $keg_kd, branch_kd: $branch_kd, posisi_kd: $posisi_kd)
     }
   `;
 };
 // Query optional filtering
 export const useGetPenugasanStruktur = () => {
   return gql`
-    query ($id: Int, $keg_kd: String, $branch_kd: String, $posisi_kd: String) {
-      PenugasanStruktur(id: $id, keg_kd: $keg_kd, branch_kd: $branch_kd, posisi_kd: $posisi_kd) {
+    query ($id: Int, $survei_kd: String!, $keg_kd: String, $branch_kd: String, $posisi_kd: String) {
+      PenugasanStruktur(id: $id, survei_kd: $survei_kd, keg_kd: $keg_kd, branch_kd: $branch_kd, posisi_kd: $posisi_kd) {
         penugasanstruktur_id
         keg_kd
         branch_kd
@@ -629,9 +673,8 @@ export const useCreateNilaiKategoriIndikator = () => {
 // get
 export const useGetNilaiKategoriIndikator = () => {
   return gql`
-    query ($id: Int, $survei_kd: String, $keg_kd: String, $branch_kd: String, $posisi_kd: String, $username: String, $tahun: String) {
-      NilaiKategoriIndikator(id: $id, survei_kd: $survei_kd, keg_kd: $keg_kd, branch_kd: $branch_kd, posisi_kd: $posisi_kd, username: $username, tahun: $tahun) {
-        __typename
+    query ($id: Int, $survei_kd: String, $keg_kd: String, $branch_kd: String, $posisi_kd: String, $kategoriIndikator_id: Int, $username: String, $tahun: String) {
+      NilaiKategoriIndikator(id: $id, survei_kd: $survei_kd, keg_kd: $keg_kd, branch_kd: $branch_kd, posisi_kd: $posisi_kd, kategoriIndikator_id: $kategoriIndikator_id, username: $username, tahun: $tahun) {
         nilaikategoriindikator_id
         survei_kd
         keg_kd
@@ -764,6 +807,8 @@ export const useGetRankMitra = () => {
         }
         kategori_id
         nilai
+        created_at
+        updated_at
       }
     }
   `;
@@ -785,5 +830,101 @@ export const useCreateRankMitra = () => {
         nilai
       }
     }
+  `;
+};
+
+/**
+ * Update Rank Mitra
+ * @param input{}
+ * @param id:int!
+ *
+ */
+
+export const useUpdateRankMitra = () => {
+  return gql`
+    mutation ($id: Int!, $input: RankMitraInputType!) {
+      updateRankMitra(id: $id, input: $input) {
+        rankmitra_id
+        branch_kd
+        username
+        kategori_id
+        nilai
+        created_at
+        updated_at
+      }
+    }
+  `;
+};
+
+/**
+ * RankMitraTahunKerja
+ */
+
+/**
+ * get RankMitraTahunKerja
+ * @returns {rankmitratahunkerja_id, branch_kd, username, tahun, nilai, kategori_id, created_at, updated_at}
+ */
+export const useGetRankMitraTahunKerja = () => {
+  return gql`
+    query ($id: Int, $branch_kd: String, $username: String, $tahun: String) {
+      RankMitraTahunKerja(id: $id, branch_kd: $branch_kd, username: $username, tahun: $tahun) {
+        rankmitratahunkerja_id
+        branch_kd
+        username
+        tahun
+        nilai
+        kategori_id
+        created_at
+        updated_at
+      }
+    }
+  `;
+};
+
+/**
+ * create RankMitraTahunKerja
+ * @returns RankMitraTahunKerja
+ * @input {branch_kd: String!,username: String!,tahun: String!,kategori_id: Int!,nilai: Float}
+ */
+export const useCreateRankMitraTahunKerja = () => {
+  return gql`
+    mutation ($input: RankMitraTahunKerjaInputType!) {
+      createRankMitraTahunKerja(input: $input) {
+        rankmitratahunkerja_id
+        branch_kd
+        username
+        tahun
+        nilai
+        kategori_id
+        created_at
+        updated_at
+      }
+    }
+  `;
+};
+
+/**
+ * update RankMitraTahunKerja
+ * @returns RankMitraTahunKerja
+ * @input input: {branch_kd: String!,username: String!,tahun: String!,kategori_id: Int!,nilai: Float}
+ * @input id: Int!
+ */
+export const useUpdateRankMitraTahunKerja = () => {
+  return gql`
+  mutation ($id: Int!, $input: RankMitraTahunKerjaInputType!) {
+    updateRankMitraTahunKerja (
+        id: $id,
+        input: $input
+    ) {
+      rankmitratahunkerja_id
+        branch_kd
+        username
+        tahun
+        nilai
+        kategori_id
+        created_at
+        updated_at
+    }
+}
   `;
 };

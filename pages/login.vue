@@ -29,10 +29,7 @@ if (authorizedRole.value !== "default" && token.value) {
 // login procedure
 const login = async () => {
   const isAuthenticated = await authenticateUser(user); // call authenticateUser and pass the user object
-  // redirect to homepage if user is authenticated
   if (isAuthenticated) {
-    // isDataSent.value = true;
-    // authorizedRole.value = validateRole(getRoleId.value);
     reloadNuxtApp({ path: "/beranda" });
   } else {
     isUserNotFound.value = true;
@@ -52,7 +49,6 @@ async function submitForm() {
   } catch (e) {
     console.log(e);
     isEmailNotValid.value = true;
-    // user.email = '';
     user.password = "";
     return;
   }

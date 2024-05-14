@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { AlertSuccess, AlertError } from "#build/components";
 import { logErrorMessages } from "@vue/apollo-util";
-// props untuk filtering, namun utk all tidak diperhatikan. Mitra di rank berdasarkan rata2 nilai pada kategori Umum.
+import { useGetRankMitraTahunKerja } from "~/composables/useQueries";
+
 const props = defineProps<{
   filter?: string;
   survei_id?: number[];
@@ -42,31 +43,29 @@ const column = [
 ];
 
 /**
- * Ranking semua mitra/petugas hanya melihat( kategori umum untuk bisa saling dibandingkan tanpa melihat posisi/kegiatan ???)
+ * Ranking semua mitra/petugas hanya melihat kategori umum pada tahun tertentu
  * Langkah:
  * A. Query kategori umum beserta kategoriIndikator dan indikator2nya
- * B. Query semua user & nilai dari branch yg sama dari rankMitra
- * C. Query juga nilai per indikator dari tabel nilaiKategoriIndikator (filter kategoriIndikator_id sesuai langkah A)
+ * B. Query semua user & nilai dari branch & TAHUN yg sama dari RankMitraTahunKerja
+ * C. Query juga nilai per indikator dari tabel nilaiKategoriIndikator (filter user+tahun)
  * D. NIlai dg indikatorKategori sama akan dirata2kan
  * E. Pemeringkatan:
- * Generate/Re-Generate rank
- * 1. Lakukan query diatas. Jika query (B) kosong, generate/ create. Jika ada, re-generate/update
- * 2. Generate/Create:
- *    - Pada langkah A dan C perhatikan branch_kd dan kategoriIndikator_id
- *    - Lakukan juga query bobot pada tabel kategoriIndikator utk menghitung dg topsis
- *    - Sesuaikan struktur data dan lakukan perangkingan dengan useTopsis
- *    - create data pada tabel rankMitra
- * 3. Update:
- *    - Query data dari tabel RankMitra (Langkah A-C telah dijalankan)
- *    - Jalankan ulang perangkingan dg useTopsis
- *    - update data pda tabel rankMitra
+ * Generate/Re-Generate rank langkah hampir sama dg semua mitra tetapi create/update pada tabel RankMitraTahunKerja
  */
+
+// B. Query tabel RankMitraTahunKerja
+const branch_kd = "0123ABC";
+const tahun = ref(props.tahun ? props.tahun[0] : new Date().getFullYear().toString());
+const { data: resultRankMitraTahunKerja, refresh: refreshRankMitraTahunKerja, status: statusRankMitraTahunKerja } = await useAsyncQuery(useGetRankMitraTahunKerja(), { branch_kd, tahun });
+const dataRankMitraTahunKerja: any[] = [];
 
 // A. Query kategori umum
 const { data: resultKategoriUmum } = await useAsyncQuery(useGetKategori(), { id: 1 });
 const dataKategoriUmum: any[] = resultKategoriUmum.value?.Kategori.KategoriIndikator;
 const kategori_id: number = parseInt(resultKategoriUmum.value?.Kategori.kategori_id);
 let Indicators_umum: indicator[] = [];
+// C. Query tabel nilaiKategoriIndikator
+const dataSavedNilai: any[] = reactive([]);
 try {
   if (!useIncludes(useToLower(resultKategoriUmum.value?.Kategori.nama), "umum")) {
     console.log(resultKategoriUmum.value);
@@ -82,6 +81,8 @@ try {
       is_benefit: item.indikator.is_benefit,
     };
     Indicators_umum.push(temp);
+    const { data: resultSavedNilai } = await useAsyncQuery(useGetNilaiKategoriIndikator(), { branch_kd, tahun, kategoriIndikator_id: parseInt(item.kategoriIndikator_id) });
+    dataSavedNilai.push(...resultSavedNilai.value?.NilaiKategoriIndikator);
   }
   Indicators_umum = useSortBy(Indicators_umum, ["urutan"]);
 } catch (e) {
@@ -94,21 +95,17 @@ column.push(
     field: ind.nama,
   }))
 );
-// B. Query tabel rankMitra
-const branch_kd = "0123ABC";
-const { data: resultRankMitra, refresh: refreshRankMitra, status: statusRankMitra } = await useAsyncQuery(useGetRankMitra(), { branch_kd });
-const dataRankMitra: any[] = [];
-// C. Query tabel nilaiKategoriIndikator
-const { data: resultSavedNilai } = await useAsyncQuery(useGetNilaiKategoriIndikator(), { branch_kd });
-const dataSavedNilai: any[] = resultSavedNilai.value?.NilaiKategoriIndikator;
+
 // D. nilai pada indikatorKategori dirata2kan jika 1 indikatorKategori_id punya nilai >1
 // Proses ini dg cara menemukan object apakah satu user dan satu indikatorKategori_id punya >1 nilai
 // struct data
 const dataRank: Rank[] = reactive([]);
 // fungsi utk mendapatkan nilai2 kategori umum setiap petugas. Jika ada >1 nilai (byk penilaian) dirata2kan
 function structData() {
+  // getNilai();
   try {
     const users = useUniqBy(dataSavedNilai, "username");
+    // console.log(users);
     users.forEach((item, idx) => {
       let temp: Rank = {
         username: item.username,
@@ -125,22 +122,22 @@ function structData() {
     console.log(e);
   }
 }
+
 structData();
 // jika sudah ada data pemeringkatan tersimpan, nilai (preferensi diambil)
 const isDataRanked = ref(false);
 const lastUpdated = ref();
-function getSavedRank(restruct? :boolean) {
-  if (restruct) dataRankMitra.length = 0;
-  dataRankMitra.push(...resultRankMitra.value?.RankMitra);
+function getSavedRank(restruct?: boolean) {
+  if (restruct) dataRankMitraTahunKerja.length = 0;
+  dataRankMitraTahunKerja.push(...resultRankMitraTahunKerja.value?.RankMitraTahunKerja);
   try {
-    if (dataRankMitra.length > 0) {
-      lastUpdated.value = new Date(dataRankMitra[0].updated_at ?? dataRankMitra[0].created_at);
-      console.log(dataRankMitra[0].updated_at);
+    if (dataRankMitraTahunKerja.length > 0) {
+      lastUpdated.value = new Date(dataRankMitraTahunKerja[0].updated_at ?? dataRankMitraTahunKerja[0].created_at);
       isDataRanked.value = true;
       dataRank.forEach((item) => {
         // useFind only return first object found
-        let matchObj = useFind(dataRankMitra, { username: item.username });
-        item.rankmitra_id = matchObj.rankmitra_id;
+        let matchObj = useFind(dataRankMitraTahunKerja, { username: item.username });
+        item.rankmitra_id = matchObj.rankmitratahunkerja_id;
         item.nilai = matchObj.nilai;
       });
       sortNilai();
@@ -179,7 +176,7 @@ function generateRank() {
 
 function createRank() {
   generateRank();
-  const { mutate: sendCreateRank, onDone: resultCreateRank, onError: errorCreateRank, loading: loadingCreateRank } = useMutation(useCreateRankMitra());
+  const { mutate: sendCreateRank, onDone: resultCreateRank, onError: errorCreateRank, loading: loadingCreateRank } = useMutation(useCreateRankMitraTahunKerja());
   const arrResult = [];
   try {
     dataRank.forEach((item) => {
@@ -189,6 +186,7 @@ function createRank() {
           username: item.username,
           kategori_id,
           nilai: item.nilai,
+          tahun: tahun.value,
         },
       });
       errorCreateRank((error) => {
@@ -210,10 +208,10 @@ function createRank() {
 function updateRank() {
   generateRank();
   console.log("updating rank!");
-  const { mutate: sendUpdateRank, onDone: resultUpdateRank, onError: errorUpdateRank, loading: loadingUpdateRank } = useMutation(useUpdateRankMitra());
-  const arrResult = [];
+  const { mutate: sendUpdateRank, onDone: resultUpdateRank, onError: errorUpdateRank, loading: loadingUpdateRank } = useMutation(useUpdateRankMitraTahunKerja());
+  const arrResult: any[] = [];
   try {
-    dataRank.forEach((item) => {
+    dataRank.forEach(async (item) => {
       if (!item.rankmitra_id) throw new Error("Data peringkat belum ada sebelumnya, gagal membuat ulang peringkat!");
       const id: number = parseInt(item.rankmitra_id);
       const temp = sendUpdateRank({
@@ -223,9 +221,11 @@ function updateRank() {
           username: item.username,
           kategori_id,
           nilai: item.nilai,
+          tahun: tahun.value,
         },
       });
       errorUpdateRank((error) => {
+        //alert failed
         toggleAlertError();
         logErrorMessages(error);
         throw new Error("Gagal membuat peringkat!");
@@ -235,22 +235,22 @@ function updateRank() {
   } catch (e) {
     console.log(e);
   }
+  // console.log(arrResult);
   resultUpdateRank(() => {
     toggleAlertSuccess();
     refresh();
   });
 }
 async function refresh() {
-  refreshRankMitra();
-  await busyWait(() => statusRankMitra.value === 'success');
+  refreshRankMitraTahunKerja();
+  await busyWait(() => statusRankMitraTahunKerja.value === "success");
   getSavedRank(true);
 }
 async function busyWait(test: () => any) {
   // wait time: 0.5s/data
-  const delay = dataRank.length >= 50 ? 20 :( dataRank.length <= 20 ? 10 : dataRank.length*0.5)
-  while(!test()) await useWaitS(delay);
+  const delay = dataRank.length >= 50 ? 20 : dataRank.length <= 20 ? 10 : dataRank.length * 0.5;
+  while (!test()) await useWaitS(delay);
 }
-
 // alert
 const alertSuccess = ref<InstanceType<typeof AlertSuccess> | null>(null);
 const alertError = ref<InstanceType<typeof AlertError> | null>(null);
@@ -260,12 +260,9 @@ const toggleAlertSuccess = (sec?: number) => {
 const toggleAlertError = (sec?: number) => {
   alertError.value?.toggle(sec);
 };
-console.log(statusRankMitra.value);
 </script>
-
 <template>
   <section>
-    <h6 class="font-semibold mb-3">Peringkat Semua Mitra</h6>
     <AlertSuccess ref="alertSuccess">
       <template #content>
         <p class="font-medium">Data berhasil diperbarui!</p>
@@ -276,31 +273,36 @@ console.log(statusRankMitra.value);
         <p class="font-medium">Data gagal diperbarui!</p>
       </template>
     </AlertError>
+    <!-- <BaseButtonMode class="mb-3" mode="normal" shape="square" @click="toggleAlertError()">Show Alert</BaseButtonMode> -->
+    <h6 class="font-semibold mb-3">Peringkat Tahunan Mitra</h6>
     <BaseButtonMode class="mb-3" mode="normal" shape="square" v-if="!isDataRanked" @click="createRank()">Buat peringkat</BaseButtonMode>
     <BaseButtonMode class="mb-3" mode="outlined" shape="square" v-if="isDataRanked" @click="updateRank()">Buat ulang peringkat</BaseButtonMode>
-    <div v-if="isDataRanked" class="mb-3">Terakhir kali di update: {{ lastUpdated.toLocaleString("id-ID") }}</div>
-    <vue-good-table
-      :columns="column"
-      :rows="dataRank"
-      :search-options="{
-        enabled: true,
-      }"
-      :sort-options="{
-        enabled: true,
-        initialSortBy: { field: 'peringkat', type: 'asc' },
-      }"
-      :pagination-options="{
-        enabled: true,
-      }"
-    >
-      <template #table-row="props">
-        <span v-if="props.column.field == 'nama'">
-          {{ props.row.nama || props.row.username }}
-        </span>
-        <span v-else>
-          {{ props.formattedRow[props.column.field] }}
-        </span>
-      </template>
-    </vue-good-table>
+    <div v-if="isDataRanked" class="mb-3">Terakhir kali diperbarui: {{ lastUpdated.toLocaleString("id-ID") }}</div>
+    <div v-if="props.tahun?.length !== 1">Pilih satu tahun untuk menampilkan peringkat</div>
+    <div v-else>
+      <vue-good-table
+        :columns="column"
+        :rows="dataRank"
+        :search-options="{
+          enabled: true,
+        }"
+        :pagination-options="{
+          enabled: true,
+        }"
+        :sort-options="{
+          enabled: true,
+          initialSortBy: { field: 'peringkat', type: 'asc' },
+        }"
+      >
+        <template #table-row="props">
+          <span v-if="props.column.field == 'nama'">
+            {{ props.row.nama || props.row.username }}
+          </span>
+          <span v-else>
+            {{ props.formattedRow[props.column.field] }}
+          </span>
+        </template>
+      </vue-good-table>
+    </div>
   </section>
 </template>
