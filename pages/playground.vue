@@ -79,7 +79,7 @@ const dataProperty = ref("");
 
 <template>
  
-  <TableRankAnnual :tahun="defaultYear"/>
+  <TableRankAnnualList/>
   <section class="mb-6">
     {{ currentYear }} 
     <h5>Query gql example</h5>

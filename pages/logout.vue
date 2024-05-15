@@ -13,8 +13,10 @@ const { authenticated } = storeToRefs(useAuthStore()); // make authenticated sta
 logUserOut();
 const authorizedRole = useCookie("authorizedRole");
 const operator = useCookie("operator");
+const userFirstName = useCookie("userFirstName");
 authorizedRole.value = undefined;
 operator.value = undefined;
+userFirstName.value = undefined;
 onLogout(); // remove auth token in apollo client
 /*if(authenticated){
   return

@@ -11,6 +11,7 @@ type dataRow = {
   evaluasiSurvei: string;
   konfirmasivaluasiSurvei: boolean;
   statusEvaluasiSurvei?: boolean;
+  survei_id: string;
 };
 const columns = [
   {
@@ -25,10 +26,6 @@ const columns = [
     label: "Tipe",
     field: "tipeSurvei",
   },
-  // {
-  //   label: "Tahapan",
-  //   field: "tahapan",
-  // },
   {
     label: "Status Kegiatan",
     field: "statusSurvei",
@@ -45,10 +42,6 @@ const columns = [
     label: "Penilaian",
     field: "evaluasiSurvei",
   },
-  // {
-  //   label: "Status Penilaian",
-  //   field: "statusEvaluasiSurvei",
-  // },
   {
     label: "Aksi",
     field: "aksi",
@@ -60,24 +53,25 @@ const { data: resultKegSurvei, refresh: refreshKegSurvei } = await useAsyncQuery
 const dataKegSurvei: any[] = resultKegSurvei.value?.KegSurvei;
 
 // query JumPosisiPetugasKegSurvei
-const { data: resultJumPosisiPetugasKegSurvei, refresh : refreshJumPosisiPetugasKegSurvei, error } = await useAsyncQuery(useGetJumPosisiPetugasKegSurvei());
+const { data: resultJumPosisiPetugasKegSurvei, refresh: refreshJumPosisiPetugasKegSurvei, error } = await useAsyncQuery(useGetJumPosisiPetugasKegSurvei());
 const dataJumPosisiPetugasKegSurvei: any[] = resultJumPosisiPetugasKegSurvei.value?.JumPosisiPetugasKegSurvei;
 let dataTable: dataRow[] = reactive([]);
 //refresh data
-function refreshData(){
+function refreshData() {
   refreshKegSurvei();
   refreshJumPosisiPetugasKegSurvei();
-  dataTable= reactive([]);
+  dataTable = reactive([]);
   addData();
 }
 
-function addData(){
+function addData() {
   try {
     dataKegSurvei.forEach((item) => {
       let temp: dataRow = {
         kodeSurvei: item.Survei?.kode,
         namaSurvei: item.Survei?.nama,
         tipeSurvei: item.Survei?.tipe,
+        survei_id: item.Survei?.survei_id,
         statusSurvei: item.status,
         kegiatanSurvei: item.Kegiatan?.nama,
         jumlahPetugasSurvei: "0",
@@ -95,8 +89,22 @@ function addData(){
   } catch (error) {
     console.log(error);
   }
-};
+}
 addData();
+
+function deleteData(survei_id: string) {
+  console.log("Delete: " + survei_id);
+  const { mutate: sendDeleteSurvei, onDone: resultDeleteSurvei, onError: errorDeleteSurvei, loading: loadingDeleteSurvei } = useMutation(useDeleteSurvei());
+  sendDeleteSurvei({
+    id: survei_id,
+  });
+  errorDeleteSurvei((error) => {
+    logErrorMessages(error);
+  });
+  resultDeleteSurvei(() =>{
+    reloadNuxtApp();
+  })
+}
 </script>
 
 <template>
@@ -109,20 +117,9 @@ addData();
             <ButtonKegiatan :status="parseInt(props.row.statusSurvei)" />
           </div>
         </span>
-        <!-- <span v-else-if="props.column.field == 'statusEvaluasiSurvei'">
-          <div class="flex justify-center">
-            <ButtonPenilaian 
-            :status="parseInt(props.row.statusEvaluasiSurvei)"  
-            :kegiatan="parseInt(props.row.statusSurvei)" 
-            :konfirmasi="parseInt(props.row.konfirmasiEvaluasiSurvei)"
-            :query="'a'+'b'"
-            />
-          </div>
-        </span> -->
-        <!-- <span v-else-if="props.column.field == 'aksi'" class="flex justify-evenly">
-          <ButtonUpdate :id="props.row.id" baseLink="#" />
-          <ButtonDelete/>
-        </span> -->
+        <span v-else-if="props.column.field == 'aksi'" class="flex justify-evenly">
+          <ButtonDelete @click.prevent="deleteData(props.row.survei_id)" />
+        </span>
         <span v-else>
           {{ props.formattedRow[props.column.field] }}
         </span>

@@ -13,13 +13,13 @@ async function autoClose(sec?: number) {
   }
 
 }
-function toggle(sec?: number) {
+function call(sec?: number) {
   if(show.value) return;
   show.value = true;
   autoClose(sec);
 }
 defineExpose({
-  toggle,
+  call,
 });
 </script>
 <template>

@@ -13,7 +13,7 @@ function getMode(status?: boolean, kegiatan: number, konfirmasi:boolean) {
     if(konfirmasi && !status){
       mode = "normal";
       statusPenilaian = "Perlu persetujuan";
-    }else if(konfirmasi && status){
+    }else if(status){
       mode = "gray";
       statusPenilaian = "Selesai";
     }else{

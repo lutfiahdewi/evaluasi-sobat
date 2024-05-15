@@ -2,13 +2,9 @@
 import type { AlertSuccess, AlertError } from "#build/components";
 import { logErrorMessages } from "@vue/apollo-util";
 import { useGetRankMitraTahunKerja } from "~/composables/useQueries";
-
+import * as XLSX from "xlsx";
 const props = defineProps<{
-  filter?: string;
-  survei_id?: number[];
-  kegiatan_id?: number[];
-  posisi_id?: number[];
-  tahun?: string[];
+  tahun: string;
 }>();
 interface Rank {
   // staticKey: string;
@@ -55,7 +51,7 @@ const column = [
 
 // B. Query tabel RankMitraTahunKerja
 const branch_kd = "0123ABC";
-const tahun = ref(props.tahun ? props.tahun[0] : new Date().getFullYear().toString());
+const tahun = ref(props.tahun);
 const { data: resultRankMitraTahunKerja, refresh: refreshRankMitraTahunKerja, status: statusRankMitraTahunKerja } = await useAsyncQuery(useGetRankMitraTahunKerja(), { branch_kd, tahun });
 const dataRankMitraTahunKerja: any[] = [];
 
@@ -114,7 +110,7 @@ function structData() {
       Indicators_umum.forEach((ind) => {
         let matchObj = useFilter(dataSavedNilai, { username: item.username, kategoriIndikator_id: ind.kategoriIndikator_id });
         // useFilter return an array, nilai2nya dirata2
-        temp[ind.nama] = useMeanBy(matchObj, "nilai");
+        temp[ind.nama] = useRound(useMeanBy(matchObj, "nilai"),3);
       });
       dataRank.push(temp);
     });
@@ -149,13 +145,13 @@ function getSavedRank(restruct?: boolean) {
 getSavedRank();
 // E. Proses pemeringkatan
 function sortNilai() {
-  const temp = useSortBy(dataRank, "nilai");
+  const temp :Rank[] = useSortBy(dataRank, "nilai");
   dataRank.length = 0;
-  dataRank.push(...temp);
   const n = temp.length;
-  dataRank.forEach((item, idx) => {
+  temp.forEach((item, idx) => {
     item.peringkat = n - idx;
   });
+  dataRank.push(...temp);
 }
 function generateRank() {
   try {
@@ -255,11 +251,24 @@ async function busyWait(test: () => any) {
 const alertSuccess = ref<InstanceType<typeof AlertSuccess> | null>(null);
 const alertError = ref<InstanceType<typeof AlertError> | null>(null);
 const toggleAlertSuccess = (sec?: number) => {
-  alertSuccess.value?.toggle(sec);
+  alertSuccess.value?.call(sec);
 };
 const toggleAlertError = (sec?: number) => {
-  alertError.value?.toggle(sec);
+  alertError.value?.call(sec);
 };
+function downloadData() {
+  // Create a new workbook
+  const workbook = XLSX.utils.book_new();
+  // Create worksheet
+  const worksheet = XLSX.utils.json_to_sheet(dataRank);
+  // Add the worksheet to the workbook
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Kategori Umum");
+
+  // Write the workbook to a file
+  const now = new Date();
+  const title: string = "Peringkat Tahun "+tahun.value+"_" + now.getDay() + now.getMonth() + now.getFullYear() + ".xlsx";
+  XLSX.writeFile(workbook, title);
+}
 </script>
 <template>
   <section>
@@ -274,11 +283,12 @@ const toggleAlertError = (sec?: number) => {
       </template>
     </AlertError>
     <!-- <BaseButtonMode class="mb-3" mode="normal" shape="square" @click="toggleAlertError()">Show Alert</BaseButtonMode> -->
-    <h6 class="font-semibold mb-3">Peringkat Tahunan Mitra</h6>
+    <h6 class="font-semibold mb-3">Peringkat Mitra Tahun {{ tahun }}</h6>
     <BaseButtonMode class="mb-3" mode="normal" shape="square" v-if="!isDataRanked" @click="createRank()">Buat peringkat</BaseButtonMode>
     <BaseButtonMode class="mb-3" mode="outlined" shape="square" v-if="isDataRanked" @click="updateRank()">Buat ulang peringkat</BaseButtonMode>
+    <BaseButtonMode class="mx-3 mb-3 border" mode="normal" shape="square" @click="downloadData()"><IconDownload class="inline" /> Unduh Data</BaseButtonMode>
     <div v-if="isDataRanked" class="mb-3">Terakhir kali diperbarui: {{ lastUpdated.toLocaleString("id-ID") }}</div>
-    <div v-if="props.tahun?.length !== 1">Pilih satu tahun untuk menampilkan peringkat</div>
+    <div v-if="!tahun">Pilih satu tahun untuk menampilkan peringkat</div>
     <div v-else>
       <vue-good-table
         :columns="column"

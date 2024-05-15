@@ -4,7 +4,7 @@ import { boolean } from 'mathjs';
 defineProps<{
   konfirmasi: boolean; // 0:tidak perlu konfirmasi, 1:perlu
   kegiatan: number; // 0:blm jalan; 1: berjalan; 2: selesai=>evaluasi
-  status: boolean; // 0: blm disetujui operator
+  status: boolean; // 0: blm disetujui operator (konfirmasi ? blm diapprove$dibuat rank : blm dibuat rank)
   query: string;
   notActive?: boolean;
 }>();
@@ -16,7 +16,7 @@ function getMode(status: boolean, kegiatan: number, konfirmasi: boolean) {
     if (konfirmasi && !status) {
       mode = "outlined";
       statusPersetujuan = "Perlu persetujuan";
-    } else if (konfirmasi && status) {
+    } else if (status) {
       mode = "gray";
       statusPersetujuan = "Selesai";
     } else {

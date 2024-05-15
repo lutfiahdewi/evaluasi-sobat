@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import { logErrorMessages } from "@vue/apollo-util";
-import { round } from "mathjs";
 import * as XLSX from "xlsx";
 
 useSeoMeta({
-  title: "Laporan Kegiatan",
+  title: "Laporan Penilaian",
 });
 interface MixedDictionary {
   // staticKey: string;
@@ -153,7 +151,7 @@ function generateRank(
 // data ranking
 let rankPosisi: rank[] = [];
 let rankUmum: rank[] = [];
-// query peringkat pd poskeg
+// query peringkat pd tabel RankMitraPosKegSurvei dg filter survei_kd, keg_kd, branch_kd, posisi_kd 
 const { data: resultSavedRank } = await useAsyncQuery(useGetRankMitraPosKegSurvei(), { survei_kd, keg_kd, branch_kd, posisi_kd });
 const dataRankPosisi = resultSavedRank.value?.RankMitraPosKegSurvei;
 
@@ -235,8 +233,15 @@ const column = [
   },
 ];
 const columnUmum = [...column];
+const columnPosisi = [...column];
 columnUmum.push(
   ...Indicators_umum.map((ind) => ({
+    label: ind.nama,
+    field: ind.nama,
+  }))
+);
+columnPosisi.push(
+  ...Indicators_posisi.map((ind) => ({
     label: ind.nama,
     field: ind.nama,
   }))
@@ -269,7 +274,7 @@ columnUmum.push(
   </section>
   <section>
     <h6 class="font-semibold mb-3">Penilaian berdasarkan posisi : kategori {{ Indicators_posisi[0].kategori }}</h6>
-    <div class="table-container rounded overflow-auto max-h-[480px] 2xl:max-h-[720px]">
+    <!-- <div class="table-container rounded overflow-auto max-h-[480px] 2xl:max-h-[720px]">
       <table class="bg-white min-w-full" id="main-table">
         <thead class="text-slate-800 text-lg border-b border-slate-500 shadow">
           <tr>
@@ -288,7 +293,6 @@ columnUmum.push(
                 </span>
                 <div class="petugas">
                   <p class="body1">{{ item?.username }}</p>
-                  <!-- <p class="body2 text-slate-500">{{ petugas.detail }}</p> -->
                 </div>
               </div>
             </td>
@@ -310,11 +314,33 @@ columnUmum.push(
           </tr>
         </tbody>
       </table>
-    </div>
+    </div> -->
+    <vue-good-table
+      :columns="columnPosisi"
+      :rows="dataPosisi"
+      :sort-options="{
+        enabled: true,
+        initialSortBy: { field: 'peringkat', type: 'asc' },
+      }"
+      :search-options="{
+        enabled: true,
+      }"
+      :pagination-options="{
+        enabled: true,
+      }"
+    >
+      <template #table-row="props">
+        <span v-if="props.column.field == 'nama'">
+          {{ props.row.nama || props.row.username }}
+        </span>
+        <span v-else>
+          {{ props.formattedRow[props.column.field] }}
+        </span>
+      </template>
+    </vue-good-table>
   </section>
   <section>
     <h6 class="font-semibold mb-3">Kategori Umum</h6>
-    <div class="table-container rounded overflow-auto max-h-[480px] 2xl:max-h-[720px]"></div>
     <vue-good-table
       :columns="columnUmum"
       :rows="dataUmum"

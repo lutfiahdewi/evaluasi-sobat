@@ -19,12 +19,12 @@ const isEmailNotValid = ref(false);
 const { authenticateUser } = useAuthStore(); // use authenticateUser action from  auth store
 // const { authenticated, getRoleId } = storeToRefs(useAuthStore()); // make authenticated state reactive with storeToRefs
 const user:User = reactive({ email: "", password: "" });
-
+/*
 const authorizedRole = useCookie<Role>("authorizedRole");
 const token = useCookie("token");
 if (authorizedRole.value !== "default" && token.value) {
   reloadNuxtApp({ path: "/beranda" });
-}
+}*/
 
 // login procedure
 const login = async () => {

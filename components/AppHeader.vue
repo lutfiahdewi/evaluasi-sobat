@@ -20,8 +20,10 @@ function changeMenuClicked() {
   menuClicked.value = !menuClicked.value;
 }
 const authorizedRole = useCookie("authorizedRole");
-// const name = ref('');
-const { data: dataProfile } = await useAsyncQuery(useGetProfile());
+const userFirstName = useCookie("userFirstName");
+// const name = ref(userFirstName.);
+//  dataProfile ? ', '+ dataProfile.profile.nama : ''
+// const { data: dataProfile } = await useAsyncQuery(useGetProfile());
 // name.value = dataProfile.value?.profile.nama
 </script>
 
@@ -60,7 +62,7 @@ const { data: dataProfile } = await useAsyncQuery(useGetProfile());
       <AppDropdown :menu-dropdown="menuProfile">
         <IconUser class="w-10 h-10" />
       </AppDropdown>
-      <span class="body1 ms-2 hidden lg:inline">Halo{{   dataProfile ? ', '+ dataProfile.profile.nama : ''}}</span>
+      <span class="body1 ms-2 hidden lg:inline">Halo{{ userFirstName ? ', '+userFirstName : '' }}</span>
     </div>
     <!-- Unauthorized Profile -->
     <div class="flex justify-end items-center" v-else>

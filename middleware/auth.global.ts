@@ -2,6 +2,7 @@ import { storeToRefs } from 'pinia';
 import { useAuthStore } from '~/store/auth';
 
 export default defineNuxtRouteMiddleware((to) => {
+  console.log("middleware!")
   //Used to apply the given auth token to the specified Apollo client.
   const { onLogin } = useApollo();
   const { authenticated } = storeToRefs(useAuthStore()); // make authenticated state reactive
@@ -17,10 +18,11 @@ export default defineNuxtRouteMiddleware((to) => {
   }
 
   // if token exists and url is /login redirect to homepage
-  /*if (!(token.value===null || token.value===undefined) && (to?.name === 'login')) {
+  if (!isNil(token.value) && (to?.name === 'login')) {
     // return navigateTo('/beranda');
+    console.log("Middleware: already logged on");
     return reloadNuxtApp({path: '/beranda'});
-  }*/
+  }
 
   // if token doesn't exist redirect to log in
   if (!token.value && to?.name !== 'login') {

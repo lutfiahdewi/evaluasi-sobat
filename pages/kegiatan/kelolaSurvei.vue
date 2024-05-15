@@ -150,7 +150,7 @@ async function sendData2(data: survei) {
   //create jumPosisiPetugasKegSurvei
   const branch_kd = "0123ABC";
   const { mutate: sendJumPosisiPetugasKegSurvei, onDone: resultJumPosisiPetugasKegSurvei, onError: errorJumPosisiPetugasKegSurvei } = useMutation(useCreateJumPosisiPetugasKegSurvei());
-  const is_confirmed = data.konfirmasiEvaluasiSurvei ? false : true;
+  const is_confirmed = false;
   const res2 = await sendJumPosisiPetugasKegSurvei({
     input: {
       survei_kd: data.kodeSurvei,

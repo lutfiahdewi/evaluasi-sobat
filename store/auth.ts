@@ -61,14 +61,17 @@ export const useAuthStore = defineStore("auth", {
         const token = useCookie("token", { maxAge: 30 * 24 * 3600 }); // useCookie new hook in nuxt 3
         const authorizedRole = useCookie("authorizedRole");
         const operator = useCookie("operator");
+        const userFirstName = useCookie("userFirstName");
         token.value = result?.data.login.token; // set token to cookie
+        const nama = result?.data.login.user.nama;
         if (result?.data) {
           this.username = result?.data.login.user.username;
-          this.name = result?.data.login.user.nama;
+          this.name = nama;
           this.roleId = result?.data.login.user.UserRole[0].role_id;
           this.role = validateRole(this.roleId);
           authorizedRole.value = this.role;
           operator.value = this.roleId == 2 ? "true" : undefined;
+          userFirstName.value = nama.split(' ')[0];
           this.authenticated = true;
         }
         return true;

@@ -1,14 +1,7 @@
 <script setup lang="ts">
 import type { AlertSuccess, AlertError } from "#build/components";
 import { logErrorMessages } from "@vue/apollo-util";
-// props untuk filtering, namun utk all tidak diperhatikan. Mitra di rank berdasarkan rata2 nilai pada kategori Umum.
-const props = defineProps<{
-  filter?: string;
-  survei_id?: number[];
-  kegiatan_id?: number[];
-  posisi_id?: number[];
-  tahun?: string[];
-}>();
+import * as XLSX from "xlsx";
 interface Rank {
   // staticKey: string;
   rankmitra_id?: string;
@@ -117,7 +110,7 @@ function structData() {
       Indicators_umum.forEach((ind) => {
         let matchObj = useFilter(dataSavedNilai, { username: item.username, kategoriIndikator_id: ind.kategoriIndikator_id });
         // useFilter return an array, nilai2nya dirata2
-        temp[ind.nama] = useMeanBy(matchObj, "nilai");
+        temp[ind.nama] = useRound(useMeanBy(matchObj, "nilai"),3);
       });
       dataRank.push(temp);
     });
@@ -129,7 +122,7 @@ structData();
 // jika sudah ada data pemeringkatan tersimpan, nilai (preferensi diambil)
 const isDataRanked = ref(false);
 const lastUpdated = ref();
-function getSavedRank(restruct? :boolean) {
+function getSavedRank(restruct?: boolean) {
   if (restruct) dataRankMitra.length = 0;
   dataRankMitra.push(...resultRankMitra.value?.RankMitra);
   try {
@@ -152,13 +145,13 @@ function getSavedRank(restruct? :boolean) {
 getSavedRank();
 // E. Proses pemeringkatan
 function sortNilai() {
-  const temp = useSortBy(dataRank, "nilai");
+  const temp: Rank[] = useSortBy(dataRank, "nilai");
   dataRank.length = 0;
-  dataRank.push(...temp);
   const n = temp.length;
-  dataRank.forEach((item, idx) => {
+  temp.forEach((item, idx) => {
     item.peringkat = n - idx;
   });
+  dataRank.push(...temp);
 }
 function generateRank() {
   try {
@@ -242,25 +235,41 @@ function updateRank() {
 }
 async function refresh() {
   refreshRankMitra();
-  await busyWait(() => statusRankMitra.value === 'success');
+  await busyWait(() => statusRankMitra.value === "success");
   getSavedRank(true);
 }
 async function busyWait(test: () => any) {
   // wait time: 0.5s/data
-  const delay = dataRank.length >= 50 ? 20 :( dataRank.length <= 20 ? 10 : dataRank.length*0.5)
-  while(!test()) await useWaitS(delay);
+  const delay = dataRank.length >= 50 ? 20 : dataRank.length <= 20 ? 10 : dataRank.length * 0.5;
+  console.log(delay);
+  while (!test()) await useWaitS(delay);
 }
 
 // alert
 const alertSuccess = ref<InstanceType<typeof AlertSuccess> | null>(null);
 const alertError = ref<InstanceType<typeof AlertError> | null>(null);
 const toggleAlertSuccess = (sec?: number) => {
-  alertSuccess.value?.toggle(sec);
+  alertSuccess.value?.call(sec);
 };
 const toggleAlertError = (sec?: number) => {
-  alertError.value?.toggle(sec);
+  alertError.value?.call(sec);
 };
 console.log(statusRankMitra.value);
+refreshRankMitra();
+
+function downloadData() {
+  // Create a new workbook
+  const workbook = XLSX.utils.book_new();
+  // Create worksheet
+  const worksheet = XLSX.utils.json_to_sheet(dataRank);
+  // Add the worksheet to the workbook
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Kategori Umum");
+
+  // Write the workbook to a file
+  const now = new Date();
+  const title: string = "Peringkat_" + now.getDay() + now.getMonth() + now.getFullYear() + ".xlsx";
+  XLSX.writeFile(workbook, title);
+}
 </script>
 
 <template>
@@ -278,6 +287,7 @@ console.log(statusRankMitra.value);
     </AlertError>
     <BaseButtonMode class="mb-3" mode="normal" shape="square" v-if="!isDataRanked" @click="createRank()">Buat peringkat</BaseButtonMode>
     <BaseButtonMode class="mb-3" mode="outlined" shape="square" v-if="isDataRanked" @click="updateRank()">Buat ulang peringkat</BaseButtonMode>
+    <BaseButtonMode class="mx-3 mb-3 border" mode="normal" shape="square" @click="downloadData()"><IconDownload class="inline" /> Unduh Data</BaseButtonMode>
     <div v-if="isDataRanked" class="mb-3">Terakhir kali di update: {{ lastUpdated.toLocaleString("id-ID") }}</div>
     <vue-good-table
       :columns="column"
@@ -285,12 +295,12 @@ console.log(statusRankMitra.value);
       :search-options="{
         enabled: true,
       }"
+      :pagination-options="{
+        enabled: true,
+      }"
       :sort-options="{
         enabled: true,
         initialSortBy: { field: 'peringkat', type: 'asc' },
-      }"
-      :pagination-options="{
-        enabled: true,
       }"
     >
       <template #table-row="props">

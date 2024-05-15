@@ -31,13 +31,6 @@ const columns = [
     label: "Daftar Indikator",
     field: "indikator",
   },
-  // {
-  //   label: "Tanggal Modifikasi",
-  //   field: "tanggal",
-  //   type: "date",
-  //   dateInputFormat: "yyyy-MM-dd",
-  //   dateOutputFormat: "dd MMM yyyy",
-  // },
   {
     label: "Aksi",
     field: "id",
@@ -96,12 +89,6 @@ async function deleteData(id: string, nama: string): Promise<void> {
     resultDeleteKategori((result) => {
       isDataLoading.value = false;
       reloadNuxtApp();
-      /*isDataSent.value = true;
-      refreshTable(useTableCategories());
-      await useWaitS(3);
-      structData();
-      console.log(dataTable);
-      isDataSent.value = false;*/
     });
   }
 }

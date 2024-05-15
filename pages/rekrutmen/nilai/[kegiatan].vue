@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { ModalBase } from "#build/components";
 import { logErrorMessages } from "@vue/apollo-util";
-import { reject } from "lodash";
 import { round } from "mathjs";
 
 useSeoMeta({
@@ -93,9 +92,9 @@ Indicators = useSortBy(Indicators, ["urutan"]);
 const { data: resultPenugasanStruktur } = await useAsyncQuery(useGetPenugasanStruktur(), { survei_kd, keg_kd, branch_kd, posisi_kd });
 const dataPenugasanStruktur: any[] = resultPenugasanStruktur.value?.PenugasanStruktur;
 const Evaluatees: evaluatee[] = reactive([]);
-try{
+try {
   Evaluatees.push(...dataPenugasanStruktur?.map((item) => ({ id: item.User.user_id, username: item.username, nama: item.User.nama })));
-}catch(e){
+} catch (e) {
   console.log(e);
 }
 //5. Buat data matriks nilai petugas dan kategori penilaian bersesuaian
@@ -367,7 +366,7 @@ function saveRank() {
       >Setujui Penilaian dan Buat Peringkat</BaseButtonMode
     >
     <BaseButtonMode
-      v-if="isOperatorConfirmed && !isOperatorEditable"
+      v-if="!isOperatorConfirmed && !isOperatorEditable"
       shape="square"
       mode="normal"
       class="py-2 px-4"
@@ -387,6 +386,7 @@ function saveRank() {
     <NuxtLink :to="'/rekrutmen/nilai/laporan/' + 'kegiatan?survei_kd=' + survei_kd + '&keg_kd=' + keg_kd + '&branch_kd=' + branch_kd + '&posisi_kd=' + posisi_kd + '&tahun=' + tahun">
       <BaseButtonMode v-if="isOperatorConfirmed && (progressPercentage == 100)" shape="square" mode="outlined" class="py-3 px-4 ms-3">Lihat Laporan Evaluasi</BaseButtonMode>
     </NuxtLink>
+    <!-- <ButtonLinkLaporan v-if="isOperatorConfirmed && progressPercentage == 100" :survei_kd="survei_kd.toString()" :keg_kd="keg_kd?.toString()" :branch_kd="branch_kd?.toString()" :posisi_kd="posisi_kd?.toString()" :tahun="tahun?.toString()" /> -->
   </section>
   <section>
     <div class="table-container rounded overflow-auto max-h-[480px] 2xl:max-h-[720px]">

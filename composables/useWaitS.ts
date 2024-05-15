@@ -1,7 +1,7 @@
 /**
  *
- * @param timeout in second
- * @returns
+ * @param timeout in second, default:1s
+ * @returns promise
  */
 export default function useWaitS(timeout?: number) {
   if (!timeout) timeout = 1;

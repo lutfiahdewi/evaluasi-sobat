@@ -363,7 +363,20 @@ export const useGetSurvei = () => {
     }
   `;
 };
-
+/**
+ * delete(include reference(cascade))
+ * @param id: Int!
+ * @returns survei_id
+ */
+export const useDeleteSurvei = () => {
+  return gql`
+    mutation ($deleteSurveiId: Int) {
+      deleteSurvei(id: $deleteSurveiId) {
+        survei_id
+      }
+    }
+  `;
+};
 /**
  * Kegiatan
  */
@@ -449,7 +462,7 @@ export const useCreatePosKegSurvei = () => {
   `;
 };
 
-//get
+//delete
 
 /**
  * JumPosisiPetugasKegSurvei
@@ -911,12 +924,9 @@ export const useCreateRankMitraTahunKerja = () => {
  */
 export const useUpdateRankMitraTahunKerja = () => {
   return gql`
-  mutation ($id: Int!, $input: RankMitraTahunKerjaInputType!) {
-    updateRankMitraTahunKerja (
-        id: $id,
-        input: $input
-    ) {
-      rankmitratahunkerja_id
+    mutation ($id: Int!, $input: RankMitraTahunKerjaInputType!) {
+      updateRankMitraTahunKerja(id: $id, input: $input) {
+        rankmitratahunkerja_id
         branch_kd
         username
         tahun
@@ -924,7 +934,7 @@ export const useUpdateRankMitraTahunKerja = () => {
         kategori_id
         created_at
         updated_at
+      }
     }
-}
   `;
 };

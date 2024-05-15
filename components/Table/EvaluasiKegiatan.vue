@@ -47,51 +47,65 @@ const { data: resultKegSurvei } = await useAsyncQuery(useGetKegSurvei());
 const dataKegSurvei: any[] = resultKegSurvei.value?.KegSurvei;
 
 // query JumPosisiPetugasKegSurvei
-const { data: resultJumPosisiPetugasKegSurvei, refresh, error } = await useAsyncQuery(useGetJumPosisiPetugasKegSurvei());
-const dataJumPosisiPetugasKegSurvei: any[] = resultJumPosisiPetugasKegSurvei.value?.JumPosisiPetugasKegSurvei;
+const { data: resultJumPosisiPetugasKegSurvei, refresh: refreshtJumPosisiPetugasKegSurvei, error, pending: pendingJumPosisiPetugasKegSurvei } = await useAsyncQuery(useGetJumPosisiPetugasKegSurvei());
+const dataJumPosisiPetugasKegSurvei: any[] = [];
 
 // query petugas survei (sedang mengerjakan apa dan di posisi apa)
 /*const { data: resultPetugasSurvei } = await useAsyncQuery(useGetPetugasSurvei());
 const dataPetugasSurvei: any[] = resultPetugasSurvei.value?.PetugasSurvei;*/
 
 let dataTable: dataRow[] = reactive([]);
+function structData(restruct?: boolean) {
+  if (restruct) dataJumPosisiPetugasKegSurvei.length = 0;
+  dataJumPosisiPetugasKegSurvei.push(...resultJumPosisiPetugasKegSurvei.value?.JumPosisiPetugasKegSurvei);
+  try {
+    dataKegSurvei.forEach(async (item, idx) => {
+      const i = useFindIndex(dataJumPosisiPetugasKegSurvei, { survei_kd: item.Survei?.kode, keg_kd: item.Kegiatan?.kode });
+      // const j = useFindIndex(dataPetugasSurvei, { survei_kd: item.Survei?.kode, keg_kd: item.Kegiatan?.kode });
 
-try {
-  dataKegSurvei.forEach(async (item, idx) => {
-    const i = useFindIndex(dataJumPosisiPetugasKegSurvei, { survei_kd: item.Survei?.kode, keg_kd: item.Kegiatan?.kode });
-    // const j = useFindIndex(dataPetugasSurvei, { survei_kd: item.Survei?.kode, keg_kd: item.Kegiatan?.kode });
-
-    if (i > -1) {
-      // query penugasan struktur (membawahi pada poskegsurvei apa(brp))
-      const { data: countPenugasanStruktur } = await useAsyncQuery(useCountSearchPenugasanStruktur(), { survei_kd: item.Survei?.kode, keg_kd: item.Kegiatan?.kode, branch_kd: dataJumPosisiPetugasKegSurvei[i].branch_kd, posisi_kd: dataJumPosisiPetugasKegSurvei[i].posisi_kd });
-      // if(idx = dataKegSurvei.length-1) console.log(countPenugasanStruktur.value)
-      if (countPenugasanStruktur.value) {
-        const temp: dataRow = {
-          namaSurvei: item.Survei?.nama,
-          namaSurvei_kd: item.Survei?.kode,
-          kegiatanSurvei: item.Kegiatan?.nama,
-          kegiatanSurvei_kd: item.Kegiatan?.kode,
-          statusSurvei: item.status,
-          posisiSurvei: dataJumPosisiPetugasKegSurvei[i].Posisi?.nama,
-          posisiSurvei_kd: dataJumPosisiPetugasKegSurvei[i].posisi_kd,
+      if (i > -1) {
+        // query penugasan struktur (membawahi pada poskegsurvei apa(brp))
+        const { data: countPenugasanStruktur } = await useAsyncQuery(useCountSearchPenugasanStruktur(), {
+          survei_kd: item.Survei?.kode,
+          keg_kd: item.Kegiatan?.kode,
           branch_kd: dataJumPosisiPetugasKegSurvei[i].branch_kd,
-          statusEvaluasiSurvei: dataJumPosisiPetugasKegSurvei[i].is_confirmed,
-          tahunSurvei: item.Survei?.tahun,
-          konfirmasiEvaluasiSurvei: item.is_confirm,
-          countPenugasanStruktur: countPenugasanStruktur.value?.countSearchPenugasanStruktur,
-        };
-        dataTable.push(temp);
+          posisi_kd: dataJumPosisiPetugasKegSurvei[i].posisi_kd,
+        });
+        // if(idx = dataKegSurvei.length-1) console.log(countPenugasanStruktur.value)
+        if (countPenugasanStruktur.value) {
+          const temp: dataRow = {
+            namaSurvei: item.Survei?.nama,
+            namaSurvei_kd: item.Survei?.kode,
+            kegiatanSurvei: item.Kegiatan?.nama,
+            kegiatanSurvei_kd: item.Kegiatan?.kode,
+            statusSurvei: item.status,
+            posisiSurvei: dataJumPosisiPetugasKegSurvei[i].Posisi?.nama,
+            posisiSurvei_kd: dataJumPosisiPetugasKegSurvei[i].posisi_kd,
+            branch_kd: dataJumPosisiPetugasKegSurvei[i].branch_kd,
+            statusEvaluasiSurvei: dataJumPosisiPetugasKegSurvei[i].is_confirmed,
+            tahunSurvei: item.Survei?.tahun,
+            konfirmasiEvaluasiSurvei: item.is_confirm,
+            countPenugasanStruktur: countPenugasanStruktur.value?.countSearchPenugasanStruktur,
+          };
+          dataTable.push(temp);
+        }
       }
-    }
-  });
-} catch (error) {
-  console.log(error);
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+structData();
+async function refresh() {
+  refreshtJumPosisiPetugasKegSurvei();
+  await useBusyWait(() => pendingJumPosisiPetugasKegSurvei.value === false, 30);
+  structData(true);
 }
 </script>
 
 <template>
   <div>
-    <BaseButtonMode mode="normal" shape="square" @click="refresh" class="mb-3"><IconRefresh class="h-6 w-6 inline me-1" />Refresh</BaseButtonMode>
+    <BaseButtonMode mode="normal" shape="square" @click="refresh()" class="mb-3"><IconRefresh class="h-6 w-6 inline me-1" />Refresh</BaseButtonMode>
     <vue-good-table :columns="columns" :rows="dataTable">
       <template #table-row="props">
         <span v-if="props.column.field == 'statusSurvei'">
