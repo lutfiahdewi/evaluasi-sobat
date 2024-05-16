@@ -32,13 +32,13 @@ const columns = [
     label: "Posisi",
     field: "posisiSurvei",
   },
-  // {
-  //   label: "Penilaian",
-  //   field: "evaluasiSurvei",
-  // },
   {
     label: "Status Penilaian",
     field: "statusEvaluasiSurvei",
+  },
+  {
+    label: "Indikator Penilaian",
+    field: "aksi",
   },
 ];
 
@@ -122,10 +122,14 @@ async function refresh() {
             />
           </div>
         </span>
-        <!-- <span v-else-if="props.column.field == 'aksi'" class="flex justify-evenly">
-          <ButtonUpdate :id="props.row.id" baseLink="#" />
-          <ButtonDelete/>
-        </span> -->
+        <span v-else-if="props.column.field == 'aksi'">
+          <div class="flex justify-center">
+            <ButtonLinkIndikator
+              :query="'kegiatan?survei_kd=' + props.row.namaSurvei_kd + '&keg_kd=' + props.row.kegiatanSurvei_kd + '&branch_kd=' + props.row.branch_kd + '&posisi_kd=' + props.row.posisiSurvei_kd + '&tahun=' + props.row.tahunSurvei"
+            />
+          </div>
+        </span>
+        
         <span v-else>
           {{ props.formattedRow[props.column.field] }}
         </span>

@@ -1,5 +1,5 @@
 <template>
-  <button class=" body2 font-medium disabled:opacity-50 "  :class="defineClass(mode, shape, notActive) + $props.class":disabled="$props.notActive">
+  <button :title="title" class="body2 font-medium disabled:opacity-50" :class="defineClass(mode, shape, notActive) + $props.class" :disabled="notActive">
     <slot />
   </button>
 </template>
@@ -11,6 +11,7 @@ defineProps<{
   mode: Mode; //default = normal
   shape: Shape; //default = square
   notActive?: boolean;
+  title?: string;
 }>();
 
 function defineClass(mode: Mode, shape: Shape, notActive?: boolean) {

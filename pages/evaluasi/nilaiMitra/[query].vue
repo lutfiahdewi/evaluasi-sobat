@@ -133,7 +133,7 @@ function validateForm() {
   dataValid.value = true;
   for (let i = 0; i < dataNilai.length; i++) {
     for (let j = 0; j < dataNilai[i].length; j++) {
-      if (!useIncludes(dataScale, dataNilai[i][j]) || isNil(dataNilai[i][j])) {
+      if (!useIncludes(dataScale, dataNilai[i][j].toString()) || isNil(dataNilai[i][j])) {
         dataNilaiValidation[i][j] = false;
         validateInput(i, j);
         if (dataValid.value) dataValid.value = false;

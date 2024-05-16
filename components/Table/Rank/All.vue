@@ -8,6 +8,7 @@ interface Rank {
   username: string;
   nama?: string;
   nilai?: number;
+  nilai_rerata?: number;
   peringkat?: number;
   [key: string]: number | string | undefined; // Can accommodate the staticKey too, dynamic key for indicators name and it's value
 }
@@ -107,11 +108,15 @@ function structData() {
         username: item.username,
         nama: item.User.nama,
       };
+      let tempRerata :number[] = []
       Indicators_umum.forEach((ind) => {
         let matchObj = useFilter(dataSavedNilai, { username: item.username, kategoriIndikator_id: ind.kategoriIndikator_id });
         // useFilter return an array, nilai2nya dirata2
-        temp[ind.nama] = useRound(useMeanBy(matchObj, "nilai"),3);
+        let nilai = useRound(useMeanBy(matchObj, "nilai"),3);
+        temp[ind.nama] = nilai;
+        tempRerata.push(nilai);
       });
+      temp.nilai_rerata = useRound(useMean(tempRerata),2)
       dataRank.push(temp);
     });
   } catch (e) {
@@ -182,6 +187,7 @@ function createRank() {
           username: item.username,
           kategori_id,
           nilai: item.nilai,
+          nilai_rerata: item.nilai_rerata,
         },
       });
       errorCreateRank((error) => {
@@ -216,6 +222,7 @@ function updateRank() {
           username: item.username,
           kategori_id,
           nilai: item.nilai,
+          nilai_rerata: item.nilai_rerata,
         },
       });
       errorUpdateRank((error) => {

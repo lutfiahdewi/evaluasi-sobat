@@ -2,8 +2,8 @@
 definePageMeta({
   layout: "mitra",
 });
-const activeBar = useCookie('activeBar');
-activeBar.value = 'Evaluasi'
+// const activeBar = useCookie('activeBar');
+// activeBar.value = 'Evaluasi'
 </script>
 
 <template>

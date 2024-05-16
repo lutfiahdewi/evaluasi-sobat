@@ -34,7 +34,7 @@ export default defineNuxtConfig({
   apollo: {
     clients: {
       default: {
-        httpEndpoint: "https://especially-arriving-mammal.ngrok-free.app/",
+        httpEndpoint: "http://localhost:4000/",
       },
     },
   },

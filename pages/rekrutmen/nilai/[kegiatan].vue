@@ -215,9 +215,13 @@ function updateDataNilai() {
 
 // Konfirmasi persetujuam
 const persetujuanModal = ref<InstanceType<typeof ModalBase> | null>(null);
+const persetujuan = ref(true);
+const persetujuanMsg = ref("");
 let resolvePromise: (value: PromiseLike<boolean> | boolean) => void;
 async function confirmData(): Promise<void> {
-  const confirmed = await isConfirmed();
+  persetujuan.value = true;
+  persetujuanMsg.value = "Anda yakin akan menyetujui penilaian dan membuat peringkat ?";
+  const confirmed = await isConfirmed(); // menunggu jawaban dari modal
   const { mutate: sendUpdateConfirmed, onDone: resultUpdateConfirmed, onError: errorUpdateConfirmed } = useMutation(useUdateJumPosisiPetugasKegSurvei());
   if (confirmed) {
     isDataLoading.value = true;
@@ -225,16 +229,14 @@ async function confirmData(): Promise<void> {
       const isUpdated = await updateDataNilai();
       const dataRanked = await generateRank();
       if (isUpdated && dataRanked) {
-        if (isOperatorEditable.value) {
-          // ubah persetujuan menjadi true
-          sendUpdateConfirmed({ id: parseInt(dataJumPosisiPetugasKegSurvei[0]?.jumposisipetugaskegsurvei_id), is_confirmed: true });
-          errorUpdateConfirmed((error) => {
-            logErrorMessages(error);
-            isDataLoading.value = false;
-            isDataError.value = true;
-            throw new Error("Gagal mengupdate status persetujuan");
-          });
-        }
+        // ubah status is_confirmed: menjadi true(telah dikonfirmasi dan/atau telah dibuat peringkat)
+        sendUpdateConfirmed({ id: parseInt(dataJumPosisiPetugasKegSurvei[0]?.jumposisipetugaskegsurvei_id), is_confirmed: true });
+        errorUpdateConfirmed((error) => {
+          logErrorMessages(error);
+          isDataLoading.value = false;
+          isDataError.value = true;
+          throw new Error("Gagal mengupdate status persetujuan");
+        });
         const savedRank = await saveRank();
         if (savedRank) {
           // arahkan ke halaman laporan peringkat
@@ -256,7 +258,35 @@ function handleUserInput(value: boolean) {
   if (!resolvePromise) return;
   resolvePromise(value);
 }
-
+//Tolak persetujuan
+const { mutate: sendFinalizeNilai, onDone: resultFinalizeNilai, onError: erroFinalizeeNilai, loading: loadingFinalizeNilai } = useMutation(useFinalizeNilaiKategoriIndikator());
+async function rejectData() {
+  persetujuan.value = false;
+  persetujuanMsg.value = "Anda yakin akan menolak persetujuan penilaian dan mengembalikan status final setiap penilaian?";
+  const confirmed = await isConfirmed(); // menunggu jawaban dari modal
+  if (confirmed) {
+    isDataLoading.value = true;
+    sendFinalizeNilai({
+      survei_kd,
+      keg_kd,
+      branch_kd,
+      posisi_kd,
+      tahun,
+      is_final: false,
+    });
+    erroFinalizeeNilai((error) => {
+      logErrorMessages(error);
+      isDataLoading.value = false;
+      isDataError.value = true;
+    });
+    resultFinalizeNilai(async () => {
+      isDataSent.value = true;
+      isDataLoading.value = false;
+      await useWaitS(3.5);
+      reloadNuxtApp();
+    });
+  }
+}
 // Generate peringkat
 const isRanked = ref(false);
 const dataRankUmum = ref();
@@ -348,7 +378,26 @@ function saveRank() {
       </tr>
     </table>
     <BaseButtonMode
-      v-if="!isOperatorConfirmed && isOperatorEditable"
+      v-if="!isOperatorConfirmed && isOperatorEditable && progressPercentage == 100"
+      shape="square"
+      mode="outlined"
+      class="py-2 px-4 me-3"
+      @click.prevent="
+        async () => {
+          const validated = await validateValue();
+          if (!validated) {
+            return;
+          } else {
+            persetujuanModal?.open();
+            rejectData();
+          }
+        }
+      "
+      title="Seluruh penilaian akan dikembalikan kepada penilai dan status final dibatalkan"
+      >Tolak Penilaian</BaseButtonMode
+    >
+    <BaseButtonMode
+      v-if="!isOperatorConfirmed && isOperatorEditable && progressPercentage == 100"
       shape="square"
       mode="normal"
       class="py-2 px-4"
@@ -366,7 +415,7 @@ function saveRank() {
       >Setujui Penilaian dan Buat Peringkat</BaseButtonMode
     >
     <BaseButtonMode
-      v-if="!isOperatorConfirmed && !isOperatorEditable"
+      v-if="!isOperatorConfirmed && !isOperatorEditable && progressPercentage == 100"
       shape="square"
       mode="normal"
       class="py-2 px-4"
@@ -384,7 +433,7 @@ function saveRank() {
       >Buat Peringkat</BaseButtonMode
     >
     <NuxtLink :to="'/rekrutmen/nilai/laporan/' + 'kegiatan?survei_kd=' + survei_kd + '&keg_kd=' + keg_kd + '&branch_kd=' + branch_kd + '&posisi_kd=' + posisi_kd + '&tahun=' + tahun">
-      <BaseButtonMode v-if="isOperatorConfirmed && (progressPercentage == 100)" shape="square" mode="outlined" class="py-3 px-4 ms-3">Lihat Laporan Evaluasi</BaseButtonMode>
+      <BaseButtonMode v-if="isOperatorConfirmed && progressPercentage == 100" shape="square" mode="outlined" class="py-3 px-4 ms-3">Lihat Laporan Evaluasi</BaseButtonMode>
     </NuxtLink>
     <!-- <ButtonLinkLaporan v-if="isOperatorConfirmed && progressPercentage == 100" :survei_kd="survei_kd.toString()" :keg_kd="keg_kd?.toString()" :branch_kd="branch_kd?.toString()" :posisi_kd="posisi_kd?.toString()" :tahun="tahun?.toString()" /> -->
   </section>
@@ -435,11 +484,11 @@ function saveRank() {
       <BaseButtonMode v-if="!isOperatorConfirmed && isOperatorEditable" shape="square" mode="outlined" class="py-3 px-4" @click.prevent="saveChanges()">Simpan Perubahan</BaseButtonMode>
     </div>
     <ModalBase ref="persetujuanModal">
-      <template #header><h5 class="font-bold text-gray-800">Konfirmasi persetujuan penilaian?</h5></template>
+      <template #header><h5 class="font-bold text-gray-800">Konfirmasi {{ persetujuan ? 'persetujuan' : 'tolak'}} penilaian?</h5></template>
       <template #body>
         <div class="grid place-content-center">
           <IconWarning class="justify-self-center h-24 w-24 text-slate-800" />
-          <div class="text-center">Anda yakin akan menyetujui penilaian dan membuat peringkat ?</div>
+          <div class="text-center">{{ persetujuanMsg }}</div>
         </div>
       </template>
       <template #footer>
@@ -466,7 +515,7 @@ function saveRank() {
               }
             "
             class="px-8"
-            >Konfirmasi persetujuan</BaseButtonMode
+            >Konfirmasi</BaseButtonMode
           >
         </div>
       </template>

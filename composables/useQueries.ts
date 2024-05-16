@@ -733,6 +733,34 @@ export const useUpdateNilaiKategoriIndikator = () => {
   `;
 };
 
+/**
+ * @returns count: Int(How many data get updated)
+ * @param $survei_kd: String!, 
+ * @param $keg_kd: String!, 
+ * @param $branch_kd: String!, 
+ * @param $posisi_kd: String!,
+ * @param $tahun: String!
+ * @param $is_final: Boolean!
+ *
+ */
+export const useFinalizeNilaiKategoriIndikator = () => {
+  return gql`
+    mutation ($survei_kd: String!, $keg_kd: String!, $branch_kd: String!, $posisi_kd: String!, $tahun: String!, $is_final: Boolean!) {
+    finalizeNilaiKategoriIndikator (
+        survei_kd: $survei_kd,
+        keg_kd: $keg_kd,
+        branch_kd: $branch_kd,
+        posisi_kd: $posisi_kd,
+        tahun: $tahun,
+        is_final: $is_final
+    ) {
+        __typename
+        count
+    }
+}
+  `;
+};
+
 // RankMitraPosKeg
 /**
  * CreateRankMitraPosKegSurvei
@@ -820,6 +848,7 @@ export const useGetRankMitra = () => {
         }
         kategori_id
         nilai
+        nilai_rerata
         created_at
         updated_at
       }
@@ -841,6 +870,7 @@ export const useCreateRankMitra = () => {
         username
         kategori_id
         nilai
+        nilai_rerata
       }
     }
   `;
@@ -862,6 +892,7 @@ export const useUpdateRankMitra = () => {
         username
         kategori_id
         nilai
+        nilai_rerata
         created_at
         updated_at
       }

@@ -21,6 +21,7 @@ function changeMenuClicked() {
 }
 const authorizedRole = useCookie("authorizedRole");
 const userFirstName = useCookie("userFirstName");
+if(authorizedRole.value === 'admin') menuProfile.pop();
 // const name = ref(userFirstName.);
 //  dataProfile ? ', '+ dataProfile.profile.nama : ''
 // const { data: dataProfile } = await useAsyncQuery(useGetProfile());
