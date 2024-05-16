@@ -17,13 +17,15 @@ export default defineNuxtConfig({
     dir: "assets/img",
     domains: ["evaluasi-sobat.vercel.com"],
   },
-  plugins: ["~/plugins/preline.client.ts",
-    "~/plugins/my-apollo-client.ts", "~/plugins/vue-select.ts",
+  plugins: [
+    "~/plugins/preline.client.ts",
+    "~/plugins/my-apollo-client.ts",
+    "~/plugins/vue-select.ts",
     { src: "~/plugins/vue-good-table-next.js", ssr: false },
     { src: "~/plugins/vue-quill.ts", mode: "client" },
     // { src: "~/plugins/vue-select.ts", mode: "client" },
   ],
-  // vue: {  
+  // vue: {
   //   compilerOptions: {
   //     isCustomElement: (tag) => ["v-select", 'QuillEditor'].includes(tag),
   //   },
@@ -32,7 +34,7 @@ export default defineNuxtConfig({
   apollo: {
     clients: {
       default: {
-        httpEndpoint: "http://localhost:4000",
+        httpEndpoint: "https://especially-arriving-mammal.ngrok-free.app/",
       },
     },
   },
