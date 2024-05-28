@@ -22,7 +22,7 @@ definePageMeta({
     <!-- Right/Mascot Section -->
     <div class="maskot sm:pe-28">
       <!-- <img src="~/assets/img/Bung itung - fit.png" class="" /> -->
-      <NuxtImg src="Bung itung - fit.png" loading="eager" />
+      <NuxtImg src="/Bung itung - fit.png" loading="eager" />
     </div>
   </div>
   <!-- Gallery Section -->

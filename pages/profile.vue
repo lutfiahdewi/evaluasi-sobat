@@ -52,7 +52,7 @@ if (dataRank.length == 1) {
   <div class="lg:grid lg:grid-cols-3 lg: gap-12 text-slate-900">
     <div class="card-user border border-slate-300 rounded shadow-md">
       <div class="photo-container  grid place-content-center py-6  ">
-        <NuxtImg src="user_stock.jpg" loading="lazy" class="max-w-60"/>
+        <NuxtImg src="/user_stock.jpg" loading="lazy" class="max-w-60"/>
       </div>
       <div class="detail-user my-3 grid place-content-center">
         <div class="name-user font-bold text-lg">{{ profile.nama }}</div>

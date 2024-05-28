@@ -37,7 +37,7 @@
     "graphql": "^16.8.1"
   },
   "devDependencies": {
-    "@nuxt/image": "^1.4.0",
+    "@nuxt/image": "^1.7.0",
     "@nuxtjs/apollo": "^5.0.0-alpha.11",
     "@pinia/nuxt": "^0.5.1",
     "@tailwindcss/forms": "^0.5.7",

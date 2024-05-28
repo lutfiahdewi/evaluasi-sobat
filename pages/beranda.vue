@@ -15,7 +15,7 @@ const token = useCookie("token");
     <article id="kegiatan">
       <div class="flex justify-center p-3 my-16">
         <!-- <div class="absolute top-36 right-10 w-48 h-20 bg-amber-400 z-0"></div> -->
-        <NuxtImg src="sp2023.png" loading="lazy" class="z-10" />
+        <NuxtImg src="/sp2023.png" loading="lazy" class="z-10" />
         <!-- <div class="absolute -bottom-52 left-10 w-48 h-20 bg-amber-950 opacity-90 z-20"></div> -->
       </div>
       <div class="grid place-content-center">
