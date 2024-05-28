@@ -18,12 +18,19 @@ interface indicator {
 
 // initialization
 const count = useState<string>("indicators"); //jumlah indikator yang telah dipilih
-/*if (count.value == undefined) {
-  count.value = "4";
-}*/
-const arr_indicators: indicator[] = reactive(new Array(parseInt(count.value)));
-const mat_weight: string[][] = reactive(Array.from(Array(parseInt(count.value)), () => new Array(parseInt(count.value)).fill("")));
-console.log("n matriks: " + mat_weight.length + ", indicators (count): " + count.value);
+if(isNil(count.value)){
+  reloadNuxtApp({path: "/pengaturan/kelolaIndikator"})
+}
+console.log(count.value);
+const arr_indicators: indicator[] = reactive([]);
+const mat_weight: string[][] = reactive([]);
+try{
+  arr_indicators.push(...new Array(parseInt(count.value)));
+  mat_weight.push(...Array.from(Array(parseInt(count.value)), () => new Array(parseInt(count.value)).fill("")))
+}catch(e){
+  console.log(e)
+}
+// console.log("n matriks: " + mat_weight.length + ", indicators (count): " + count.value);
 //Modal
 const createCatModal = ref<InstanceType<typeof ModalBase> | null>(null);
 const isDataSent = ref(false);
@@ -36,8 +43,8 @@ const kategoriNama = ref("");
 const kategoriDefinisi = ref("");
 for (let i = 0; i < parseInt(count.value); i++) {
   arr_indicators[i] = {
-    nama: "indikator " + i,
-    definisi: "definisi" + i,
+    nama: '',
+    definisi: '',
     perbandingan: "",
     isBenefit: undefined,
     no_urut: i,
@@ -268,7 +275,7 @@ function sendData() {
         <div class="col-span-2">
           <label :for="'textarea-label' + i" class="block font-medium mb-2">Konsep dan Definisi</label>
           <div class="bg-slate-50 border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none" id="textarea-label">
-          <QuillEditor placeholder="'Penjelasan mengenai indikator ' + (i + 1)" v-model:content="arr_indicators[i].definisi" theme="snow" contentType="html" />
+          <QuillEditor :placeholder="'Penjelasan mengenai indikator ' + (i + 1)" v-model:content="arr_indicators[i].definisi" theme="snow" contentType="html" />
         </div>
         </div>
       </div>

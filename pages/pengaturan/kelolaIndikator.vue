@@ -3,7 +3,7 @@ import type { ModalBase } from "#build/components";
 import { logErrorMessages } from "@vue/apollo-util";
 
 useSeoMeta({
-  title: "Kelola Indikator",
+  title: "Kelola Kategori Indikator",
 });
 
 const currentIndicators = useState<number>("indicators", () => 1);
@@ -53,7 +53,11 @@ function newIndikator() {
 </script>
 <template>
   <!-- Daftar Kategori -->
-  <h3 class="font-bold mb-3">Kategori Indikator</h3>
+  <h3 class="font-bold mb-3">Kelola Kategori Indikator</h3>
+  <!-- Tata cara -->
+  <NuxtLink :to="'tataCara'">
+    <BaseButtonMode mode="gray" shape="square" class="border border-slate-600 shadow">Tata Cara Kelola Kategori-Indikator</BaseButtonMode>
+  </NuxtLink>
   <section class="mb-3">
     <!-- Modal membuat kategori dan indikator baru -->
     <ModalBase ref="newCatIndModal">

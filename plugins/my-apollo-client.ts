@@ -5,8 +5,8 @@ import { DefaultApolloClient } from "@vue/apollo-composable";
 // Apollo client
 // HTTP connection to the API
 const httpLink = createHttpLink({
-    uri: "http://localhost:4000/",
-    // uri: "https://especially-arriving-mammal.ngrok-free.app/",
+    // uri: "http://localhost:4000/",
+    uri: "https://evaluasisobat.my.id/graphql",
   });
   
   // Cache implementation
