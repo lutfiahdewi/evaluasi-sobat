@@ -33,6 +33,9 @@
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.2/xlsx-0.20.2.tgz",
     "yup": "^1.4.0"
   },
+  "peerDependencies": {
+    "graphql": "^16.8.1"
+  },
   "devDependencies": {
     "@nuxt/image": "^1.4.0",
     "@nuxtjs/apollo": "^5.0.0-alpha.11",
