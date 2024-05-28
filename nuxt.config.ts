@@ -18,7 +18,7 @@ export default defineNuxtConfig({
   },
   image: {
     dir: "assets/img",
-    domains: ["evaluasi-sobat.vercel.com"],
+    domains: ["evaluasi-sobat.vercel.app"],
   },
   plugins: [
     "~/plugins/preline.client.ts",
