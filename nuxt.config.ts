@@ -1,6 +1,9 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   hooks: {},
+  build: {
+    transpile: ["graphql"],
+  },
   devtools: { enabled: true },
   typescript: {
     // typeCheck: true,
