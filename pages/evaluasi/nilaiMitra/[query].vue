@@ -70,6 +70,7 @@ try {
   for (const item of dataPenugasanStruktur) {
     const temp: evaluatee = {
       id: item.User.user_id,
+      nama: item.User.nama,
       username: item.username,
     };
     Evaluatees.push(temp);
@@ -433,6 +434,7 @@ async function readTemplate() {
       </div>
     </form>
   </section>
+  coba HMR
   <!-- Modal -->
   <ModalLoading v-if="isDataLoading" @close="isDataLoading = !isDataLoading" />
   <ModalError v-if="isDataError" @close="isDataError = !isDataError" />
