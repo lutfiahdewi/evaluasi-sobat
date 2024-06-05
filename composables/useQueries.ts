@@ -522,6 +522,7 @@ export const useSearchJumPosisiPetugasKegSurvei = () => {
             indikator {
               indikator_id
               nama
+              definisi
               is_benefit
             }
           }

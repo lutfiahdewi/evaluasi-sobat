@@ -95,8 +95,8 @@ Indicators = useSortBy(Indicators, ["urutan"]);
     <div class="indikator">
         <h6 class="mb-3">Penjelasan Indikator Penilaian</h6>
       <ul>
-        <li v-for="ind in Indicators" :key="ind.urutan" class="mb-2">
-          {{ ind.nama }} :
+        <li v-for="(ind,i) in Indicators" :key="ind.urutan" class="mb-2">
+          {{ i+1 }}. {{ ind.nama }} :
           <div v-html="ind.definisi" class="wysiwyg ps-4"></div>
         </li>
       </ul>

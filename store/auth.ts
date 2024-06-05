@@ -13,8 +13,8 @@ interface UserPayloadInterface {
 // Apollo client
 // HTTP connection to the API
 const httpLink = createHttpLink({
-  uri: "http://localhost:4000/",
-  // uri: "https://evaluasisobat.my.id/graphql",
+  // uri: "http://localhost:4000/",
+  uri: "https://evaluasisobat.my.id/graphql",
 });
 
 // Cache implementation
