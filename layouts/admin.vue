@@ -35,7 +35,7 @@ const operator = useCookie("operator");
 if(operator.value){
   menuAdmin[2].child?.push(...[
       { title: "Evaluasi Kegiatan", url: "/rekrutmen/evaluasi" },
-      { title: "Daftar Nilai Evaluasi", url: "/rekrutmen/nilaiEvaluasi" },
+      // { title: "Daftar Nilai Evaluasi", url: "/rekrutmen/nilaiEvaluasi" },
       { title: "Daftar Peringkat", url: "/rekrutmen/peringkat" },
     ]);
   menuAdmin[1].child = undefined;

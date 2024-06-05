@@ -468,7 +468,7 @@ makeMatrices();
   </div>
   <div class="flex justify-end">
     <ModalBase ref="createCatModal">
-      <template #header><h6 class="font-bold text-gray-800">Buat kategori penilaian</h6></template>
+      <template #header><h6 class="font-bold text-gray-800">Ubah kategori penilaian</h6></template>
       <template #body>
         <div class="mt-1 text-gray-800">
           <h6>Kategori : {{ kategoriNama }}</h6>

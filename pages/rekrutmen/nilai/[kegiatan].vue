@@ -454,7 +454,7 @@ function saveRank() {
                   <IconUserPenilaian />
                 </span>
                 <div class="petugas">
-                  <p class="body1">{{ petugas.username }}</p>
+                  <p class="body1">{{ petugas.nama ?? petugas.username }}</p>
                   <p class="body2 text-slate-500">{{ petugas.detail }}</p>
                 </div>
               </div>

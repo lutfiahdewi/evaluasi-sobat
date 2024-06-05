@@ -158,7 +158,11 @@ const closeAlertLoading = (sec?: number) => {
         <p class="font-medium">Data gagal diperbarui!</p>
       </template>
     </AlertError>
-    <vue-good-table :columns="columns" :rows="dataTable">
+    <vue-good-table :columns="columns" :rows="dataTable"
+    :search-options="{
+      enabled: true,
+    }"
+    >
       <template #table-row="props">
         <span v-if="props.column.field == 'statusSurvei'">
           <div class="flex justify-center">

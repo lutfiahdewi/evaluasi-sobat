@@ -92,11 +92,11 @@ function addData() {
 }
 addData();
 
-function deleteData(survei_id: string) {
-  console.log("Delete: " + survei_id);
+function deleteData(kode: string) {
+  console.log("Delete: " + kode);
   const { mutate: sendDeleteSurvei, onDone: resultDeleteSurvei, onError: errorDeleteSurvei, loading: loadingDeleteSurvei } = useMutation(useDeleteSurvei());
   sendDeleteSurvei({
-    id: survei_id,
+    kode
   });
   errorDeleteSurvei((error) => {
     logErrorMessages(error);
@@ -118,7 +118,7 @@ function deleteData(survei_id: string) {
           </div>
         </span>
         <span v-else-if="props.column.field == 'aksi'" class="flex justify-evenly">
-          <ButtonDelete @click.prevent="deleteData(props.row.survei_id)" />
+          <ButtonDelete @click.prevent="deleteData(props.row.kodeSurvei)" />
         </span>
         <span v-else>
           {{ props.formattedRow[props.column.field] }}

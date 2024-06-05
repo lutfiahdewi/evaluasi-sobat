@@ -370,8 +370,8 @@ export const useGetSurvei = () => {
  */
 export const useDeleteSurvei = () => {
   return gql`
-    mutation ($deleteSurveiId: Int) {
-      deleteSurvei(id: $deleteSurveiId) {
+    mutation ($id: Int, $kode: String) {
+      deleteSurvei(id: $id, kode: $kode) {
         survei_id
       }
     }
@@ -735,9 +735,9 @@ export const useUpdateNilaiKategoriIndikator = () => {
 
 /**
  * @returns count: Int(How many data get updated)
- * @param $survei_kd: String!, 
- * @param $keg_kd: String!, 
- * @param $branch_kd: String!, 
+ * @param $survei_kd: String!,
+ * @param $keg_kd: String!,
+ * @param $branch_kd: String!,
  * @param $posisi_kd: String!,
  * @param $tahun: String!
  * @param $is_final: Boolean!
@@ -746,18 +746,11 @@ export const useUpdateNilaiKategoriIndikator = () => {
 export const useFinalizeNilaiKategoriIndikator = () => {
   return gql`
     mutation ($survei_kd: String!, $keg_kd: String!, $branch_kd: String!, $posisi_kd: String!, $tahun: String!, $is_final: Boolean!) {
-    finalizeNilaiKategoriIndikator (
-        survei_kd: $survei_kd,
-        keg_kd: $keg_kd,
-        branch_kd: $branch_kd,
-        posisi_kd: $posisi_kd,
-        tahun: $tahun,
-        is_final: $is_final
-    ) {
+      finalizeNilaiKategoriIndikator(survei_kd: $survei_kd, keg_kd: $keg_kd, branch_kd: $branch_kd, posisi_kd: $posisi_kd, tahun: $tahun, is_final: $is_final) {
         __typename
         count
+      }
     }
-}
   `;
 };
 

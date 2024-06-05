@@ -2,7 +2,7 @@ import { storeToRefs } from 'pinia';
 import { useAuthStore } from '~/store/auth';
 
 export default defineNuxtRouteMiddleware((to) => {
-  console.log("middleware!")
+  // console.log("middleware!")
   //Used to apply the given auth token to the specified Apollo client.
   const { onLogin } = useApollo();
   const { authenticated } = storeToRefs(useAuthStore()); // make authenticated state reactive
