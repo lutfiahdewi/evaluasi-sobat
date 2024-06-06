@@ -188,7 +188,7 @@ function tableData(data: MixedDictionary[], rank: rank[], indicators: indicator[
   for (let i = 0; i < rank.length; i++) {
     let temp: MixedDictionary = {
       peringkat: i + 1,
-      name: rank[i].nama,
+      nama: rank[i].nama,
       username: rank[i].username,
       nilai_preferensi: rank[i].nilai_preferensi,
     };
@@ -271,6 +271,7 @@ columnPosisi.push(
       </tr>
     </table>
     <BaseButtonMode shape="square" mode="outlined" class="py-3 px-4" @click.prevent="downloadData()">Unduh Penilaian</BaseButtonMode>
+    CEK HMR
   </section>
   <section>
     <h6 class="font-semibold mb-3">Penilaian berdasarkan posisi : kategori {{ Indicators_posisi[0].kategori }}</h6>
@@ -331,7 +332,7 @@ columnPosisi.push(
     >
       <template #table-row="props">
         <span v-if="props.column.field == 'nama'">
-          {{ props.row.nama || props.row.username }}
+          {{ props.row.nama ?? props.row.username }}
         </span>
         <span v-else>
           {{ props.formattedRow[props.column.field] }}
@@ -357,7 +358,7 @@ columnPosisi.push(
     >
       <template #table-row="props">
         <span v-if="props.column.field == 'nama'">
-          {{ props.row.nama || props.row.username }}
+          {{ props.row.nama ?? props.row.username }}
         </span>
         <span v-else>
           {{ props.formattedRow[props.column.field] }}

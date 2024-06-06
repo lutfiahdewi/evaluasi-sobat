@@ -106,7 +106,11 @@ async function refresh() {
 <template>
   <div>
     <BaseButtonMode mode="normal" shape="square" @click="refresh()" class="mb-3"><IconRefresh class="h-6 w-6 inline me-1" />Refresh</BaseButtonMode>
-    <vue-good-table :columns="columns" :rows="dataTable">
+    <vue-good-table :columns="columns" :rows="dataTable"
+    :search-options="{
+      enabled: true,
+    }"
+    >
       <template #table-row="props">
         <span v-if="props.column.field == 'statusSurvei'">
           <div class="flex justify-center"><ButtonKegiatan :status="parseInt(props.row.statusSurvei)" class="" /></div>

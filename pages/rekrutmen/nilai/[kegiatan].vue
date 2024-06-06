@@ -240,7 +240,10 @@ async function confirmData(): Promise<void> {
         const savedRank = await saveRank();
         if (savedRank) {
           // arahkan ke halaman laporan peringkat
-          navigateTo({ path: "/rekrutmen/nilai/laporan/" + "kegiatan?survei_kd=" + survei_kd + "&keg_kd=" + keg_kd + "&branch_kd=" + branch_kd + "&posisi_kd=" + posisi_kd + "&tahun=" + tahun });
+          /*const link = "/rekrutmen/nilai/laporan/" + "kegiatan?survei_kd=" + survei_kd + "&keg_kd=" + keg_kd + "&branch_kd=" + branch_kd + "&posisi_kd=" + posisi_kd + "&tahun=" + tahun;
+          console.log(link);
+          navigateTo({ path: link });*/
+          reloadNuxtApp();
         }
       }
     } catch (e) {
@@ -341,6 +344,9 @@ function saveRank() {
     resolve("Berhasil menyimpan data peringkat");
   });
 }
+// error in reloading
+// https://evaluasisobat.my.id/rekrutmen/nilai/kegiatan?survei_kd=0201A&keg_kd=0124B&branch_kd=0123ABC&posisi_kd=0123C&tahun=2023
+// https://evaluasisobat.my.id/rekrutmen/nilai/laporan/kegiatan
 </script>
 
 <template>
@@ -484,7 +490,9 @@ function saveRank() {
       <BaseButtonMode v-if="!isOperatorConfirmed && isOperatorEditable" shape="square" mode="outlined" class="py-3 px-4" @click.prevent="saveChanges()">Simpan Perubahan</BaseButtonMode>
     </div>
     <ModalBase ref="persetujuanModal">
-      <template #header><h5 class="font-bold text-gray-800">Konfirmasi {{ persetujuan ? 'persetujuan' : 'tolak'}} penilaian?</h5></template>
+      <template #header
+        ><h5 class="font-bold text-gray-800">Konfirmasi {{ persetujuan ? "persetujuan" : "tolak" }} penilaian?</h5></template
+      >
       <template #body>
         <div class="grid place-content-center">
           <IconWarning class="justify-self-center h-24 w-24 text-slate-800" />
