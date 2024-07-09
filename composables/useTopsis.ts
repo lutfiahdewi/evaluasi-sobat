@@ -39,7 +39,6 @@ export default function useTopsis(score: number[][], weight: number[], is_benefi
       nwMat[i][j] = round(normalizedMat[i][j] * weight[j], 5);
     }
   }
-  // console.log(nwMat);
 
   // 3. Solusi ideal positif dan negatif
   const sPositive = new Array(q);
@@ -54,8 +53,7 @@ export default function useTopsis(score: number[][], weight: number[], is_benefi
       sNegative[j] = max(temp);
     }
   }
-  // console.log("A+: " + sPositive);
-  // console.log(sNegative)
+
   // 4. Jarak antara nilai setiap alternatif dengan matriks solusi ideal positif dan negatif
   const dPositive = new Array(p);
   const dNegative = new Array(p);
@@ -67,10 +65,7 @@ export default function useTopsis(score: number[][], weight: number[], is_benefi
     // console.log(ssqNegative);
     dPositive[i] = round(sqrt(sum(ssqPositive)), 5);
     dNegative[i] = round(sqrt(sum(ssqNegative)), 5);
-    // console.log("array: ", dNegative[i], " cal: ", round(sqrt(sum(ssqNegative)), 5));
   }
-  // console.log(dPositive);
-  // console.log(dNegative);
 
   // 5. Nilai preferensi
   for (let i = 0; i < p; i++) {

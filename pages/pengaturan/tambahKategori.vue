@@ -343,7 +343,7 @@ async function sendData() {
   <!-- Matriks Perbandingan-->
   <section>
     <h5 class="mb-3">Matriks Perbandingan</h5>
-    <div v-if="mat_weight.length > 0" v-for="(item, i) in mat_weight" :key="i">
+    <!-- <div v-if="mat_weight.length > 0" v-for="(item, i) in mat_weight" :key="i">
       <div v-if="i == 0" class="grid grid-flow-col auto-cols-max gap-4 mb-4">
         <div class="w-24"></div>
         <div v-for="(item, j) in mat_weight[i]" :key="j" class="w-24 truncate">{{ chosenIndicator[j].nama }}</div>
@@ -360,34 +360,28 @@ async function sendData() {
           class="w-24 border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
         />
       </div>
-    </div>
-    <!-- <table>
-      <thead>
-        <tr>
-          <td></td>
-          <td v-for="(item, j) in chosenIndicator" :key="j" class="pe-3 min-w-24"><span class="flex justify-center">{{ item.nama }}</span></td>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(item, i) in mat_weight" :key="i">
-          <td  class="pe-3 min-w-24">{{ chosenIndicator[i].nama }}</td>
-          <td v-for="(item, j) in mat_weight[i]">
-            <span class="flex justify-center">
-              <input
-                v-model="mat_weight[i][j]"
-                :key="i+j"
-                :disabled="j <= i"
-                @keyup.enter="generate()"
-                type="text"
-                class="w-24 me-3 border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
-              />
-            </span>
-          </td>
-        </tr>
-      </tbody>
-    </table> -->
+    </div> -->
+    <table v-if="mat_weight.length > 0">
+      <tr >
+        <td></td>
+        <td v-for="(item, j) in chosenIndicator" :key="j" class="w-28 pb-3 align-bottom">{{ item.nama }}</td>
+      </tr>
+      <tr v-for="(item, i) in mat_weight" :key="i">
+        <td class="w-min-24 w-max-32 pb-3 pe-3">{{ i < chosenIndicator.length ? chosenIndicator[i].nama : "" }}</td>
+        <td v-for="(item, j) in mat_weight[i]" class="pb-3">
+          <input
+          v-model="mat_weight[i][j]"
+          :key="j"
+          :disabled="j <= i"
+          @keyup.enter="generate()"
+          type="text"
+          class="w-24 border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
+        />
+        </td>
+      </tr>
+    </table>
     <BaseButtonMode v-if="mat_weight.length > 0" shape="square" mode="outlined" class="me-3 font-semibold" @click.prevent="generate()">Cek Konsistensi</BaseButtonMode>
-    <div class="my-3 p-3 flex item-center text-red-600 border rounded-lg" v-if="!isMatricesValid"><IconWarning class="w-6 h-6 me-2" />Pastikan skala yang dimasukkan antara 1-9</div>
+    <div class="my-3 p-3 flex item-center text-red-600 border rounded-lg" v-if="!isMatricesValid"><IconWarning class="w-6 h-6 me-2" />Pastikan skala yang dimasukkan antara 1-9 atau kebalikan dari 1-9</div>
     <div class="my-3 p-3 flex item-center text-red-600 border rounded-lg" v-if="!ahp.isConsistent && isMatricesValid">
       <IconWarning class="w-6 h-6 me-2" />Rasio konsistensi = {{ round(ahp.CR, 3) }}, pastikan perbandingan yang dimasukkan konsisten
     </div>
@@ -411,7 +405,7 @@ async function sendData() {
           </table>
         </div>
         <div class="my-3 flex item-center text-red-600" v-if="!isValid"><IconWarning class="w-6 h-6 me-2" />Pastikan form telah terisi semua!</div>
-        <div class="my-3 flex item-center text-red-600" v-if="!isMatricesValid"><IconWarning class="w-6 h-6 me-2" />Pastikan skala yang dimasukkan antara 1-9 pada matriks perbandingan</div>
+        <div class="my-3 flex item-center text-red-600" v-if="!isMatricesValid"><IconWarning class="w-6 h-6 me-2" />Pastikan skala yang dimasukkan antara 1-9 atau kebalikan dari 1-9 pada matriks perbandingan</div>
       </template>
       <template #footer-button>
         <BaseButtonMode shape="square" mode="normal" @click.prevent="sendData()" :not-active="!isValid || !isMatricesValid">Konfirmasi</BaseButtonMode>

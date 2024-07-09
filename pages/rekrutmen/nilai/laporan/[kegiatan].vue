@@ -271,7 +271,6 @@ columnPosisi.push(
       </tr>
     </table>
     <BaseButtonMode shape="square" mode="outlined" class="py-3 px-4" @click.prevent="downloadData()">Unduh Penilaian</BaseButtonMode>
-    CEK HMR
   </section>
   <section>
     <h6 class="font-semibold mb-3">Penilaian berdasarkan posisi : kategori {{ Indicators_posisi[0].kategori }}</h6>

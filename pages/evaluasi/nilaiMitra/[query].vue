@@ -415,7 +415,7 @@ async function readTemplate() {
                     v-model="dataNilai[i][j]"
                     :class="!dataNilaiValidation[i][j] && 'border-red-500 '"
                     @click="dataNilaiValidation[i][j] = true"
-                    class="py-2 px-3 w-24 border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
+                    class="text-center py-2 px-3 w-24 border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
                     :disabled="isDataFinalized"
                     @focusout="validateInput(i, j)"
                     @enter="validateInput(i, j)"
