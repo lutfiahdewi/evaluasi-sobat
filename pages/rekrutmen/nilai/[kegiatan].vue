@@ -441,10 +441,13 @@ function saveRank() {
     <NuxtLink :to="'/rekrutmen/nilai/laporan/' + 'kegiatan?survei_kd=' + survei_kd + '&keg_kd=' + keg_kd + '&branch_kd=' + branch_kd + '&posisi_kd=' + posisi_kd + '&tahun=' + tahun">
       <BaseButtonMode v-if="isOperatorConfirmed && progressPercentage == 100" shape="square" mode="outlined" class="py-3 px-4 ms-3">Lihat Laporan Evaluasi</BaseButtonMode>
     </NuxtLink>
-    <!-- <ButtonLinkLaporan v-if="isOperatorConfirmed && progressPercentage == 100" :survei_kd="survei_kd.toString()" :keg_kd="keg_kd?.toString()" :branch_kd="branch_kd?.toString()" :posisi_kd="posisi_kd?.toString()" :tahun="tahun?.toString()" /> -->
+    <!-- <ButtonLinkLaporan v-if="isOperatorConfirmed && progressPercentage == 100" :survei_kd="survei_kd.toString()" :keg_kd="keg_kd?.toString()" :branch_kd="branch_kd?.toString()" :posisi_kd="posisi_kd?.toString()" :tahun="tahun?.toString()" /> 
+    max-h-[480px] 2xl:max-h-[720px] 
+    -->
   </section>
   <section>
-    <div class="table-container rounded overflow-auto max-h-[480px] 2xl:max-h-[720px]">
+    
+    <div class="table-container rounded overflow-auto">
       <table class="bg-white min-w-full" id="main-table">
         <thead class="text-slate-800 text-lg border-b border-slate-500 shadow">
           <tr>
@@ -470,11 +473,10 @@ function saveRank() {
                 <span v-if="!isOperatorEditable || isOperatorConfirmed">{{ dataNilai[i][j].nilai }}</span>
                 <input
                   v-else
-                  
                   type="text"
                   v-model="dataNilai[i][j].nilai"
                   @click="dataNilai[i][j].valid = true"
-                  class="text-center py-2 px-3 w-24 border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
+                  class="py-2 px-3 w-24 border-gray-200 rounded-lg text-right text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
                   :class="!dataNilai[i][j].valid && ' border-red-500 '"
                   :disabled="isOperatorConfirmed || !dataNilai[i][j].is_final || !dataNilai[i][j].id"
                   @change="validateInput(i, j)"

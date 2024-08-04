@@ -1,12 +1,17 @@
 /**
- * Composable for getting GraphQL queries
- * Login
- * List item:
- * 1. Kategori
- * 2. Indikator
+ * Composables berisi kueri2 yang dapat dipanggil tanpa mendefinisikan query berulang2.
+ * Pada composable ini hanya mengambil field yang akan digunakan.
+ * Adapun struktur composablenya berisi query graphql yang memiliki detail input serta serta struktur data yang diminta(dikirim oleh API).
+ * Tipe input serta field lengkap dari suatu objek dapat dilihat pada skema GraphQL. 
  */
 
 // Login => argumen email and password
+/**
+ * Used in auth.ts in store
+ * @param {string} email
+ * @param {string} password
+ * @returns token, {user}
+ */
 export const useLogin = () => {
   const query = gql`
     mutation ($email: String!, $password: String!) {
@@ -27,6 +32,10 @@ export const useLogin = () => {
 };
 
 // profil
+/**
+ * Get detail profile in page profile
+ * @returns username, nama, email etc
+ */
 export const useGetProfile = () => {
   const query = gql`
     query {
@@ -54,6 +63,10 @@ export const useGetProfile = () => {
 };
 
 // Getting all kategori data
+/**
+ * get all kategori in page kelolaSurvei
+ * @returns kategori_id, nama
+ */
 export const useGetAllKategori = () => {
   const query = gql`
     query {
@@ -65,9 +78,14 @@ export const useGetAllKategori = () => {
   `;
   return query;
 };
+
 // Getting a Kategori Nested
 /**
- * @param?: id
+ * Mengkueri satu kategori nested, terkait kategoriIndikator yang terkait juga dg detail indikator.
+ * Pages: \evaluasi\kondef\[query], \evaluasi\nilaiMitra\[query], \pengaturan\ubahKategori\[id], \rekrutmen\nilai\[kegiatan], rekrutmen\nilai\laporan\[kegiatan]
+ * COmponent (Table\Rank): All, Annual
+ * @param {int} id
+ * @returns {kategori}
  */
 export const useGetKategori = () => {
   const query = gql`
@@ -99,7 +117,11 @@ export const useGetKategori = () => {
   return query;
 };
 
-// Creating a kategori
+/**
+ * Creating a kategori
+ * Pages: \pengaturan\tambahKategori, \pengaturan\tambahKategoriIndikator
+ * @returns kategori_id
+ */
 export const useCreateKategori = () => {
   const query = gql`
     mutation createKategori($input: KategoriInputType!) {
@@ -111,7 +133,11 @@ export const useCreateKategori = () => {
   return query;
 };
 
-// updating a kategori
+/**
+ * updating a kategori
+ * Pages: \pengaturan\ubahKategori\[id]
+ * @returns kategori_id, nama, definisi
+ */
 export const useUpdateKategori = () => {
   const query = gql`
     mutation ($input: KategoriInputType!, $id: Int!) {
@@ -124,7 +150,14 @@ export const useUpdateKategori = () => {
   `;
   return query;
 };
-//Deleting a kategori (and connection to kategoriIndikator)
+
+/**
+ * Deleting a kategori (and connection to kategoriIndikator)
+ * Pages: \pengaturan\ubahKategori\[id]
+ * Component (Table) : KategoriIndikator
+ * @param {int} id
+ * @returns kategori_id, nama
+ */
 export const useDeleteKategori = () => {
   const query = gql`
     mutation ($id: Int!) {
@@ -137,7 +170,11 @@ export const useDeleteKategori = () => {
   return query;
 };
 
-// Creating an indikator nested (a kategoriIndikator directly connected)
+/**
+ * Creating an indikator nested (a kategoriIndikator directly connected)
+ * Pages: \pengaturan\tambahKategoriIndikator
+ * @returns {indikator}
+ */
 export const useCreateIndikatorNested = () => {
   const query = gql`
     mutation ($input: IndikatorNestedInputType!) {
@@ -158,8 +195,12 @@ export const useCreateIndikatorNested = () => {
   return query;
 };
 
-// Getting all kategori data
-// Data berupa nama, id kategori beserta indikator2 terkait
+/**
+ * Getting all kategori data
+ * Data berupa nama, id kategori beserta indikator2 terkait
+ * Component (Table): KAtegoriINdikator
+ * @returns {kategori[]}
+ */
 export const useTableCategories = () => {
   const query = gql`
     query {
@@ -179,7 +220,11 @@ export const useTableCategories = () => {
   `;
   return query;
 };
-// Creating an indikator
+/**
+ * Creating an indikator
+ * Pages: \pengaturan\kelolaIndikator, \pengaturan\tambahKategoriIndikator
+ * @returns {indikator}
+ */
 export const useCreateIndikator = () => {
   const query = gql`
     mutation ($input: IndikatorInputType!) {
@@ -194,7 +239,11 @@ export const useCreateIndikator = () => {
   return query;
 };
 
-// get many or single(id) indikayor
+/**
+ * Get many or one (id) indikator
+ * Pages: \pengaturan\tambahKategori, \pengaturan\ubahKategori\[id]
+ * @returns {indikator}
+ */
 export const useGetIndicators = () => {
   const query = gql`
     query ($id: Int) {
@@ -210,7 +259,11 @@ export const useGetIndicators = () => {
   return query;
 };
 
-// Update indikator
+/**
+ * Update indikator
+ * Component (table): Indikator
+ * @returns indikator_id
+ */
 export const useUpdateIndicator = () => {
   const query = gql`
     mutation ($input: IndikatorInputType!, $id: Int!) {
@@ -222,7 +275,11 @@ export const useUpdateIndicator = () => {
   return query;
 };
 
-// Delete indikator
+/**
+ * Delete indikator
+ * Component (table): Indikator
+ * @returns indikator_id, nama
+ */
 export const useDeleteIndicator = () => {
   const query = gql`
     mutation ($id: Int!) {
@@ -234,8 +291,13 @@ export const useDeleteIndicator = () => {
   `;
   return query;
 };
-// Getting all indicators data
-// Data berupaka nama indikator, id dan kategori terkait
+
+/**
+ * Getting all indicators data
+ * Data berupaka nama indikator, id dan kategori terkait
+ * Component (table): Indikator
+ * @returns {indikator[]}
+ */
 export const useTableIndicators = () => {
   const query = gql`
     query {
@@ -257,7 +319,12 @@ export const useTableIndicators = () => {
   return query;
 };
 
-// create kategoriIndikator
+/**
+ * create kategoriIndikator
+ * Pages: pengaturan\tambahKategori, \pengaturan\ubahKategori\[id]
+ * Page ubah kategori juga dapat membuat baru untuk indikator yg belum ada sebelumnya.
+ * @returns {kategoriIndikator}
+ */
 export const useCreateKategoriIndikator = () => {
   return gql`
     mutation ($input: KategoriIndikatorInputType!) {
@@ -282,7 +349,11 @@ export const useCreateKategoriIndikator = () => {
   `;
 };
 
-// update kategoriIndikator
+/**
+ * update kategoriIndikator
+ * Pages: \pengaturan\ubahKategori\[id]
+ * @returns {kategoriIndikator}
+ */
 export const useUpdateKategoriIndikator = () => {
   return gql`
     mutation ($input: KategoriIndikatorInputType!, $id: Int!) {
@@ -312,7 +383,12 @@ export const useUpdateKategoriIndikator = () => {
   `;
 };
 
-// delete kategoriIndikator
+/**
+ * Delete kategoriIndikator
+ * Pages: \pengaturan\ubahKategori\[id]
+ * @param {int} id
+ * @returns
+ */
 export const useDeleteKategoriIndikator = () => {
   return gql`
     mutation ($id: Int!) {
@@ -329,26 +405,13 @@ export const useDeleteKategoriIndikator = () => {
   `;
 };
 
+// SURVEI
 /**
- * Survei
- * @returns
+ * Get all or one Survei
+ * Component : \Table\Rank\AnnualList.vue
+ * Page: \rekrutmen\nilaiEvaluasi
+ * @returns {Survei[]}
  */
-export const useCreateSurvei = () => {
-  return gql`
-    mutation ($kode: String!, $nama: String!, $tahun: String!, $tipe: Int!, $unit_kd: String) {
-      createSurvei(kode: $kode, nama: $nama, tahun: $tahun, tipe: $tipe, unit_kd: $unit_kd) {
-        __typename
-        survei_id
-        kode
-        nama
-        tahun
-        tipe
-        unit_kd
-      }
-    }
-  `;
-};
-// Get all or single Survei
 export const useGetSurvei = () => {
   return gql`
     query ($kode: String) {
@@ -365,6 +428,7 @@ export const useGetSurvei = () => {
 };
 /**
  * delete(include reference(cascade))
+ * component: \table\survei
  * @param id: Int!
  * @returns survei_id
  */
@@ -377,10 +441,13 @@ export const useDeleteSurvei = () => {
     }
   `;
 };
+
+// KEGIATAN
 /**
- * Kegiatan
+ * Get all or one kegiatan
+ * pages: \kegiatan\kelolaSurvei, \rekrutmen\nilaiEvaluasi
+ * @returns {kegiatan[]}
  */
-// Get all or single kegiatan
 export const useGetKegiatan = () => {
   return gql`
     query ($kode: String) {
@@ -393,10 +460,12 @@ export const useGetKegiatan = () => {
   `;
 };
 
+// POSISI
 /**
- * Posisi
+ * Get all or one posisi
+ * Pages: \kegiatan\kelolaSurvei, \rekrutmen\nilaiEvaluasi
+ * @returns {posisi[]}
  */
-// Get all or single posisi
 export const useGetPosisi = () => {
   return gql`
     query ($kode: String) {
@@ -409,10 +478,11 @@ export const useGetPosisi = () => {
   `;
 };
 
+// KegSurvei
 /**
- * KegSurvei
+ * Pages: \kegiatan\kelolaSurvei
+ * @returns kegsurvei_id, status
  */
-//create
 export const useCreateKegSurvei = () => {
   return gql`
     mutation ($input: KegSurveiInputType!, $survei: SurveiInputType) {
@@ -423,7 +493,16 @@ export const useCreateKegSurvei = () => {
     }
   `;
 };
-// get
+
+/**
+ * Untuk mendapatkan detail kegiatan survei
+ * @param {int} id
+ * @param {String} survei_kd
+ * @param {String} keg_kd
+ * Components (Table): DaftarEvaluasiKegiatan, EvaluasiKegiatan, Survei, Rank\Position
+ * Pages: \evaluasi\kondef\[query], \evaluasi\nilaiMitra\[query], \rekrutmen\nilai\[kegiatan], rekrutmen\nilai\laporan\[kegiatan]
+ * @returns {kegsurvei}
+ */
 export const useGetKegSurvei = () => {
   return gql`
     query ($id: Int, $survei_kd: String, $keg_kd: String) {
@@ -446,11 +525,11 @@ export const useGetKegSurvei = () => {
   `;
 };
 
+// PosKEgSurvei
 /**
- * PosKegSurvei
+ * Pages: \kegiatan\kelolaSurvei
+ * @returns poskegsurvei_id, urutan
  */
-
-//Create
 export const useCreatePosKegSurvei = () => {
   return gql`
     mutation ($input: PosKegSurveiInputType!) {
@@ -462,13 +541,12 @@ export const useCreatePosKegSurvei = () => {
   `;
 };
 
-//delete
-
+// JumPosisiPetugasKegSurvei
 /**
- * JumPosisiPetugasKegSurvei
+ * Pages: \kegiatan\kelolaSurvei
+ * @returns jumposisipetugaskegsurvei_id, jumlah, is_confirmed
+ * is_confirmed: apakah penilaian telah disetujui
  */
-
-// create
 export const useCreateJumPosisiPetugasKegSurvei = () => {
   return gql`
     mutation ($input: JumPosisiPetugasKegSurveiInputType!) {
@@ -480,7 +558,11 @@ export const useCreateJumPosisiPetugasKegSurvei = () => {
     }
   `;
 };
-// query
+/**
+ * Kueri data terkait jumlah petugas, kategori penilaian, status konfirmasi pada poskegsurvei tertentu
+ * Components (table): DaftarEvaluasiKegiatan, EvaluasiKegiatan, Survei, Position,
+ * @returns {JumPosisiPetugasKegSurvei[]}
+ */
 export const useGetJumPosisiPetugasKegSurvei = () => {
   return gql`
     query ($id: Int) {
@@ -503,7 +585,13 @@ export const useGetJumPosisiPetugasKegSurvei = () => {
     }
   `;
 };
-// serach by
+
+/**
+ * Mencari data terkait jumlah petugas, kategori penilaian, status konfirmasi pada poskegsurvei tertentu
+ * Pages: \evaluasi\kondef\[query], \evaluasi\nilaiMitra\[query],\rekrutmen\nilai\[kegiatan], rekrutmen\nilai\laporan\[kegiatan]
+ * @param {branch_kd, keg_kd, posisi_kd, survei_kd}
+ * @returns  {JumPosisiPetugasKegSurvei[]}
+ */
 export const useSearchJumPosisiPetugasKegSurvei = () => {
   return gql`
     query ($survei_kd: String!, $keg_kd: String!, $branch_kd: String!, $posisi_kd: String!) {
@@ -533,7 +621,15 @@ export const useSearchJumPosisiPetugasKegSurvei = () => {
     }
   `;
 };
-// update
+
+/**
+ * Mengubah data jumlah petugas dan status konfirmasi pada poskegsurvei tertentu
+ * Pages: \rekrutmen\nilai\[kegiatan].vue
+ * @param {int} id
+ * @param {int} jumlah
+ * @param {boolean} is_confirmed
+ * @returns  {JumPosisiPetugasKegSurvei[]}
+ */
 export const useUdateJumPosisiPetugasKegSurvei = () => {
   return gql`
     mutation ($id: Int!, $jumlah: Int, $is_confirmed: Boolean) {
@@ -546,14 +642,12 @@ export const useUdateJumPosisiPetugasKegSurvei = () => {
   `;
 };
 
+//Petugas Survey
 /**
- * Petugas Survey
- *
+ * Mendapat daftar petugas pada poskegsurvei tertentu
+ * Components (table): DaftarEvaluasiKegiatan, EvaluasiKegiatan, Position,
+ * @returns {PetugasSurvei[]}
  */
-
-// Create
-
-// Get
 export const useGetPetugasSurvei = () => {
   return gql`
     query ($id: Int) {
@@ -573,9 +667,12 @@ export const useGetPetugasSurvei = () => {
     }
   `;
 };
-// create
 
-// create many
+/**
+ * Membuat relasi (meng-assign posisi) petugas pada poskegsurvei tertentu
+ * Pages: \kegiatan\kelolaSurvei
+ * @returns {petugassurvei_id[]}
+ */
 export const useCreateManyPetugasSurvei = () => {
   return gql`
     mutation ($input: PetugasSurveiInputType!, $usernames: [String]!) {
@@ -587,13 +684,10 @@ export const useCreateManyPetugasSurvei = () => {
 };
 
 /***
- * Penugasan Struktur
- * @returns
- * @param input: What?
+ * Membuat banyak Struktur Penugasan, terkait pengawas dan petugas yang diawasi
+ * Pages: \kegiatan\kelolaSurvei
+ * @returns {penugasanstruktur_id[]}
  */
-//get
-//create
-//create many
 export const useCreateManyPenugasanStruktur = () => {
   return gql`
     mutation ($input: PenugasanStrukturInputType!, $usernames: [String]!) {
@@ -603,7 +697,11 @@ export const useCreateManyPenugasanStruktur = () => {
     }
   `;
 };
-// search(query by filtering )
+/**
+ * Mencari struktur penugasan berdasarkan poskegsurvei tertentu
+ * Pages: \evaluasi\nilaiMitra\[query].vue
+ * @returns {username, parent, status}
+ */
 export const useSearchPenugasanStruktur = () => {
   return gql`
     query ($keg_kd: String!, $survei_kd: String!, $branch_kd: String!, $posisi_kd: String!) {
@@ -619,7 +717,12 @@ export const useSearchPenugasanStruktur = () => {
     }
   `;
 };
-// countSearch(query by filtering )
+
+/**
+ * Mendapatkan jumlah petugas yang diawasi (user yg login) berdasarkan branch_kd, keg_kd, posisi_kd, survei_kd
+ * Components: \Table\EvaluasiKegiatan
+ * @returns {int}
+ */
 export const useCountSearchPenugasanStruktur = () => {
   return gql`
     query ($survei_kd: String!, $keg_kd: String!, $branch_kd: String!, $posisi_kd: String!) {
@@ -627,7 +730,13 @@ export const useCountSearchPenugasanStruktur = () => {
     }
   `;
 };
+
 // Query optional filtering
+/**
+ * Kueri data penugasan struktur berdasarkan poskegsurvei tertentu
+ * Pages: \rekrutmen\nilai\[kegiatan], \rekrutmen\nilai\laporan\[kegiatan]
+ * @returns {user, parent, status,...}
+ */
 export const useGetPenugasanStruktur = () => {
   return gql`
     query ($id: Int, $survei_kd: String!, $keg_kd: String, $branch_kd: String, $posisi_kd: String) {
@@ -650,7 +759,8 @@ export const useGetPenugasanStruktur = () => {
 };
 
 /**
- * Nilai Kategori Indikator
+ * Membuat nilai pada Kategori Indikator tertentu sesuai petugas dan poskegsurvei-nya, contoh input:
+ * PAges: \evaluasi\nilaiMitra\[query].vue
  * @param "input": {
  *      "survei_kd": "0125A",
  *       "keg_kd": "0125B",
@@ -665,6 +775,7 @@ export const useGetPenugasanStruktur = () => {
  *       ],
  *       "is_final": false
  *   }
+ * @returns {nilaiKategoriIndikator}
  */
 // create
 export const useCreateNilaiKategoriIndikator = () => {
@@ -684,7 +795,13 @@ export const useCreateNilaiKategoriIndikator = () => {
     }
   `;
 };
-// get
+
+/**
+ * Kueri nilai dari suatu kategori-indikator tertentu dengan filter survei_kd, keg_kd, posisi_kd, tahun (kerja), username
+ * Pages: \evaluasi\nilaiMitra\[query], \rekrutmen\nilai\[kegiatan], rekrutmen\nilai\laporan\[kegiatan]
+ * Component (Table\Rank): All, Annual
+ * @returns
+ */
 export const useGetNilaiKategoriIndikator = () => {
   return gql`
     query ($id: Int, $survei_kd: String, $keg_kd: String, $branch_kd: String, $posisi_kd: String, $kategoriIndikator_id: Int, $username: String, $tahun: String) {
@@ -710,14 +827,12 @@ export const useGetNilaiKategoriIndikator = () => {
   `;
 };
 
-// update
 /**
- * @returns id, nilai, is_final
- *
- * @param single update: id should have is_final
- * @param
+ * Mengubah nilai nilai dari suatu kategori-indikator tertentu, field yang diubah hanya nilai dan is_final (status finalisasi)
+ * single update: id should have is_final
  * batch update: input where there are list of kategoriIndikator_id and nilai, both should have same length.
- *
+ * Pages: \evaluasi\nilaiMitra\[query], \rekrutmen\nilai\[kegiatan]
+ * @returns {nilaikategoriindikator_id, nilai, is_final}[]
  */
 export const useUpdateNilaiKategoriIndikator = () => {
   return gql`
@@ -735,14 +850,16 @@ export const useUpdateNilaiKategoriIndikator = () => {
 };
 
 /**
- * @returns count: Int(How many data get updated)
+ * Mengubah status finalisasi sekelompok nilai pada kategori-indikator poskegsurvei tahun yang sama
+ * Finalisasi dilakukan operator admin
+ * Pages: \pages\rekrutmen\nilai\[kegiatan]
  * @param $survei_kd: String!,
  * @param $keg_kd: String!,
  * @param $branch_kd: String!,
  * @param $posisi_kd: String!,
  * @param $tahun: String!
  * @param $is_final: Boolean!
- *
+ * @returns count: Int(How many data get updated)
  */
 export const useFinalizeNilaiKategoriIndikator = () => {
   return gql`
@@ -755,9 +872,9 @@ export const useFinalizeNilaiKategoriIndikator = () => {
   `;
 };
 
-// RankMitraPosKeg
 /**
- * CreateRankMitraPosKegSurvei
+ * Membuat data peringkat petugas terkait poskegsurvei tertentu
+ * Pages: \rekrutmen\nilai\[kegiatan]
  * @param input {{
     "input": {
         "survei_kd": "Vivamus",
@@ -768,7 +885,7 @@ export const useFinalizeNilaiKategoriIndikator = () => {
         "nilai": 131.52
     }
 }}
- * @returns 
+ * @returns {RankMitraPosKegSurvei}[]
  */
 export const useCreateRankMitraPosKegSurvei = () => {
   return gql`
@@ -785,7 +902,12 @@ export const useCreateRankMitraPosKegSurvei = () => {
     }
   `;
 };
-// query
+
+/**
+ * Kueri peringkat petugas pada poskegsurvei tertentu
+ * Pages: \rekrutmen\nilai\laporan\[kegiatan]
+ * @returns {RankMitraPosKegSurvei}[]
+ */
 export const useGetRankMitraPosKegSurvei = () => {
   return gql`
     query ($id: Int, $survei_kd: String, $keg_kd: String, $branch_kd: String, $posisi_kd: String, $username: String) {
@@ -803,15 +925,15 @@ export const useGetRankMitraPosKegSurvei = () => {
   `;
 };
 
+// RankMitra
 /**
- * RankMitra
- */
-/**
- * Get
+ * Kueri peringkat mitra/petugas (kategori:umum) secara keseluruhan
+ * Pages: profile, rekrutmen\nilai\laporan\[kegiatan]
+ * Component (Table\Rank): All, Annual
  * @param branch_kd
  * @param username
  * @param kategori_id
- * @return
+ * @return {RankMitra}[]
  */
 export const useGetRankMitra = () => {
   return gql`
@@ -851,8 +973,10 @@ export const useGetRankMitra = () => {
 };
 
 /**
- * Create Rank Mitra
- * @param input {}
+ * Membuat peringkat petugas saat penilaian selesai, atau melihat daftar peringkat keseluruhan atau tahunan
+ * Pages: rekrutmen\nilai\laporan\[kegiatan]
+ * Component (Table\Rank): All, Annual
+ * @return {RankMitra}[]
  */
 
 export const useCreateRankMitra = () => {
@@ -871,12 +995,12 @@ export const useCreateRankMitra = () => {
 };
 
 /**
- * Update Rank Mitra
- * @param input{}
- * @param id:int!
- *
+ * Mengubah peringkat mitra (secara keseluruhan) ketika nilai dari kegiatan baru, maka peringkat perlu diupdate. OPerator harus mengklik "Buat Ulang Peringkat"
+ * Component (Table\Rank): All, Annual
+ * @param {RankMitraInputType} input
+ * @param {int} id
+ * @return {RankMitra}[]
  */
-
 export const useUpdateRankMitra = () => {
   return gql`
     mutation ($id: Int!, $input: RankMitraInputType!) {
@@ -895,12 +1019,9 @@ export const useUpdateRankMitra = () => {
 };
 
 /**
- * RankMitraTahunKerja
- */
-
-/**
- * get RankMitraTahunKerja
- * @returns {rankmitratahunkerja_id, branch_kd, username, tahun, nilai, kategori_id, created_at, updated_at}
+ * kueri peringkat tahunan mitra/petugas berdasarkan tahun
+ * Components (Table\Rank): Annual
+ * @returns {rankmitratahunkerja_id, branch_kd, username, tahun, nilai, kategori_id, created_at, updated_at} []
  */
 export const useGetRankMitraTahunKerja = () => {
   return gql`
@@ -920,8 +1041,9 @@ export const useGetRankMitraTahunKerja = () => {
 };
 
 /**
- * create RankMitraTahunKerja
- * @returns RankMitraTahunKerja
+ * Membuat peringkat tahunan petugas, digenerate operator dengan klik "Buat Peringkat"
+ * Components (Table\Rank): Annual
+ * @returns {RankMitraTahunKerja}[]
  * @input {branch_kd: String!,username: String!,tahun: String!,kategori_id: Int!,nilai: Float}
  */
 export const useCreateRankMitraTahunKerja = () => {
@@ -942,10 +1064,11 @@ export const useCreateRankMitraTahunKerja = () => {
 };
 
 /**
- * update RankMitraTahunKerja
- * @returns RankMitraTahunKerja
+ * Mengubah peringkat ketika operator mengklik "Buat Ulang Peringkat"
+ * Components (Table\Rank): Annual
  * @input input: {branch_kd: String!,username: String!,tahun: String!,kategori_id: Int!,nilai: Float}
  * @input id: Int!
+ * @returns {RankMitraTahunKerja}[]
  */
 export const useUpdateRankMitraTahunKerja = () => {
   return gql`

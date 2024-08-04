@@ -1,4 +1,9 @@
 <script setup lang="ts">
+/**
+ * Tabel daftar kategori, untuk mengupdate serta menghapus kategori
+ * ROle: admin
+ * Pages: kelolaIndikator
+ */
 import { useTableCategories, useDeleteKategori } from "~/composables/useQueries";
 import { logErrorMessages } from "@vue/apollo-util";
 interface Kategori {

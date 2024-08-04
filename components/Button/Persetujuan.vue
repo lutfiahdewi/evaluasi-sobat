@@ -1,5 +1,13 @@
+/**
+ * Komponen untuk menampilkan status persetujuan pada tabel daftar kegiatan yang dinilai untuk petugas (penilai)
+ * @param {boolean} konfirmasi: perlu tidaknya konfirmasi dari operator
+ * @param {number} kegiatan: status tahapan kegiatan
+ * @param {boolean} status: status persetujuan operator (jika punya hak)
+ * @param {string} query: parameter url untuk mengakses halaman daftar penilaian
+ * @param {boolean} notActive: jika petugas tidak memiliki petugas untuk dinilai (bukan pengawas) = TRUE. Tidak bisa akses halaman penilaian.
+ * 
+ */
 <script setup lang="ts">
-import { boolean } from 'mathjs';
 
 defineProps<{
   konfirmasi: boolean; // 0:tidak perlu konfirmasi, 1:perlu

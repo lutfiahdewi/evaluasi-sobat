@@ -226,10 +226,12 @@ const column = [
   {
     label: "Peringkat",
     field: "peringkat",
+    type: "number",
   },
   {
     label: "Nilai preferensi",
     field: "nilai_preferensi",
+    type: "number",
   },
 ];
 const columnUmum = [...column];
@@ -238,12 +240,14 @@ columnUmum.push(
   ...Indicators_umum.map((ind) => ({
     label: ind.nama,
     field: ind.nama,
+    type: "number",
   }))
 );
 columnPosisi.push(
   ...Indicators_posisi.map((ind) => ({
     label: ind.nama,
     field: ind.nama,
+    type: "number",
   }))
 );
 </script>

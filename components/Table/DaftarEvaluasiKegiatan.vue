@@ -32,6 +32,7 @@ const columns = [
   {
     label: "Tahun Survei",
     field: "tahunSurvei",
+    type: "number",
   },
   {
     label: "Kegiatan",

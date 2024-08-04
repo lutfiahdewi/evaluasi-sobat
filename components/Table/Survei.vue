@@ -1,4 +1,9 @@
 <script setup lang="ts">
+/**
+ * Tabel daftar survei
+ * ROle: admin
+ * Pages: kelolaSurvei
+ */
 import { useGetJumPosisiPetugasKegSurvei } from "~/composables/useQueries";
 import { logErrorMessages } from "@vue/apollo-util";
 type dataRow = {
@@ -37,6 +42,7 @@ const columns = [
   {
     label: "Jumlah petugas",
     field: "jumlahPetugasSurvei",
+    type: "number",
   },
   {
     label: "Penilaian",

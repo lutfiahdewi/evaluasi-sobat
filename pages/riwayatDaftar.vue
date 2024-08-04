@@ -31,6 +31,7 @@ const columns = [
   {
     label: "Nilai",
     field: "nilai",
+    type: "number",
   },
   {
     label: "Status Kegiatan",

@@ -28,10 +28,12 @@ const column = [
   {
     label: "Peringkat",
     field: "peringkat",
+    type: "number",
   },
   {
     label: "Nilai preferensi",
     field: "nilai",
+    type: "number",
   },
 ];
 
@@ -86,6 +88,7 @@ column.push(
   ...Indicators_umum.map((ind) => ({
     label: ind.nama,
     field: ind.nama,
+    type: "number",
   }))
 );
 // B. Query tabel rankMitra

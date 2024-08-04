@@ -1,3 +1,7 @@
+/**
+ * Tabel digunakan pada halaman /evaluasi/kegiatan
+ * Role : petugas
+ */
 <script setup lang="ts">
 import { useCountSearchPenugasanStruktur, useGetJumPosisiPetugasKegSurvei, useGetPetugasSurvei } from "~/composables/useQueries";
 import { logErrorMessages } from "@vue/apollo-util";

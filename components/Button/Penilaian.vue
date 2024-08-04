@@ -1,3 +1,10 @@
+/**
+ * Komponen untuk menampilkan status penilaian pada tabel daftar kegiatan yang dinilai untuk operator
+ * @param {boolean} konfirmasi: perlu tidaknya konfirmasi dari operator
+ * @param {number} kegiatan: status tahapan kegiatan
+ * @param {boolean} status: status persetujuan operator (jika punya hak)
+ * @param {string} query: parameter url untuk mengakses halaman daftar penilaian
+ */
 <script setup lang="ts">
 defineProps<{
   konfirmasi: boolean; // 0:tidak perlu konfirmasi, 1:perlu

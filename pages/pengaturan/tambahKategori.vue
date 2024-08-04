@@ -74,6 +74,7 @@ const columns = [
   {
     label: "No",
     field: "no_urut",
+    type: "number",
   },
   {
     label: "Nama Indikator",
@@ -342,7 +343,7 @@ async function sendData() {
   </section>
   <!-- Matriks Perbandingan-->
   <section>
-    <h5 class="mb-3">Matriks Perbandingan</h5>
+    <h5 class="mb-3 text-center">Matriks Perbandingan</h5>
     <!-- <div v-if="mat_weight.length > 0" v-for="(item, i) in mat_weight" :key="i">
       <div v-if="i == 0" class="grid grid-flow-col auto-cols-max gap-4 mb-4">
         <div class="w-24"></div>
@@ -361,26 +362,30 @@ async function sendData() {
         />
       </div>
     </div> -->
-    <table v-if="mat_weight.length > 0">
-      <tr >
-        <td></td>
-        <td v-for="(item, j) in chosenIndicator" :key="j" class="w-28 pb-3 align-bottom">{{ item.nama }}</td>
-      </tr>
-      <tr v-for="(item, i) in mat_weight" :key="i">
-        <td class="w-min-24 w-max-32 pb-3 pe-3">{{ i < chosenIndicator.length ? chosenIndicator[i].nama : "" }}</td>
-        <td v-for="(item, j) in mat_weight[i]" class="pb-3">
-          <input
-          v-model="mat_weight[i][j]"
-          :key="j"
-          :disabled="j <= i"
-          @keyup.enter="generate()"
-          type="text"
-          class="w-24 border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
-        />
-        </td>
-      </tr>
-    </table>
+    <div class="matrices-container flex justify-center">
+      <table v-if="mat_weight.length > 0">
+        <tr>
+          <td></td>
+          <td v-for="(item, j) in chosenIndicator" :key="j" class="w-min-28 pe-3 pb-3 align-bottom">{{ item.nama }}</td>
+        </tr>
+        <tr v-for="(item, i) in mat_weight" :key="i">
+          <td class="w-min-24 w-max-32 pb-3 pe-3">{{ i < chosenIndicator.length ? chosenIndicator[i].nama : "" }}</td>
+          <td v-for="(item, j) in mat_weight[i]" class="pb-3">
+            <input
+              v-model="mat_weight[i][j]"
+              :key="j"
+              :disabled="j <= i"
+              @keyup.enter="generate()"
+              type="text"
+              class="w-24 border-gray-200 rounded-lg text-right text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
+            />
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="matrices-container flex justify-center">
     <BaseButtonMode v-if="mat_weight.length > 0" shape="square" mode="outlined" class="me-3 font-semibold" @click.prevent="generate()">Cek Konsistensi</BaseButtonMode>
+    </div>
     <div class="my-3 p-3 flex item-center text-red-600 border rounded-lg" v-if="!isMatricesValid"><IconWarning class="w-6 h-6 me-2" />Pastikan skala yang dimasukkan antara 1-9 atau kebalikan dari 1-9</div>
     <div class="my-3 p-3 flex item-center text-red-600 border rounded-lg" v-if="!ahp.isConsistent && isMatricesValid">
       <IconWarning class="w-6 h-6 me-2" />Rasio konsistensi = {{ round(ahp.CR, 3) }}, pastikan perbandingan yang dimasukkan konsisten
@@ -414,7 +419,7 @@ async function sendData() {
     <NuxtLink to="/pengaturan/kelolaIndikator">
       <BaseButtonMode shape="square" mode="outlined" class="me-3 font-semibold" :data-valid="runChecking">Batal</BaseButtonMode>
     </NuxtLink>
-    <BaseButtonMode shape="square" mode="normal" @click.prevent="createCatModal?.open()" :not-active="!isValid || !isMatricesValid || !ahp.isConsistent || chosenIndicator.length < 1  || ahp.CR == -1">Buat Kategori</BaseButtonMode>
+    <BaseButtonMode shape="square" mode="normal" @click.prevent="createCatModal?.open()" :not-active="!isValid || !isMatricesValid || !ahp.isConsistent || chosenIndicator.length < 1 || ahp.CR == -1">Buat Kategori</BaseButtonMode>
   </div>
 
   <ModalSuccess v-if="isDataSent" @close="isDataSent = !isDataSent" />

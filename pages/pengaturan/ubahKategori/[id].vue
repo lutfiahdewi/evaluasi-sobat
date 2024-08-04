@@ -101,6 +101,7 @@ const columns = [
   {
     label: "No",
     field: "no_urut",
+    type: "number",
   },
   {
     label: "Nama Indikator",
@@ -469,7 +470,7 @@ makeMatrices();
           :disabled="j <= i"
           @keyup.enter="generate()"
           type="text"
-          class="w-24 border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
+          class="w-24 border-gray-200 rounded-lg text-right text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
         />
         </td>
       </tr>

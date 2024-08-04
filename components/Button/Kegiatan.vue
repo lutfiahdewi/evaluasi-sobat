@@ -1,6 +1,11 @@
+/**
+ * KOmponen terkait status kegiatan
+ * @param {number} status
+ * keterangan nomor= 0:blm jalan; 1: berjalan; 2: selesai =selesai
+ */
 <script setup lang="ts">
 defineProps<{
-  status: number; // 0:blm jalan; 1: berjalan; 2: selesai =selesai
+  status: number;
 }>();
 type Mode = "normal" | "outlined" | "gray";
 var mode: Mode = "outlined";

@@ -1,4 +1,9 @@
 <script setup lang="ts">
+/**
+ * Tabel daftar indikator, untuk mengupdate serta menghapus indikator
+ * ROle: admin
+ * Pages: kelolaIndikator
+ */
 import type { ModalBase } from "#build/components";
 import { logErrorMessages } from "@vue/apollo-util";
 type indicatorQuery = {

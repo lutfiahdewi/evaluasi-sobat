@@ -1,3 +1,6 @@
+/**
+ * Tabel tingkat kepentingan untuk membuat matriks perbandingan pada AHP
+ */
 <template>
   <table class="bg-slate-200 rounded shadow my-4 divide-y divide-slate-400">
     <thead>

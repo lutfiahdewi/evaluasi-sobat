@@ -33,6 +33,7 @@ const columns = [
   {
     label: "Nilai",
     field: "nilai",
+    type: "number",
   },
 ];
 const rows = [{ a: 1 }];
